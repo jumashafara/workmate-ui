@@ -54,7 +54,7 @@ const Dashboard: React.FC = () => {
             />
           </svg>
         </CardDataStats>
-        <CardDataStats title="Update Model" total="" rate="" levelUp>
+        {/* <CardDataStats title="Update Model" total="" rate="" levelUp>
           <svg
             className="fill-primary dark:fill-white"
             width="22"
@@ -72,7 +72,7 @@ const Dashboard: React.FC = () => {
               fill=""
             />
           </svg>
-        </CardDataStats>
+        </CardDataStats> */}
         <CardDataStats title="Total Users" total="3" rate="" levelDown>
           <svg
             className="fill-primary dark:fill-white"
