@@ -34,9 +34,14 @@ export type PredictedData = PredictedDataEntry[];
 
 // Function to fetch the predicted data
 export const fetchPredictedData = async (): Promise<PredictedData> => {
-  const response = await fetch(
-    'http://localhost:8000/predictor/submitted-data',
-  );
+  const token = localStorage.getItem('token');
+  const response = await fetch('api/predictor/submitted-data', {
+    method: 'GET',
+    headers: {
+      Authorization: `Token ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
 
   if (!response.ok) {
     throw new Error('Failed to fetch predictions');

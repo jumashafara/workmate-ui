@@ -40,7 +40,7 @@ function App() {
           index
           element={
             <>
-              <PageTitle title="RTV Dashboard | RTV WorkMa" />
+              <PageTitle title="RTV Dashboard | RTV WorkMate" />
               <Dashboard />
             </>
           }
@@ -49,7 +49,7 @@ function App() {
           path="/calendar"
           element={
             <>
-              <PageTitle title="Calendar | RTV WorkMa" />
+              <PageTitle title="Calendar | RTV WorkMate" />
               <Calendar />
             </>
           }
@@ -58,7 +58,7 @@ function App() {
           path="/chat"
           element={
             <>
-              <PageTitle title="Chat | RTV WorkMate" />
+              <PageTitle title="Chat | RTV WorkMatete" />
               <Chat />
             </>
           }
@@ -67,7 +67,7 @@ function App() {
           path="/profile"
           element={
             <>
-              <PageTitle title="Profile | RTV WorkMa" />
+              <PageTitle title="Profile | RTV WorkMate" />
               <Profile />
             </>
           }
@@ -76,7 +76,7 @@ function App() {
           path="/forms/form-elements"
           element={
             <>
-              <PageTitle title="Form Elements | RTV WorkMa" />
+              <PageTitle title="Form Elements | RTV WorkMate" />
               <FormElements />
             </>
           }
@@ -85,7 +85,7 @@ function App() {
           path="/forms/form-layout"
           element={
             <>
-              <PageTitle title="Form Layout | RTV WorkMa" />
+              <PageTitle title="Form Layout | RTV WorkMate" />
               <FormLayout />
             </>
           }
@@ -94,7 +94,7 @@ function App() {
           path="/tables"
           element={
             <>
-              <PageTitle title="Tables | RTV WorkMa" />
+              <PageTitle title="Tables | RTV WorkMate" />
               <Tables />
             </>
           }
@@ -103,7 +103,7 @@ function App() {
           path="/settings"
           element={
             <>
-              <PageTitle title="Settings | RTV WorkMa" />
+              <PageTitle title="Settings | RTV WorkMate" />
               <Settings />
             </>
           }
@@ -112,7 +112,7 @@ function App() {
           path="/chart"
           element={
             <>
-              <PageTitle title="Basic Chart | RTV WorkMa" />
+              <PageTitle title="Basic Chart | RTV WorkMate" />
               <Chart />
             </>
           }
@@ -121,7 +121,7 @@ function App() {
           path="/ui/alerts"
           element={
             <>
-              <PageTitle title="Alerts | RTV WorkMa" />
+              <PageTitle title="Alerts | RTV WorkMate" />
               <Alerts />
             </>
           }
@@ -130,7 +130,7 @@ function App() {
           path="/ui/buttons"
           element={
             <>
-              <PageTitle title="Buttons | RTV WorkMa" />
+              <PageTitle title="Buttons | RTV WorkMate" />
               <Buttons />
             </>
           }
@@ -139,7 +139,7 @@ function App() {
           path="/auth/signin"
           element={
             <>
-              <PageTitle title="Signin | RTV WorkMa" />
+              <PageTitle title="Signin | RTV WorkMate" />
               <SignIn />
             </>
           }
@@ -148,7 +148,7 @@ function App() {
           path="/auth/signup"
           element={
             <>
-              <PageTitle title="Signup | RTV WorkMa" />
+              <PageTitle title="Signup | RTV WorkMate" />
               <SignUp />
             </>
           }

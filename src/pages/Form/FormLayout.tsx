@@ -56,7 +56,7 @@ const FormLayout = () => {
         const formDataToSend = new FormData();
         formDataToSend.append('file', selectedFile);
 
-        response = await fetch('http://localhost:8000/predictor/predict', {
+        response = await fetch('api/predictor/predict', {
           method: 'POST',
           body: formDataToSend,
         });
@@ -94,7 +94,7 @@ const FormLayout = () => {
           ],
         };
 
-        response = await fetch('http://localhost:8000/predictor/predict', {
+        response = await fetch('api/predictor/predict', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

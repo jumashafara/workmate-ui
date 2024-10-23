@@ -26,9 +26,14 @@ export interface SummaryStatistics {
 }
 
 export const fetchSummaryStatistics = async (): Promise<SummaryStatistics> => {
-  const response = await fetch(
-    'http://localhost:8000/predictor/summary-statistics',
-  );
+  const token = localStorage.getItem('token');
+  const response = await fetch('api/predictor/summary-statistics', {
+    method: 'GET',
+    headers: {
+      Authorization: `Token ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
   if (!response.ok) {
     throw new Error('Failed to fetch predictions');
   }
