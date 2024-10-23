@@ -1,5 +1,5 @@
 {
-  "name": "WorkMate-react-free",
+  "name": "WorkMate",
   "private": true,
   "version": "1.3.8",
   "type": "module",
@@ -42,5 +42,8 @@
     "tailwindcss": "^3.4.1",
     "vite": "^4.4.7",
     "webpack": "^5.88.2"
-  }
+  },
+  "homepage": "https://jumashafara.github.io/workmate-ui/",
+  "predeploy": "npm run build",
+  "deploy": "gh-pages -d build"
 }
