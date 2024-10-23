@@ -44,7 +44,7 @@
     "vite": "^4.4.7",
     "webpack": "^5.88.2"
   },
-  "homepage": "https://jumashafara.github.io/workmate-ui/",
+  "homepage": "https://main.d3lh0sa85o9n0g.amplifyapp.com/",
   "predeploy": "npm run build",
   "deploy": "gh-pages -d build"
 }
