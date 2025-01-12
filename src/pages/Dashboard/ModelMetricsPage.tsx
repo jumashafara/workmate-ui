@@ -1,16 +1,30 @@
-import React from 'react';
-import CardDataStats from '../../components/CardDataStats';
-import ChartOne from '../../components/Charts/ChartOne';
-import ChartThree from '../../components/Charts/ChartThree';
-import ChartTwo from '../../components/Charts/ChartTwo';
-import ChatCard from '../../components/Chat/ChatCard';
-import MapOne from '../../components/Maps/MapOne';
-import TableOne from '../../components/Tables/TableOne';
+import React from "react";
+// import CardDataStats from "../../components/CardDataStats";
+// import ChartOne from "../../components/Charts/ChartOne";
+// import ChartThree from "../../components/Charts/ChartThree";
+// import ChartTwo from "../../components/Charts/ChartTwo";
+// import ChatCard from "../../components/Chat/ChatCard";
+// import MapOne from "../../components/Maps/MapOne";
+// import TableOne from "../../components/Tables/TableOne";
+import ModelStatsChart from "../../components/Charts/ModelMetrics";
+import ConfusionMatrix from "../../components/Charts/ConfusionMatrix";
+import ROCCurve from "../../components/Charts/ROCAUC";
 
-const ECommerce: React.FC = () => {
+const ModelMetrics: React.FC = () => {
   return (
     <>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
+      <div>
+        <ModelStatsChart />
+      </div>
+      <div className="flex flex-col md:flex-row md:space-x-3 mt-6">
+        <div className="md:w-1/2">
+          <ConfusionMatrix />
+        </div>
+        <div className="md:w-1/2">
+          <ROCCurve />
+        </div>
+      </div>
+      {/* <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
         <CardDataStats title="Total views" total="$3.456K" rate="0.43%" levelUp>
           <svg
             className="fill-primary dark:fill-white"
@@ -95,9 +109,9 @@ const ECommerce: React.FC = () => {
             />
           </svg>
         </CardDataStats>
-      </div>
+      </div> */}
 
-      <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
+      {/* <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
         <ChartOne />
         <ChartTwo />
         <ChartThree />
@@ -106,9 +120,9 @@ const ECommerce: React.FC = () => {
           <TableOne />
         </div>
         <ChatCard />
-      </div>
+      </div> */}
     </>
   );
 };
 
-export default ECommerce;
+export default ModelMetrics;
