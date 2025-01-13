@@ -17,6 +17,7 @@ import Tables from "./pages/Tables";
 import Alerts from "./pages/UiElements/Alerts";
 import Buttons from "./pages/UiElements/Buttons";
 import DefaultLayout from "./layout/DefaultLayout";
+import IndividualPredictionPage from "./pages/Dashboard/IndividualPredictionPage";
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -50,6 +51,15 @@ function App() {
             <>
               <PageTitle title="Feature Importance | RTV" />
               <FeatureImportance />
+            </>
+          }
+        />
+        <Route
+          path="/individual-predictions"
+          element={
+            <>
+              <PageTitle title="Individual Predictions | RTV" />
+              <IndividualPredictionPage />
             </>
           }
         />

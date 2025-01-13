@@ -213,3 +213,31 @@ span.flatpickr-weekday,
 [x-cloak] {
   display: none !important;
 }
+
+/* Slider style */
+/* Slider track */
+.slider {
+  width: 80%;
+  height: 8px;
+  background-color: #ddd;
+  border-radius: 4px;
+  margin-top: 20px;
+}
+
+/* Slider thumb */
+.thumb {
+  height: 20px;
+  width: 20px;
+  background-color: #EA580C;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: -6px;
+}
+
+/* Active track */
+.track {
+  background-color: #CCC;
+  height: 100%;
+}
+
+
