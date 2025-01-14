@@ -3,6 +3,7 @@ import ReactSlider from "react-slider";
 import PieChart from "../../components/Charts/PieChart";
 import SelectGroupOne from "../../components/Forms/SelectGroup/SelectGroupOne";
 import CheckboxTwo from "../../components/Checkboxes/CheckboxTwo";
+import { BounceLoader, PuffLoader } from "react-spinners";
 
 const IndividualPredictionPage: React.FC = () => {
   const [selectedHousehold, setSelectedHousehold] = useState<string>("");
@@ -14,10 +15,22 @@ const IndividualPredictionPage: React.FC = () => {
     console.log("passenger selected");
   };
 
-  const [sliderValue, setSliderValue] = useState<number>(0.5);
+  const [cutoffSliderValue, setCutoffSliderValue] = useState<number>(0.5);
+  const [landSliderValue, setLandSliderValue] = useState<number>(1);
+  const [memberSliderValue, setMemberSliderValue] = useState<number>(5);
 
-  const handleSliderChange = async (new_value: number) => {
-    setSliderValue(new_value);
+  const handleCutoffSliderChange = async (new_value: number) => {
+    setCutoffSliderValue(new_value);
+    console.log(new_value);
+  };
+
+  const handleLandSliderChange = async (new_value: number) => {
+    setLandSliderValue(new_value);
+    console.log(new_value);
+  };
+
+  const handleMemberSliderChange = async (new_value: number) => {
+    setMemberSliderValue(new_value);
     console.log(new_value);
   };
 
@@ -70,13 +83,13 @@ const IndividualPredictionPage: React.FC = () => {
                 min={0.1}
                 max={0.9}
                 step={0.1}
-                value={sliderValue}
-                onChange={handleSliderChange}
+                value={cutoffSliderValue}
+                onChange={handleCutoffSliderChange}
                 className="slider m-auto"
                 thumbClassName="thumb"
                 trackClassName="track"
               />
-              <div className="slider-value">{sliderValue}</div>
+              <div className="slider-value">{cutoffSliderValue}</div>
             </div>
           </div>
         </div>
@@ -188,32 +201,32 @@ const IndividualPredictionPage: React.FC = () => {
                 Numerical
               </h2> */}
                 <div className="slider-container flex flex-col md:flex-row md:space-x-6 px-6 pb-6">
-                  <p className="min-w-fit">Agriculture Land: </p>
+                  <p className="min-w-fit">Agriculture Land </p>
                   <ReactSlider
                     min={0}
                     max={10}
                     step={0.1}
-                    value={sliderValue}
-                    onChange={handleSliderChange}
+                    value={landSliderValue}
+                    onChange={handleLandSliderChange}
                     className="slider m-auto"
                     thumbClassName="thumb"
                     trackClassName="track"
                   />
-                  <div className="slider-value">{sliderValue}</div>
+                  <div className="slider-value">{landSliderValue}</div>
                 </div>
                 <div className="slider-container flex flex-col md:flex-row md:space-x-6 px-6 pb-6">
-                  <p className="min-w-fit">Household Members: </p>
+                  <p className="min-w-fit">Household Members </p>
                   <ReactSlider
                     min={0}
-                    max={10}
-                    step={0.1}
-                    value={sliderValue}
-                    onChange={handleSliderChange}
+                    max={30}
+                    step={1}
+                    value={memberSliderValue}
+                    onChange={handleMemberSliderChange}
                     className="slider m-auto"
                     thumbClassName="thumb"
                     trackClassName="track"
                   />
-                  <div className="slider-value">{sliderValue}</div>
+                  <div className="slider-value">{memberSliderValue}</div>
                 </div>
               </div>
             </div>
@@ -226,8 +239,12 @@ const IndividualPredictionPage: React.FC = () => {
             </h2>
             <p>All set? Get prediction</p>
           </div>
-          <div className="p-6">
-            <button className="inline-flex items-center justify-center bg-primary py-3 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10">
+          <div className="p-6 flex flex-col m-auto space-y-3">
+            <div className="m-auto p-3">
+                <PuffLoader loading={true}/>
+                <BounceLoader loading={false}/>
+            </div>
+            <button className=" inline-flex items-center justify-center bg-primary py-3 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10">
               Get prediction
             </button>
           </div>

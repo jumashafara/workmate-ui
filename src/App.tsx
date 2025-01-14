@@ -18,6 +18,7 @@ import Alerts from "./pages/UiElements/Alerts";
 import Buttons from "./pages/UiElements/Buttons";
 import DefaultLayout from "./layout/DefaultLayout";
 import IndividualPredictionPage from "./pages/Dashboard/IndividualPredictionPage";
+import ChatPage from "./pages/ChatPage";
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -60,6 +61,15 @@ function App() {
             <>
               <PageTitle title="Individual Predictions | RTV" />
               <IndividualPredictionPage />
+            </>
+          }
+        />
+        <Route
+          path="/chat-bot"
+          element={
+            <>
+              <PageTitle title="Chatbot | RTV" />
+              <ChatPage />
             </>
           }
         />
