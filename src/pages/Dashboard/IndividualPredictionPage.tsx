@@ -123,8 +123,8 @@ const IndividualPredictionPage: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col md:flex-row">
-        <div className="border border-gray-300 mt-6 md:w-3/4 bg-white">
+      <div className="flex flex-col md:flex-row mt-6 md:space-x-6">
+        <div className="border border-gray-300 md:w-3/4 bg-white">
           <div className="bg-gray-200 dark:bg-gray-700 p-3 text-center">
             <h2 className="text-lg font-semibold mb-4 w-full text-gray-900 dark:text-white">
               Feature Input
@@ -173,6 +173,15 @@ const IndividualPredictionPage: React.FC = () => {
                     }
                   />
                 </div>
+                <div>
+                  <CheckboxTwo
+                    label="Business Participation"
+                    initialChecked={formData.coffee}
+                    onChange={(checked) =>
+                      setFormData({ ...formData, coffee: checked })
+                    }
+                  />
+                </div>
               </div>
               <div className="">
                 {/* <h2 className="text-lg mb-4 w-full text-gray-900 dark:text-white">
@@ -210,8 +219,18 @@ const IndividualPredictionPage: React.FC = () => {
             </div>
           </form>
         </div>
-        <div>
-            
+        <div className="border border-gray-300 md:w-1/4 bg-white">
+          <div className="bg-gray-200 dark:bg-gray-700 p-3 text-center">
+            <h2 className="text-lg font-semibold mb-4 w-full text-gray-900 dark:text-white">
+              Run prediction
+            </h2>
+            <p>All set? Get prediction</p>
+          </div>
+          <div className="p-6">
+            <button className="inline-flex items-center justify-center bg-primary py-3 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10">
+              Get prediction
+            </button>
+          </div>
         </div>
       </div>
     </div>
