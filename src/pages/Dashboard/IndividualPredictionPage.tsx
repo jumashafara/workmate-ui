@@ -4,6 +4,8 @@ import PieChart from "../../components/Charts/PieChart";
 import SelectGroupOne from "../../components/Forms/SelectGroup/SelectGroupOne";
 import CheckboxTwo from "../../components/Checkboxes/CheckboxTwo";
 import { BounceLoader, PuffLoader } from "react-spinners";
+import getPrediction from "../../api/Predictions";
+import { Features } from "../../types/features";
 
 const IndividualPredictionPage: React.FC = () => {
   const [selectedHousehold, setSelectedHousehold] = useState<string>("");
@@ -18,6 +20,24 @@ const IndividualPredictionPage: React.FC = () => {
   const [cutoffSliderValue, setCutoffSliderValue] = useState<number>(0.5);
   const [landSliderValue, setLandSliderValue] = useState<number>(1);
   const [memberSliderValue, setMemberSliderValue] = useState<number>(5);
+  const [waterSliderValue, setWaterSliderValue] = useState<number>(1);
+  const [farmImplementsValue, setFarmImplementsValue] = useState<number>(1);
+
+  const handleWaterSliderChange = async (new_value: number) => {
+    setWaterSliderValue(new_value);
+    setFormData({
+      ...formData,
+      Average_Water_Consumed_Per_Day: [waterSliderValue],
+    });
+  };
+
+  const handleFarmImplementsChange = async (new_value: number) => {
+    setFarmImplementsValue(new_value);
+    setFormData({
+      ...formData,
+      farm_implements_owned: [farmImplementsValue],
+    });
+  };
 
   const handleCutoffSliderChange = async (new_value: number) => {
     setCutoffSliderValue(new_value);
@@ -26,37 +46,46 @@ const IndividualPredictionPage: React.FC = () => {
 
   const handleLandSliderChange = async (new_value: number) => {
     setLandSliderValue(new_value);
-    console.log(new_value);
+    setFormData({
+      ...formData,
+      Land_size_for_Crop_Agriculture_Acres: [landSliderValue],
+    });
   };
 
   const handleMemberSliderChange = async (new_value: number) => {
     setMemberSliderValue(new_value);
-    console.log(new_value);
+    setFormData({
+      ...formData,
+      tot_hhmembers: [memberSliderValue],
+    });
   };
 
   const [prediction, setPrediction] = useState<number>(0.5);
+  const [probabilities, setProbabilities] = useState<Array<number>>([0.5, 0.5]);
 
-  type FormDataType = {
-    agricultureLand: number;
-    foodBanana: boolean;
-    farmImplements: number;
-    householdMembers: number;
-    sweetPotatoes: boolean;
-    groundNuts: boolean;
-    coffee: boolean;
-    businessParticipation: string;
-  };
-
-  const [formData, setFormData] = useState<FormDataType>({
-    agricultureLand: 0,
-    foodBanana: false,
-    farmImplements: 0,
-    householdMembers: 0,
-    sweetPotatoes: false,
-    groundNuts: false,
-    coffee: false,
-    businessParticipation: "",
+  const [formData, setFormData] = useState<Features>({
+    household_id: "",
+    cassava: [true], //done
+    maize: [true], //
+    ground_nuts: [true], //done
+    irish_potatoes: [true], //
+    sweet_potatoes: [true], //done
+    perennial_crops_grown_food_banana: [true], //done
+    tot_hhmembers: [0], // done
+    business_participation: [true],
+    Land_size_for_Crop_Agriculture_Acres: [0], //done
+    farm_implements_owned: [0],
+    vsla_participation: [true],
+    Average_Water_Consumed_Per_Day: [0],
   });
+
+  const handleGetPrediction = async (data: Features) => {
+    const response = await getPrediction(data);
+    const prediction = response.prediction
+    const probabiliy = response.probability
+    setPrediction(prediction);
+    setProbabilities([probabiliy, (1 - probabiliy)]);
+  };
 
   return (
     <div className="">
@@ -115,23 +144,29 @@ const IndividualPredictionPage: React.FC = () => {
                 <tbody>
                   <tr className="">
                     <td className="px-4 py-2 border-b text-left">Achieving</td>
-                    <td className="px-4 py-2 border-b text-left">{0.5}</td>
+                    <td className="px-4 py-2 border-b text-left">
+                      {probabilities[0].toFixed(2)}
+                    </td>
                   </tr>
                   <tr>
                     <td className="px-4 py-2 border-b text-left">
                       Not Achieving
                     </td>
-                    <td className="px-4 py-2 border-b text-left">{0.5}</td>
+                    <td className="px-4 py-2 border-b text-left">
+                      {probabilities[1].toFixed(2)}
+                    </td>
                   </tr>
                   <tr>
                     <td className="px-4 py-2 border-b text-left">Predicted</td>
-                    <td className="px-4 py-2 border-b text-left">Achieved</td>
+                    <td className="px-4 py-2 border-b text-left">
+                      {prediction == 1 ? "Achieved" : "Not Achieved"}
+                    </td>
                   </tr>
                 </tbody>
               </table>
             </div>
             <div className="md:w-1/2 p-6">
-              <PieChart />
+              <PieChart data={probabilities} />
             </div>
           </div>
         </div>
@@ -153,45 +188,53 @@ const IndividualPredictionPage: React.FC = () => {
                 <div>
                   <CheckboxTwo
                     label="Food Banana"
-                    initialChecked={formData.foodBanana}
+                    initialChecked={
+                      formData.perennial_crops_grown_food_banana[0]
+                    }
                     onChange={(checked) =>
-                      setFormData({ ...formData, foodBanana: checked })
+                      setFormData({
+                        ...formData,
+                        perennial_crops_grown_food_banana: [checked],
+                      })
                     }
                   />
                 </div>
                 <div>
                   <CheckboxTwo
                     label="Ground Nuts"
-                    initialChecked={formData.groundNuts}
+                    initialChecked={formData.ground_nuts[0]}
                     onChange={(checked) =>
-                      setFormData({ ...formData, groundNuts: checked })
+                      setFormData({ ...formData, ground_nuts: [checked] })
                     }
                   />
                 </div>
                 <div>
                   <CheckboxTwo
                     label="Sweet Potatoes"
-                    initialChecked={formData.sweetPotatoes}
+                    initialChecked={formData.sweet_potatoes[0]}
                     onChange={(checked) =>
-                      setFormData({ ...formData, sweetPotatoes: checked })
+                      setFormData({ ...formData, sweet_potatoes: [checked] })
                     }
                   />
                 </div>
                 <div>
                   <CheckboxTwo
-                    label="Coffee"
-                    initialChecked={formData.coffee}
+                    label="Cassava"
+                    initialChecked={formData.cassava[0]}
                     onChange={(checked) =>
-                      setFormData({ ...formData, coffee: checked })
+                      setFormData({ ...formData, cassava: [checked] })
                     }
                   />
                 </div>
                 <div>
                   <CheckboxTwo
                     label="Business Participation"
-                    initialChecked={formData.coffee}
+                    initialChecked={formData.business_participation[0]}
                     onChange={(checked) =>
-                      setFormData({ ...formData, coffee: checked })
+                      setFormData({
+                        ...formData,
+                        business_participation: [checked],
+                      })
                     }
                   />
                 </div>
@@ -228,6 +271,38 @@ const IndividualPredictionPage: React.FC = () => {
                   />
                   <div className="slider-value">{memberSliderValue}</div>
                 </div>
+                <div className="slider-container flex flex-col md:flex-row md:space-x-6 px-6 pb-6">
+                  <p className="min-w-fit">Farm Implements </p>
+                  <ReactSlider
+                    min={0}
+                    max={20}
+                    step={1}
+                    value={farmImplementsValue}
+                    onChange={handleFarmImplementsChange}
+                    className="slider m-auto"
+                    thumbClassName="thumb"
+                    trackClassName="track"
+                  />
+                  <div className="slider-value">
+                    {formData.farm_implements_owned}
+                  </div>
+                </div>
+                <div className="slider-container flex flex-col md:flex-row md:space-x-6 px-6 pb-6">
+                  <p className="min-w-fit">Daily Consumed Water</p>
+                  <ReactSlider
+                    min={0}
+                    max={20}
+                    step={0.1}
+                    value={waterSliderValue}
+                    onChange={handleWaterSliderChange}
+                    className="slider m-auto"
+                    thumbClassName="thumb"
+                    trackClassName="track"
+                  />
+                  <div className="slider-value">
+                    {formData.Average_Water_Consumed_Per_Day}
+                  </div>
+                </div>
               </div>
             </div>
           </form>
@@ -241,10 +316,15 @@ const IndividualPredictionPage: React.FC = () => {
           </div>
           <div className="p-6 flex flex-col m-auto space-y-3">
             <div className="m-auto p-3">
-                <PuffLoader loading={true}/>
-                <BounceLoader loading={false}/>
+              <PuffLoader loading={true} />
+              <BounceLoader loading={false} />
             </div>
-            <button className=" inline-flex items-center justify-center bg-primary py-3 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10">
+            <button
+              onClick={() => {
+                handleGetPrediction(formData);
+              }}
+              className="inline-flex items-center justify-center bg-primary py-3 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
+            >
               Get prediction
             </button>
           </div>

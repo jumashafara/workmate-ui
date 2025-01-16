@@ -2,7 +2,11 @@
 import React from "react";
 import ReactApexChart from "react-apexcharts";
 
-const PieChart: React.FC = () => {
+interface PieChartProps {
+  data: number[];
+}
+
+const PieChart: React.FC<PieChartProps> = ({ data }) => {
   const chartOptions = {
     chart: {
       type: "pie",
@@ -24,7 +28,7 @@ const PieChart: React.FC = () => {
     ],
   };
 
-  const chartSeries = [38, 62]; // Example data: 38% survived, 62% did not
+  const chartSeries = data; // Example data: 38% survived, 62% did not
 
   return (
     <div>
