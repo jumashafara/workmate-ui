@@ -5,6 +5,7 @@ import UserOne from "../../images/user/user-01.png";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [userInfo, setUserInfo] = useState({});
 
   const handleLogout = () => {
     localStorage.removeItem("access_token");
@@ -15,6 +16,17 @@ const DropdownUser = () => {
     return localStorage.getItem("access_token");
   };
 
+  const getUserInfo = () => {
+    return {
+      username: localStorage.getItem("username"),
+      email: localStorage.getItem("email"),
+      role: localStorage.getItem("role"),
+      id: localStorage.getItem("id"),
+    };
+  };
+
+  getUserInfo();
+
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
       <Link
@@ -24,12 +36,15 @@ const DropdownUser = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            Juma Shafara
+            {getUserInfo().username ? getUserInfo().username : "Unknown User"}
           </span>
-          <span className="block text-xs">Data Scientist</span>
+          <span className="block text-xs">
+            {getUserInfo().role ? getUserInfo().role : "Unknown Role"}
+          </span>
         </span>
 
         <span className="h-12 w-12 rounded-full">
+          {/* user image */}
           <img src={UserOne} alt="User" />
         </span>
 

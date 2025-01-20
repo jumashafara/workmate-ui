@@ -4,7 +4,7 @@ import Breadcrumb from "../../components/Breadcrumbs/Breadcrumb";
 import LogoDark from "../../images/logo/RTV_Logo.png";
 import Logo from "../../images/logo/RTV_Logo.png";
 import { login } from "../../api/Auth";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 
 const SignIn: React.FC = () => {
   const [username, setUsername] = useState<string>("");
@@ -19,14 +19,14 @@ const SignIn: React.FC = () => {
       // Save the tokens (you can use localStorage, cookies, or Context API)
       localStorage.setItem("access_token", data.access_token);
       localStorage.setItem("refresh_token", data.refresh_token);
-      localStorage.setItem("username", data.user.username);
+      localStorage.setItem("user", data.user.username);
       // setLoading(false)
       //   redirect home
       toast.success("Login successful");
       // Move the redirect after a short delay
       setTimeout(() => {
         window.location.href = "/";
-      }, 1000); // Wait 1 second for the toast to show
+      }, 5000); // Wait 1 second for the toast to show
     } catch (err: any) {
       setLoading(false);
       toast.error(err.message);
