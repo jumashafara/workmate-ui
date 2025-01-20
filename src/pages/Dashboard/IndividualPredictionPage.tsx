@@ -9,6 +9,7 @@ import { Features } from "../../types/features";
 
 const IndividualPredictionPage: React.FC = () => {
   const [selectedHousehold, setSelectedHousehold] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleHouseholdChange = async (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -80,11 +81,13 @@ const IndividualPredictionPage: React.FC = () => {
   });
 
   const handleGetPrediction = async (data: Features) => {
+    setLoading(true);
     const response = await getPrediction(data);
-    const prediction = response.prediction
-    const probabiliy = response.probability
+    const prediction = response.prediction;
+    const probabiliy = response.probability;
     setPrediction(prediction);
-    setProbabilities([probabiliy, (1 - probabiliy)]);
+    setProbabilities([probabiliy, 1 - probabiliy]);
+    setLoading(false);
   };
 
   return (
@@ -260,7 +263,7 @@ const IndividualPredictionPage: React.FC = () => {
                 <div className="slider-container flex flex-col md:flex-row md:space-x-6 px-6 pb-6">
                   <p className="min-w-fit">Household Members </p>
                   <ReactSlider
-                    min={0}
+                    min={1}
                     max={30}
                     step={1}
                     value={memberSliderValue}
@@ -290,7 +293,7 @@ const IndividualPredictionPage: React.FC = () => {
                 <div className="slider-container flex flex-col md:flex-row md:space-x-6 px-6 pb-6">
                   <p className="min-w-fit">Daily Consumed Water</p>
                   <ReactSlider
-                    min={0}
+                    min={0.1}
                     max={20}
                     step={0.1}
                     value={waterSliderValue}
@@ -314,16 +317,19 @@ const IndividualPredictionPage: React.FC = () => {
             </h2>
             <p>All set? Get prediction</p>
           </div>
-          <div className="p-6 flex flex-col m-auto space-y-3">
-            <div className="m-auto p-3">
-              <PuffLoader loading={true} />
-              <BounceLoader loading={false} />
+          <div className="p-6 flex flex-col m-auto space-y-3 h-3/4">
+            <div className="m-auto p-3 flex flex-col">
+              <div className="">
+                <PuffLoader loading={loading} color="#EA580C" />
+              </div>
+              <div>
+                <BounceLoader loading={!loading} color="#EA580C" />
+              </div>
             </div>
+
             <button
-              onClick={() => {
-                handleGetPrediction(formData);
-              }}
-              className="inline-flex items-center justify-center bg-primary py-3 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
+              onClick={() => handleGetPrediction(formData)}
+              className="mt-auto inline-flex items-center justify-center bg-primary py-3 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               Get prediction
             </button>

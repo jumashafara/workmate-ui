@@ -1,10 +1,38 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Breadcrumb from "../../components/Breadcrumbs/Breadcrumb";
 import LogoDark from "../../images/logo/RTV_Logo.png";
 import Logo from "../../images/logo/RTV_Logo.png";
+import { login } from "../../api/Auth";
+import {toast} from "react-toastify";
 
 const SignIn: React.FC = () => {
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleSignIn = async (e: any) => {
+    e.preventDefault();
+    try {
+      const data = await login({ username, password });
+      // Save the tokens (you can use localStorage, cookies, or Context API)
+      localStorage.setItem("access_token", data.access_token);
+      localStorage.setItem("refresh_token", data.refresh_token);
+      localStorage.setItem("username", data.user.username);
+      // setLoading(false)
+      //   redirect home
+      toast.success("Login successful");
+      // Move the redirect after a short delay
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1000); // Wait 1 second for the toast to show
+    } catch (err: any) {
+      setLoading(false);
+      toast.error(err.message);
+      setErrorMessage(err.message);
+    }
+  };
   return (
     <>
       <Breadcrumb pageName="Sign In" />
@@ -28,10 +56,7 @@ const SignIn: React.FC = () => {
                 />
               </Link>
 
-              <p className="2xl:px-20">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit
-                suspendisse.
-              </p>
+              <p className="2xl:px-20">Welcome back, Login</p>
 
               <span className="mt-15 inline-block">
                 <svg
@@ -165,7 +190,7 @@ const SignIn: React.FC = () => {
               <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
                 Sign In to RTV Workmate
               </h2>
-
+              <div>{errorMessage}</div>
               <form>
                 <div className="mb-4">
                   <label className="mb-2.5 block font-medium text-black dark:text-white">
@@ -175,6 +200,9 @@ const SignIn: React.FC = () => {
                     <input
                       type="email"
                       placeholder="Enter your email"
+                      onChange={(e) => {
+                        setUsername(e.target.value);
+                      }}
                       className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                     />
 
@@ -200,11 +228,14 @@ const SignIn: React.FC = () => {
 
                 <div className="mb-6">
                   <label className="mb-2.5 block font-medium text-black dark:text-white">
-                    Re-type Password
+                    Password
                   </label>
                   <div className="relative">
                     <input
                       type="password"
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                      }}
                       placeholder="6+ Characters, 1 Capital letter"
                       className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                     />
@@ -237,11 +268,15 @@ const SignIn: React.FC = () => {
                   <input
                     type="submit"
                     value="Sign In"
+                    onClick={handleSignIn}
                     className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
                   />
                 </div>
 
-                <button className="flex w-full items-center justify-center gap-3.5 rounded-lg border border-stroke bg-gray p-4 hover:bg-opacity-50 dark:border-strokedark dark:bg-meta-4 dark:hover:bg-opacity-50">
+                <button
+                  onClick={() => alert("This feature is under construction!")}
+                  className="flex w-full items-center justify-center gap-3.5 rounded-lg border border-stroke bg-gray p-4 hover:bg-opacity-50 dark:border-strokedark dark:bg-meta-4 dark:hover:bg-opacity-50"
+                >
                   <span>
                     <svg
                       width="20"

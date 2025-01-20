@@ -33,25 +33,47 @@ const ChatPage: React.FC = () => {
     setInput("");
     setLoading(true);
 
+    // Initialize an empty bot message
+    const botMessage: Message = {
+      id: messages.length + 2,
+      text: "",
+      sender: "bot",
+      timestamp: new Date().toLocaleTimeString(),
+    };
+    setMessages((prevMessages) => [...prevMessages, botMessage]);
+
     try {
-      const url = `https://iankagera--askfsdl-backend-web.modal.run/?query=${encodeURIComponent(
+      const url = `https://iankagera-prod--askfsdl-backend-stream-qa.modal.run/?query=${encodeURIComponent(
         newMessage.text
       )}&request_id=${encodeURIComponent("test@raisingthevillage.org")}`;
 
       const response = await fetch(url);
-      const data = await response.json();
 
-      const botMessage: Message = {
-        id: messages.length + 2,
-        text: data.answer,
-        sender: "bot",
-        timestamp: new Date().toLocaleTimeString(),
-      };
-      setMessages((prevMessages) => [...prevMessages, botMessage]);
+      if (!response.body) {
+        throw new Error("ReadableStream not supported in this browser.");
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let receivedText = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        receivedText += decoder.decode(value, { stream: true });
+
+        // Update the bot's message in real-time
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.id === botMessage.id ? { ...msg, text: receivedText } : msg
+          )
+        );
+      }
 
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching the response:", error);
+      console.error("Error fetching the streamed response:", error);
     }
   };
 
@@ -81,8 +103,6 @@ const ChatPage: React.FC = () => {
     }
   };
 
- 
-
   return (
     <div className="flex flex-col h-5/6 bg-gray-100 dark:bg-gray-900 md:w-3/4 m-auto ">
       {/* Header */}
@@ -90,9 +110,11 @@ const ChatPage: React.FC = () => {
         Chat with Workmate
       </div>
 
-      <div className="mt-6 border border-gray-300 rounded-sm">
-        <h2 className="text-lg font-semibold p-6 bg-gray-200">Try asking</h2>
-        <ul className="bg-white p-6">
+      <div className="mt-6 border border-gray-300 rounded-sm dark:border-gray-600">
+        <h2 className="text-lg font-semibold p-6 bg-gray-200 dark:bg-gray-600">
+          Try asking
+        </h2>
+        <ul className="bg-white p-6 dark:bg-gray-900">
           <li
             className="text-primary cursor-pointer"
             onClick={() => {
@@ -131,10 +153,10 @@ const ChatPage: React.FC = () => {
               msg.sender === "user" ? "justify-end" : "justify-start"
             }`}
           >
-            <div className="max-w-xs rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+            <div className="max-w-xs md:max-w-2xl rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
               <div
                 className={`border-b py-4 px-6.5 dark:border-strokedark ${
-                  msg.sender == "user" ? "border-primary" : "border-y-gray-3"
+                  msg.sender == "user" ? "border-primary" : "border-y-gray-300"
                 }`}
               >
                 <h3 className="font-medium text-black dark:text-white">
@@ -149,7 +171,7 @@ const ChatPage: React.FC = () => {
                       >
                         <path d="M160-360q-50 0-85-35t-35-85q0-50 35-85t85-35v-80q0-33 23.5-56.5T240-760h120q0-50 35-85t85-35q50 0 85 35t35 85h120q33 0 56.5 23.5T800-680v80q50 0 85 35t35 85q0 50-35 85t-85 35v160q0 33-23.5 56.5T720-120H240q-33 0-56.5-23.5T160-200v-160Zm200-80q25 0 42.5-17.5T420-500q0-25-17.5-42.5T360-560q-25 0-42.5 17.5T300-500q0 25 17.5 42.5T360-440Zm240 0q25 0 42.5-17.5T660-500q0-25-17.5-42.5T600-560q-25 0-42.5 17.5T540-500q0 25 17.5 42.5T600-440ZM320-280h320v-80H320v80Zm-80 80h480v-480H240v480Zm240-240Z" />
                       </svg>
-                      <span> Workmate</span>
+                      <span> Workmate </span>
                     </div>
                   ) : (
                     <div className="px-3 flex space-x-3">
@@ -205,7 +227,7 @@ const ChatPage: React.FC = () => {
       </div>
 
       {/* Input Area */}
-      <div className="p-4 border bg-white dark:bg-gray-800 rounded-sm">
+      <div className="p-4 border bg-white dark:border-gray-600 dark:bg-gray-800 rounded-sm">
         <div className="flex items-center">
           <input
             type="text"
@@ -213,7 +235,7 @@ const ChatPage: React.FC = () => {
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Type your message..."
-            className="flex-1 p-4 border focus:outline-none focus:border-primary dark:bg-gray-200 dark:text-white rounded-sm"
+            className="flex-1 p-4 border dark:border-gray-600 focus:outline-none focus:border-primary dark:bg-gray-900 dark:text-white rounded-sm"
           />
           <button onClick={handleSendMessage} className="text-white px-4 py-2">
             <svg
