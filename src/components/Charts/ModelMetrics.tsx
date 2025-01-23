@@ -1,32 +1,15 @@
 import React from "react";
+import { MetricsProps } from "../../types/modelmetrics";
 
-interface MetricsProps {
-  year: number;
-  accuracy: number;
-  precisionClass0: number;
-  precisionClass1: number;
-  recallClass0: number;
-  recallClass1: number;
-  f1ScoreClass0: number;
-  f1ScoreClass1: number;
-  ROCAUCScore: number;
+interface ModelMetrics {
+  model_metrics: MetricsProps | null;
 }
 
-const year_metrics: MetricsProps = {
-  year: 1,
-  accuracy: 0.721,
-  precisionClass0: 0.733,
-  precisionClass1: 0.709,
-  recallClass0: 0.728,
-  recallClass1: 0.714,
-  f1ScoreClass0: 0.73,
-  f1ScoreClass1: 0.711,
-  ROCAUCScore: 0.81,
-};
-
-const ModelStatsTable: React.FC = () => {
+const ModelStatsTable: React.FC<ModelMetrics> = ({ model_metrics }) => {
   return (
     <div className="overflow-x-auto border border-gray-300 p-4 bg-white dark:bg-gray-800 dark:border-gray-700 shadow-md">
+      {/* select model */}
+
       <h2 className="text-lg font-semibold mb-4 text-center text-gray-900 dark:text-white">
         Model Metrics
       </h2>
@@ -53,10 +36,10 @@ const ModelStatsTable: React.FC = () => {
               Precision
             </td>
             <td className="px-4 py-2 border text-center text-gray-900 dark:text-gray-100">
-              {year_metrics.precisionClass1.toFixed(2)}
+              {model_metrics?.achieved_precision.toFixed(2)}
             </td>
             <td className="px-4 py-2 border text-center text-gray-900 dark:text-gray-100">
-              {year_metrics.precisionClass0.toFixed(2)}
+              {model_metrics?.not_achived_precision.toFixed(2)}
             </td>
             <td className="px-4 py-2 border text-gray-900 dark:text-gray-100">
               Proportion of correct positive predictions.
@@ -67,10 +50,10 @@ const ModelStatsTable: React.FC = () => {
               Recall
             </td>
             <td className="px-4 py-2 border text-center text-gray-900 dark:text-gray-100">
-              {year_metrics.recallClass1.toFixed(2)}
+              {model_metrics?.achieved_recall.toFixed(2)}
             </td>
             <td className="px-4 py-2 border text-center text-gray-900 dark:text-gray-100">
-              {year_metrics.recallClass0.toFixed(2)}
+              {model_metrics?.not_achived_recall.toFixed(2)}
             </td>
             <td className="px-4 py-2 border text-gray-900 dark:text-gray-100">
               Proportion of actual positives correctly identified.
@@ -81,10 +64,10 @@ const ModelStatsTable: React.FC = () => {
               F1 Score
             </td>
             <td className="px-4 py-2 border text-center text-gray-900 dark:text-gray-100">
-              {year_metrics.f1ScoreClass1.toFixed(2)}
+              {model_metrics?.achieved_f1_score.toFixed(2)}
             </td>
             <td className="px-4 py-2 border text-center text-gray-900 dark:text-gray-100">
-              {year_metrics.f1ScoreClass0.toFixed(2)}
+              {model_metrics?.not_achived_f1_score.toFixed(2)}
             </td>
             <td className="px-4 py-2 border text-gray-900 dark:text-gray-100">
               Harmonic mean of precision and recall.
@@ -98,7 +81,7 @@ const ModelStatsTable: React.FC = () => {
               colSpan={2}
               className="px-4 py-2 border text-center text-gray-900 dark:text-gray-100"
             >
-              {year_metrics.accuracy.toFixed(2)}
+              {model_metrics?.accuracy.toFixed(2)}
             </td>
             <td className="px-4 py-2 border text-gray-900 dark:text-gray-100">
               Overall correctness of predictions.
@@ -112,7 +95,7 @@ const ModelStatsTable: React.FC = () => {
               colSpan={2}
               className="px-4 py-2 border text-center text-gray-900 dark:text-gray-100"
             >
-              {year_metrics.ROCAUCScore.toFixed(2)}
+              {model_metrics?.achieved_roc_auc.toFixed(2)}
             </td>
             <td className="px-4 py-2 border text-gray-900 dark:text-gray-100">
               Ability to distinguish between classes.

@@ -34,14 +34,13 @@ export const register = async (data: RegisterData) => {
     body: JSON.stringify(data),
   });
 
-  console.log(data);
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.detail || "Error registering user");
+  if (response.status === 201) {
+    const responseData = await response.json();
+    return responseData;
+  } else {
+    const error = await response.json();
+    throw new Error(error.error_message || "Error registering user");
   }
-
-  const responseData = await response.json();
-  return responseData;
 };
 
 export const login = async (data: LoginData): Promise<AuthResponse> => {
@@ -53,14 +52,13 @@ export const login = async (data: LoginData): Promise<AuthResponse> => {
     body: JSON.stringify(data),
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    return errorData;
+  if (response.status === 200) {
+    const responseData: AuthResponse = await response.json();
+    return responseData;
+  } else {
+    const error = await response.json();
+    throw new Error(error.error_message || "Error logging in");
   }
-
-  const responseData = await response.json();
-  console.log(responseData);
-  return responseData;
 };
 
 export const logout = async () => {

@@ -19,7 +19,7 @@ const SignIn: React.FC = () => {
       // Save the tokens (you can use localStorage, cookies, or Context API)
       localStorage.setItem("access_token", data.access_token);
       localStorage.setItem("refresh_token", data.refresh_token);
-      localStorage.setItem("user", data.user.username);
+      localStorage.setItem("username", data.user.username);
       // setLoading(false)
       //   redirect home
       toast.success("Login successful");
@@ -27,10 +27,11 @@ const SignIn: React.FC = () => {
       setTimeout(() => {
         window.location.href = "/";
       }, 5000); // Wait 1 second for the toast to show
-    } catch (err: any) {
+    } catch (error: any) {
+      console.log(error);
       setLoading(false);
-      toast.error(err.message);
-      setErrorMessage(err.message);
+      toast.error(error.message);
+      setErrorMessage(error.message);
     }
   };
   return (
@@ -190,8 +191,13 @@ const SignIn: React.FC = () => {
               <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
                 Sign In to RTV Workmate
               </h2>
-              <div>{errorMessage}</div>
+
               <form>
+                {errorMessage && (
+                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                    {errorMessage}
+                  </div>
+                )}
                 <div className="mb-4">
                   <label className="mb-2.5 block font-medium text-black dark:text-white">
                     Email

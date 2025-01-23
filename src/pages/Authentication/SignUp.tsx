@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import Breadcrumb from "../../components/Breadcrumbs/Breadcrumb";
 import LogoDark from "../../images/logo/RTV_Logo.png";
@@ -10,10 +10,17 @@ const SignUp: React.FC = () => {
   const [username, setUsername] = useState<string>("");
   // const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
-  const handleSignup = () => {
-    const userData = register({ username, password });
-    window.location.href = "/auth/signin";
+  const handleSignup = async (e: any) => {
+    e.preventDefault();
+    try {
+      const reponse = await register({ username, password });
+      window.location.href = "/auth/signin";
+    } catch (error: any) {
+      console.log(error);
+      setErrorMessage(error.message);
+    }
   };
   return (
     <>
@@ -175,6 +182,12 @@ const SignUp: React.FC = () => {
               </h2>
 
               <form>
+                {errorMessage && (
+                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                    {errorMessage}
+                  </div>
+                )}
+
                 {/* <div className="mb-4">
                   <label className="mb-2.5 block font-medium text-black dark:text-white">
                     Name

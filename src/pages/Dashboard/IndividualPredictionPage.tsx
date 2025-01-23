@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import ReactSlider from "react-slider";
 import PieChart from "../../components/Charts/PieChart";
 import SelectGroupOne from "../../components/Forms/SelectGroup/SelectGroupOne";
@@ -6,6 +6,8 @@ import CheckboxTwo from "../../components/Checkboxes/CheckboxTwo";
 import { BounceLoader, PuffLoader } from "react-spinners";
 import getPrediction from "../../api/Predictions";
 import { Features } from "../../types/features";
+import { fetchModelMetrics } from "../../api/ModelMetrics";
+import { MetricsProps } from "../../types/modelmetrics";
 
 const IndividualPredictionPage: React.FC = () => {
   const [selectedHousehold, setSelectedHousehold] = useState<string>("");
@@ -90,8 +92,29 @@ const IndividualPredictionPage: React.FC = () => {
     setLoading(false);
   };
 
+  const [model_id, setModelId] = useState<number>(1);
+
   return (
     <div className="">
+      <div className="">
+        <select
+          value={model_id}
+          name=""
+          id=""
+          className="p-2 bg-transparent outline-none"
+          onChange={(e) => {
+            console.log("hello");
+            const selectedId = Number(e.target.value);
+            setModelId(selectedId);
+            localStorage.setItem("model_id", selectedId.toString());
+          }}
+        >
+          <option className="disabled" value="">
+            Select Model
+          </option>
+          <option value="1">Year 1 Classification</option>
+        </select>
+      </div>
       <div className="flex flex-col space-y-6 md:flex-row md:space-y-0 md:space-x-6">
         <div className="w-full md:w-1/2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-md">
           <div className="bg-gray-200 dark:bg-gray-700 p-3 text-center">
