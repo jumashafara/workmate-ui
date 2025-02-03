@@ -1,17 +1,28 @@
-import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
-import ReactSlider from "react-slider";
+import React, { useState } from "react";
 import PieChart from "../../components/Charts/PieChart";
 import SelectGroupOne from "../../components/Forms/SelectGroup/SelectGroupOne";
 import CheckboxTwo from "../../components/Checkboxes/CheckboxTwo";
 import { BounceLoader, PuffLoader } from "react-spinners";
 import getPrediction from "../../api/Predictions";
 import { Features } from "../../types/features";
-import { fetchModelMetrics } from "../../api/ModelMetrics";
-import { MetricsProps } from "../../types/modelmetrics";
 
 const IndividualPredictionPage: React.FC = () => {
-  const [selectedHousehold, setSelectedHousehold] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+
+  const [cutoffValue, setCutoffValue] = useState<number>(0.5);
+  const [landValue, setLandValue] = useState<number>(1);
+  const [memberValue, setMemberValue] = useState<number>(5);
+  const [waterValue, setWaterValue] = useState<number>(1);
+  const [farmImplementsValue, setFarmImplementsValue] = useState<number>(1);
+  const [prediction, setPrediction] = useState<number>(0.5);
+  const [probabilities, setProbabilities] = useState<Array<number>>([0.5, 0.5]);
+
+  // pre-data
+  const [selectedHousehold, setSelectedHousehold] = useState<string>("");
+  const [district, setDistrict] = useState<string>("");
+  const [village, setVillage] = useState<string>("");
+  const [cluster, setCluster] = useState<string>("");
+  const [evaluationMonth, setEvaluationMonth] = useState<number>(1);
 
   const handleHouseholdChange = async (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -20,17 +31,12 @@ const IndividualPredictionPage: React.FC = () => {
     console.log("passenger selected");
   };
 
-  const [evaluationMonth, setEvaluationMonth] = useState(1)
-  const [cutoffSliderValue, setCutoffSliderValue] = useState<number>(0.5);
-  const [landSliderValue, setLandSliderValue] = useState<number>(1);
-  const [memberSliderValue, setMemberSliderValue] = useState<number>(5);
-  const [waterSliderValue, setWaterSliderValue] = useState<number>(1);
-  const [farmImplementsValue, setFarmImplementsValue] = useState<number>(1);
-  const [prediction, setPrediction] = useState<number>(0.5);
-  const [probabilities, setProbabilities] = useState<Array<number>>([0.5, 0.5]);
-
   const [formData, setFormData] = useState<Features>({
     household_id: "",
+    district: "",
+    village: "",
+    cluster: "",
+    evaluation_month: 0,
     cassava: [true], //done
     maize: [true], //
     ground_nuts: [true], //done
@@ -55,11 +61,9 @@ const IndividualPredictionPage: React.FC = () => {
     setLoading(false);
   };
 
-  const [model_id, setModelId] = useState<number>(1);
-
   return (
     <div className="">
-      <div className="">
+      {/* <div className="">
         <select
           value={model_id}
           name=""
@@ -77,8 +81,8 @@ const IndividualPredictionPage: React.FC = () => {
           </option>
           <option value="1">Year 1 Classification</option>
         </select>
-      </div>
-      <div className="flex flex-col space-y-6 md:flex-row md:space-y-0 md:space-x-6">
+      </div> */}
+      <div className="flex flex-col space-y-6 md:flex-row md:space-y-0 md:justify-between md:space-x-6">
         <div className="w-full md:w-1/2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-md">
           <div className="bg-gray-200 dark:bg-gray-700 p-3 text-center">
             <h2 className="text-lg font-semibold mb-4 w-full text-gray-900 dark:text-white">
@@ -102,8 +106,8 @@ const IndividualPredictionPage: React.FC = () => {
                 min={0.1}
                 max={0.9}
                 step={0.1}
-                value={cutoffSliderValue}
-                onChange={(e) => setCutoffSliderValue(Number(e.target.value))}
+                value={cutoffValue}
+                onChange={(e) => setCutoffValue(Number(e.target.value))}
                 className="p-2 border border-gray-400 outline-none rounded-sm"
               />
             </div>
@@ -158,8 +162,8 @@ const IndividualPredictionPage: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col md:flex-row mt-6 md:space-x-6">
-        <div className="border border-gray-300 md:w-3/4 bg-white">
+      <div className="flex flex-col md:flex-row mt-6 md:justify-between md:space-x-6">
+        <div className="border border-gray-300 md:w-3/4 bg-white mb-6 md:mb-0">
           <div className="bg-gray-200 dark:bg-gray-700 p-3 text-center">
             <h2 className="text-lg font-semibold mb-4 w-full text-gray-900 dark:text-white">
               Feature Input
@@ -226,69 +230,112 @@ const IndividualPredictionPage: React.FC = () => {
                   />
                 </div>
               </div>
-              <div className="">
+              <div className="px-3">
                 {/* <h2 className="text-lg mb-4 w-full text-gray-900 dark:text-white">
                 Numerical
               </h2> */}
-              <div className="slider-container flex flex-col md:flex-row md:space-x-6 px-6 pb-6">
-                  <p className="min-w-fit">Evaluation Month </p>
-                  <input
-                    min={0}
-                    max={3}
-                    step={1}
-                    value={landSliderValue}
-                    onChange={(e) => setLandSliderValue(Number(e.target.value))}
-                    className="p-2 border border-gray-400 outline-none rounded-sm"
-                  />
+
+                <div className="flex flex-col md:flex-row md:justify-between">
+                  <div className="flex flex-col xl:flex-row pb-6">
+                    <p className="min-w-fit pr-3">Agriculture Land </p>
+                    <input
+                      min={0}
+                      max={10}
+                      value={landValue}
+                      onChange={(e) => setLandValue(Number(e.target.value))}
+                      className="p-2 border border-gray-400 outline-none rounded-sm"
+                    />
+                  </div>
+                  <div className="flex flex-col xl:flex-row pb-6">
+                    <p className="min-w-fit pr-3">Household Members </p>
+                    <input
+                      min={1}
+                      max={30}
+                      step={1}
+                      value={memberValue}
+                      onChange={(e) => setMemberValue(Number(e.target.value))}
+                      className="p-2 border border-gray-400 outline-none rounded-sm"
+                    />
+                  </div>
                 </div>
-                <div className="slider-container flex flex-col md:flex-row md:space-x-6 px-6 pb-6">
-                  <p className="min-w-fit">Agriculture Land </p>
-                  <input
-                    min={0}
-                    max={10}
-                    value={landSliderValue}
-                    onChange={(e) => setLandSliderValue(Number(e.target.value))}
-                    className="p-2 border border-gray-400 outline-none rounded-sm"
-                  />
+                <div className="flex flex-col md:flex-row md:justify-between">
+                  <div className="flex flex-col xl:flex-row pb-6">
+                    <p className="min-w-fit pr-3">Farm Implements </p>
+                    <input
+                      min={0}
+                      max={20}
+                      step={1}
+                      value={farmImplementsValue}
+                      onChange={(e) =>
+                        setFarmImplementsValue(Number(e.target.value))
+                      }
+                      className="p-2 border border-gray-400 outline-none rounded-sm"
+                    />
+                  </div>
+                  <div className="flex flex-col xl:flex-row pb-6">
+                    <p className="min-w-fit pr-3">Daily Consumed Water</p>
+                    <input
+                      min={0.1}
+                      max={20}
+                      step={0.1}
+                      value={waterValue}
+                      onChange={(e) => setWaterValue(Number(e.target.value))}
+                      className="p-2 border border-gray-400 outline-none rounded-sm"
+                    />
+                  </div>
                 </div>
-                <div className="slider-container flex flex-col md:flex-row md:space-x-6 px-6 pb-6">
-                  <p className="min-w-fit">Household Members </p>
-                  <input
-                    min={1}
-                    max={30}
-                    step={1}
-                    value={memberSliderValue}
-                    onChange={(e) =>
-                      setMemberSliderValue(Number(e.target.value))
-                    }
-                    className="p-2 border border-gray-400 outline-none rounded-sm"
-                  />
+                <div className="flex flex-col md:flex-row justify-between">
+                  <div className="flex flex-col xl:flex-row pb-6">
+                    <p className="min-w-fit pr-3">District </p>
+                    <input
+                      min={0}
+                      max={3}
+                      step={1}
+                      value={district}
+                      placeholder="eg Kaliro"
+                      onChange={(e) => setDistrict(e.target.value)}
+                      className="p-2 border border-gray-400 outline-none rounded-sm"
+                    />
+                  </div>
+                  <div className="flex flex-col xl:flex-row pb-6">
+                    <p className="min-w-fit pr-3">Village </p>
+                    <input
+                      min={0}
+                      max={3}
+                      step={1}
+                      value={village}
+                      placeholder="eg Buyunga"
+                      onChange={(e) => setVillage(e.target.value)}
+                      className="p-2 border border-gray-400 outline-none rounded-sm"
+                    />
+                  </div>
                 </div>
-                <div className="slider-container flex flex-col md:flex-row md:space-x-6 px-6 pb-6">
-                  <p className="min-w-fit">Farm Implements </p>
-                  <input
-                    min={0}
-                    max={20}
-                    step={1}
-                    value={farmImplementsValue}
-                    onChange={(e) =>
-                      setFarmImplementsValue(Number(e.target.value))
-                    }
-                    className="p-2 border border-gray-400 outline-none rounded-sm"
-                  />
-                </div>
-                <div className="slider-container flex flex-col md:flex-row md:space-x-6 px-6 pb-6">
-                  <p className="min-w-fit">Daily Consumed Water</p>
-                  <input
-                    min={0.1}
-                    max={20}
-                    step={0.1}
-                    value={waterSliderValue}
-                    onChange={(e) =>
-                      setWaterSliderValue(Number(e.target.value))
-                    }
-                    className="p-2 border border-gray-400 outline-none rounded-sm"
-                  />
+                <div className="flex flex-col md:flex-row justify-between">
+                  <div className="flex flex-col xl:flex-row pb-6">
+                    <p className="min-w-fit pr-3">Cluster </p>
+                    <input
+                      min={0}
+                      max={3}
+                      step={1}
+                      value={cluster}
+                      placeholder="eg Mitooma"
+                      onChange={(e) => setCluster(e.target.value)}
+                      className="p-2 border border-gray-400 outline-none rounded-sm"
+                    />
+                  </div>
+                  <div className="flex flex-col xl:flex-row pb-6">
+                    <p className="min-w-fit pr-3">Evaluation Month </p>
+                    <input
+                      min={0}
+                      max={3}
+                      step={1}
+                      value={evaluationMonth}
+                      onChange={(e) =>
+                        setEvaluationMonth(Number(e.target.value))
+                      }
+                      className="p-2 border border-gray-400 outline-none rounded-sm"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -301,7 +348,7 @@ const IndividualPredictionPage: React.FC = () => {
             </h2>
             <p>All set? Get prediction</p>
           </div>
-          <div className="p-6 flex flex-col m-auto space-y-3 h-3/4">
+          <div className="flex flex-col m-auto h-3/4">
             <div className="m-auto p-3 flex flex-col">
               <div className="">
                 <PuffLoader loading={loading} color="#EA580C" />
@@ -313,7 +360,7 @@ const IndividualPredictionPage: React.FC = () => {
 
             <button
               onClick={() => handleGetPrediction(formData)}
-              className="mt-auto inline-flex items-center justify-center bg-primary py-3 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
+              className="mt-auto inline-flex items-center justify-center bg-primary py-3 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10 m-3"
             >
               Get prediction
             </button>

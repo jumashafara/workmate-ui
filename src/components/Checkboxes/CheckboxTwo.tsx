@@ -30,8 +30,9 @@ const CheckboxTwo: React.FC<CheckboxTwoProps> = ({
     <div>
       <label
         htmlFor={`checkbox-${label}`}
-        className="flex cursor-pointer select-none items-center"
+        className="flex cursor-pointer select-none items-center justify-between"
       >
+        <h2 className="pr-2">{label}</h2>
         <div className="relative">
           <input
             type="checkbox"
@@ -65,7 +66,6 @@ const CheckboxTwo: React.FC<CheckboxTwoProps> = ({
             </span>
           </div>
         </div>
-        {label}
       </label>
     </div>
   );
