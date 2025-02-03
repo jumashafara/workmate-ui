@@ -20,49 +20,12 @@ const IndividualPredictionPage: React.FC = () => {
     console.log("passenger selected");
   };
 
+  const [evaluationMonth, setEvaluationMonth] = useState(1)
   const [cutoffSliderValue, setCutoffSliderValue] = useState<number>(0.5);
   const [landSliderValue, setLandSliderValue] = useState<number>(1);
   const [memberSliderValue, setMemberSliderValue] = useState<number>(5);
   const [waterSliderValue, setWaterSliderValue] = useState<number>(1);
   const [farmImplementsValue, setFarmImplementsValue] = useState<number>(1);
-
-  const handleWaterSliderChange = async (new_value: number) => {
-    setWaterSliderValue(new_value);
-    setFormData({
-      ...formData,
-      Average_Water_Consumed_Per_Day: [waterSliderValue],
-    });
-  };
-
-  const handleFarmImplementsChange = async (new_value: number) => {
-    setFarmImplementsValue(new_value);
-    setFormData({
-      ...formData,
-      farm_implements_owned: [farmImplementsValue],
-    });
-  };
-
-  const handleCutoffSliderChange = async (new_value: number) => {
-    setCutoffSliderValue(new_value);
-    console.log(new_value);
-  };
-
-  const handleLandSliderChange = async (new_value: number) => {
-    setLandSliderValue(new_value);
-    setFormData({
-      ...formData,
-      Land_size_for_Crop_Agriculture_Acres: [landSliderValue],
-    });
-  };
-
-  const handleMemberSliderChange = async (new_value: number) => {
-    setMemberSliderValue(new_value);
-    setFormData({
-      ...formData,
-      tot_hhmembers: [memberSliderValue],
-    });
-  };
-
   const [prediction, setPrediction] = useState<number>(0.5);
   const [probabilities, setProbabilities] = useState<Array<number>>([0.5, 0.5]);
 
@@ -132,19 +95,17 @@ const IndividualPredictionPage: React.FC = () => {
             </button>
           </div>
           <div className="flex flex-col">
-            <h2 className="text-center">Select cutoff probability</h2>
-            <div className="slider-container flex flex-row px-6 pb-6">
-              <ReactSlider
+            <div className="slider-container flex flex-row px-6 pb-6 justify-between">
+              <h2 className="text-center px-3">Select cutoff probability</h2>
+              <input
+                type="number"
                 min={0.1}
                 max={0.9}
                 step={0.1}
                 value={cutoffSliderValue}
-                onChange={handleCutoffSliderChange}
-                className="slider m-auto"
-                thumbClassName="thumb"
-                trackClassName="track"
+                onChange={(e) => setCutoffSliderValue(Number(e.target.value))}
+                className="p-2 border border-gray-400 outline-none rounded-sm"
               />
-              <div className="slider-value">{cutoffSliderValue}</div>
             </div>
           </div>
         </div>
@@ -269,65 +230,65 @@ const IndividualPredictionPage: React.FC = () => {
                 {/* <h2 className="text-lg mb-4 w-full text-gray-900 dark:text-white">
                 Numerical
               </h2> */}
+              <div className="slider-container flex flex-col md:flex-row md:space-x-6 px-6 pb-6">
+                  <p className="min-w-fit">Evaluation Month </p>
+                  <input
+                    min={0}
+                    max={3}
+                    step={1}
+                    value={landSliderValue}
+                    onChange={(e) => setLandSliderValue(Number(e.target.value))}
+                    className="p-2 border border-gray-400 outline-none rounded-sm"
+                  />
+                </div>
                 <div className="slider-container flex flex-col md:flex-row md:space-x-6 px-6 pb-6">
                   <p className="min-w-fit">Agriculture Land </p>
-                  <ReactSlider
+                  <input
                     min={0}
                     max={10}
-                    step={0.1}
                     value={landSliderValue}
-                    onChange={handleLandSliderChange}
-                    className="slider m-auto"
-                    thumbClassName="thumb"
-                    trackClassName="track"
+                    onChange={(e) => setLandSliderValue(Number(e.target.value))}
+                    className="p-2 border border-gray-400 outline-none rounded-sm"
                   />
-                  <div className="slider-value">{landSliderValue}</div>
                 </div>
                 <div className="slider-container flex flex-col md:flex-row md:space-x-6 px-6 pb-6">
                   <p className="min-w-fit">Household Members </p>
-                  <ReactSlider
+                  <input
                     min={1}
                     max={30}
                     step={1}
                     value={memberSliderValue}
-                    onChange={handleMemberSliderChange}
-                    className="slider m-auto"
-                    thumbClassName="thumb"
-                    trackClassName="track"
+                    onChange={(e) =>
+                      setMemberSliderValue(Number(e.target.value))
+                    }
+                    className="p-2 border border-gray-400 outline-none rounded-sm"
                   />
-                  <div className="slider-value">{memberSliderValue}</div>
                 </div>
                 <div className="slider-container flex flex-col md:flex-row md:space-x-6 px-6 pb-6">
                   <p className="min-w-fit">Farm Implements </p>
-                  <ReactSlider
+                  <input
                     min={0}
                     max={20}
                     step={1}
                     value={farmImplementsValue}
-                    onChange={handleFarmImplementsChange}
-                    className="slider m-auto"
-                    thumbClassName="thumb"
-                    trackClassName="track"
+                    onChange={(e) =>
+                      setFarmImplementsValue(Number(e.target.value))
+                    }
+                    className="p-2 border border-gray-400 outline-none rounded-sm"
                   />
-                  <div className="slider-value">
-                    {formData.farm_implements_owned}
-                  </div>
                 </div>
                 <div className="slider-container flex flex-col md:flex-row md:space-x-6 px-6 pb-6">
                   <p className="min-w-fit">Daily Consumed Water</p>
-                  <ReactSlider
+                  <input
                     min={0.1}
                     max={20}
                     step={0.1}
                     value={waterSliderValue}
-                    onChange={handleWaterSliderChange}
-                    className="slider m-auto"
-                    thumbClassName="thumb"
-                    trackClassName="track"
+                    onChange={(e) =>
+                      setWaterSliderValue(Number(e.target.value))
+                    }
+                    className="p-2 border border-gray-400 outline-none rounded-sm"
                   />
-                  <div className="slider-value">
-                    {formData.Average_Water_Consumed_Per_Day}
-                  </div>
                 </div>
               </div>
             </div>
