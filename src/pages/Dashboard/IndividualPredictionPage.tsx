@@ -52,6 +52,7 @@ const IndividualPredictionPage: React.FC = () => {
   });
 
   const handleGetPrediction = async (data: Features) => {
+    // console.log(data)
     setLoading(true);
     const response = await getPrediction(data);
     const prediction = response.prediction;
@@ -242,7 +243,15 @@ const IndividualPredictionPage: React.FC = () => {
                       min={0}
                       max={10}
                       value={landValue}
-                      onChange={(e) => setLandValue(Number(e.target.value))}
+                      onChange={(e) => {
+                        setLandValue(Number(e.target.value));
+                        setFormData({
+                          ...formData,
+                          Land_size_for_Crop_Agriculture_Acres: [
+                            Number(landValue),
+                          ],
+                        });
+                      }}
                       className="p-2 border border-gray-400 outline-none rounded-sm"
                     />
                   </div>
@@ -253,7 +262,13 @@ const IndividualPredictionPage: React.FC = () => {
                       max={30}
                       step={1}
                       value={memberValue}
-                      onChange={(e) => setMemberValue(Number(e.target.value))}
+                      onChange={(e) => {
+                        setMemberValue(Number(e.target.value));
+                        setFormData({
+                          ...formData,
+                          tot_hhmembers: [Number(memberValue)],
+                        });
+                      }}
                       className="p-2 border border-gray-400 outline-none rounded-sm"
                     />
                   </div>
@@ -266,9 +281,13 @@ const IndividualPredictionPage: React.FC = () => {
                       max={20}
                       step={1}
                       value={farmImplementsValue}
-                      onChange={(e) =>
-                        setFarmImplementsValue(Number(e.target.value))
-                      }
+                      onChange={(e) => {
+                        setFarmImplementsValue(Number(e.target.value));
+                        setFormData({
+                          ...formData,
+                          farm_implements_owned: [Number(farmImplementsValue)],
+                        });
+                      }}
                       className="p-2 border border-gray-400 outline-none rounded-sm"
                     />
                   </div>
@@ -279,7 +298,13 @@ const IndividualPredictionPage: React.FC = () => {
                       max={20}
                       step={0.1}
                       value={waterValue}
-                      onChange={(e) => setWaterValue(Number(e.target.value))}
+                      onChange={(e) => {
+                        setWaterValue(Number(e.target.value));
+                        setFormData({
+                          ...formData,
+                          Average_Water_Consumed_Per_Day: [Number(waterValue)],
+                        });
+                      }}
                       className="p-2 border border-gray-400 outline-none rounded-sm"
                     />
                   </div>
@@ -293,7 +318,13 @@ const IndividualPredictionPage: React.FC = () => {
                       step={1}
                       value={district}
                       placeholder="eg Kaliro"
-                      onChange={(e) => setDistrict(e.target.value)}
+                      onChange={(e) => {
+                        setDistrict(e.target.value);
+                        setFormData({
+                          ...formData,
+                          district: e.target.value,
+                        });
+                      }}
                       className="p-2 border border-gray-400 outline-none rounded-sm"
                     />
                   </div>
@@ -303,9 +334,14 @@ const IndividualPredictionPage: React.FC = () => {
                       min={0}
                       max={3}
                       step={1}
-                      value={village}
                       placeholder="eg Buyunga"
-                      onChange={(e) => setVillage(e.target.value)}
+                      onChange={(e) => {
+                        setVillage(e.target.value);
+                        setFormData({
+                          ...formData,
+                          village: e.target.value,
+                        });
+                      }}
                       className="p-2 border border-gray-400 outline-none rounded-sm"
                     />
                   </div>
@@ -319,7 +355,13 @@ const IndividualPredictionPage: React.FC = () => {
                       step={1}
                       value={cluster}
                       placeholder="eg Mitooma"
-                      onChange={(e) => setCluster(e.target.value)}
+                      onChange={(e) => {
+                        setCluster(e.target.value);
+                        setFormData({
+                          ...formData,
+                          cluster: e.target.value,
+                        });
+                      }}
                       className="p-2 border border-gray-400 outline-none rounded-sm"
                     />
                   </div>
@@ -330,9 +372,13 @@ const IndividualPredictionPage: React.FC = () => {
                       max={3}
                       step={1}
                       value={evaluationMonth}
-                      onChange={(e) =>
-                        setEvaluationMonth(Number(e.target.value))
-                      }
+                      onChange={(e) => {
+                        setEvaluationMonth(Number(e.target.value));
+                        setFormData({
+                          ...formData,
+                          evaluation_month: Number(e.target.value),
+                        });
+                      }}
                       className="p-2 border border-gray-400 outline-none rounded-sm"
                     />
                   </div>
