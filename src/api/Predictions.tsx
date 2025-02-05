@@ -2,7 +2,7 @@ import { Features } from "../types/features";
 
 const getPrediction = async (features: Features) => {
     const response = await fetch(
-        "http://localhost:8000/api/predictions/",
+        "http://localhost:8000/api/single-prediction/",
         {
             method: "POST",
             headers: {

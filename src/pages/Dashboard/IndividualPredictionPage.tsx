@@ -18,18 +18,18 @@ const IndividualPredictionPage: React.FC = () => {
   const [probabilities, setProbabilities] = useState<Array<number>>([0.5, 0.5]);
 
   // pre-data
-  const [selectedHousehold, setSelectedHousehold] = useState<string>("");
+  // const [selectedHousehold, setSelectedHousehold] = useState<string>("");
   const [district, setDistrict] = useState<string>("");
   const [village, setVillage] = useState<string>("");
   const [cluster, setCluster] = useState<string>("");
   const [evaluationMonth, setEvaluationMonth] = useState<number>(1);
 
-  const handleHouseholdChange = async (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    setSelectedHousehold(event.target.value);
-    console.log("passenger selected");
-  };
+  // const handleHouseholdChange = async (
+  //   event: React.ChangeEvent<HTMLSelectElement>
+  // ) => {
+  //   setSelectedHousehold(event.target.value);
+  //   console.log("passenger selected");
+  // };
 
   const [formData, setFormData] = useState<Features>({
     household_id: "",
@@ -334,6 +334,7 @@ const IndividualPredictionPage: React.FC = () => {
                       min={0}
                       max={3}
                       step={1}
+                      value={village}
                       placeholder="eg Buyunga"
                       onChange={(e) => {
                         setVillage(e.target.value);

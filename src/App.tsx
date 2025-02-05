@@ -10,6 +10,7 @@ import FeatureImportance from "./pages/Dashboard/FeatureImportancePage";
 
 import DefaultLayout from "./layout/DefaultLayout";
 import IndividualPredictionPage from "./pages/Dashboard/IndividualPredictionPage";
+import MultiplePredictionsPage from "./pages/Dashboard/MultiplePredictionsPage";
 import ChatPage from "./pages/ChatPage";
 
 function App() {
@@ -56,6 +57,15 @@ function App() {
             </>
           }
         />
+          <Route
+              path="/multiple-predictions"
+              element={
+                  <>
+                      <PageTitle title="Multiple Predictions | RTV" />
+                      <MultiplePredictionsPage />
+                  </>
+              }
+          />
         <Route
           path="/chat-bot"
           element={
