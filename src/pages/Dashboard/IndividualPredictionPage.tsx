@@ -55,8 +55,8 @@ const IndividualPredictionPage: React.FC = () => {
     // console.log(data)
     setLoading(true);
     const response = await getPrediction(data);
-    const prediction = response.prediction;
-    const probabiliy = response.probability;
+    const prediction = response.data.prediction;
+    const probabiliy = response.data.probability;
     setPrediction(prediction);
     setProbabilities([probabiliy, 1 - probabiliy]);
     setLoading(false);

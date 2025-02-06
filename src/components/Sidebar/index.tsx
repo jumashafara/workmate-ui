@@ -106,9 +106,37 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
             <ul className="mb-6 flex flex-col gap-1.5">
               {/* <!-- Menu Item Dashboard --> */}
+              <li>
+                <NavLink
+                  to="/"
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                    pathname.includes("calendar") &&
+                    "bg-graydark dark:bg-meta-4"
+                  }`}
+                >
+                  <svg
+                    className="fill-current duration-300 ease-in-out"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M3 10L12 2L21 10V20C21 20.55 20.55 21 20 21H16C15.45 21 15 20.55 15 20V15C15 14.45 14.55 14 14 14H10C9.45 14 9 14.45 9 15V20C9 20.55 8.55 21 8 21H4C3.45 21 3 20.55 3 20V10Z"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  Home
+                </NavLink>
+              </li>
               <SidebarLinkGroup
                 activeCondition={
-                  pathname === "/" || pathname.includes("dashboard")
+                  pathname === "/model-metrics" ||
+                  pathname.includes("dashboard")
                 }
               >
                 {(handleClick, open) => {
@@ -181,44 +209,44 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
                           <li>
                             <NavLink
-                                to="/"
-                                className={({isActive}) =>
-                                    "group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white " +
-                                    (isActive && "!text-white")
-                                }
+                              to="/model-metrics"
+                              className={({ isActive }) =>
+                                "group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white " +
+                                (isActive && "!text-white")
+                              }
                             >
                               Model Metrics
                             </NavLink>
                           </li>
                           <li>
                             <NavLink
-                                to="/feature-importance"
-                                className={({isActive}) =>
-                                    "group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white " +
-                                    (isActive && "!text-white")
-                                }
+                              to="/feature-importance"
+                              className={({ isActive }) =>
+                                "group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white " +
+                                (isActive && "!text-white")
+                              }
                             >
                               Feature Importance
                             </NavLink>
                           </li>
                           <li>
                             <NavLink
-                                to="/individual-predictions"
-                                className={({isActive}) =>
-                                    "group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white " +
-                                    (isActive && "!text-white")
-                                }
+                              to="/individual-predictions"
+                              className={({ isActive }) =>
+                                "group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white " +
+                                (isActive && "!text-white")
+                              }
                             >
                               Individual Predictions
                             </NavLink>
                           </li>
                           <li>
                             <NavLink
-                                to="/multiple-predictions"
-                                className={({isActive}) =>
-                                    "group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white " +
-                                    (isActive && "!text-white")
-                                }
+                              to="/multiple-predictions"
+                              className={({ isActive }) =>
+                                "group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white " +
+                                (isActive && "!text-white")
+                              }
                             >
                               Multiple Predictions
                             </NavLink>
@@ -235,9 +263,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               {/* <!-- Menu Item Calendar --> */}
               <li>
                 <NavLink
-                    to="/chat-bot"
-                    className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                        pathname.includes("calendar") &&
+                  to="/chat-bot"
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                    pathname.includes("calendar") &&
                     "bg-graydark dark:bg-meta-4"
                   }`}
                 >

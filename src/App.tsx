@@ -12,6 +12,7 @@ import DefaultLayout from "./layout/DefaultLayout";
 import IndividualPredictionPage from "./pages/Dashboard/IndividualPredictionPage";
 import MultiplePredictionsPage from "./pages/Dashboard/MultiplePredictionsPage";
 import ChatPage from "./pages/ChatPage";
+import HomePage from "./pages/HomePage";
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -35,6 +36,15 @@ function App() {
           element={
             <>
               <PageTitle title="Model Metrics Dashboard | RTV" />
+              <HomePage />
+            </>
+          }
+        />
+        <Route
+          path="/model-metrics"
+          element={
+            <>
+              <PageTitle title="Multiple Predictions | RTV" />
               <ModelMetrics />
             </>
           }
@@ -57,15 +67,16 @@ function App() {
             </>
           }
         />
-          <Route
-              path="/multiple-predictions"
-              element={
-                  <>
-                      <PageTitle title="Multiple Predictions | RTV" />
-                      <MultiplePredictionsPage />
-                  </>
-              }
-          />
+        <Route
+          path="/multiple-predictions"
+          element={
+            <>
+              <PageTitle title="Multiple Predictions | RTV" />
+              <MultiplePredictionsPage />
+            </>
+          }
+        />
+
         <Route
           path="/chat-bot"
           element={
