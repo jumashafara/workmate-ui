@@ -26,7 +26,7 @@ const MultiplePredictionsPage: React.FC = () => {
         setMessage("");
 
         try {
-            const response = await axios.post("http://127.0.0.1:8000/api/many-predictions/", formData, {
+            const response = await axios.post("/api/many-predictions/", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },

@@ -23,7 +23,7 @@ const HomePage: React.FC = () => {
 
   const fetchDashboardStats = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/stats/");
+      const response = await fetch("/api/stats/");
       const data = await response.json();
       setStats(data);
     } catch (error) {

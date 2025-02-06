@@ -64,25 +64,6 @@ const IndividualPredictionPage: React.FC = () => {
 
   return (
     <div className="">
-      {/* <div className="">
-        <select
-          value={model_id}
-          name=""
-          id=""
-          className="p-2 bg-transparent outline-none"
-          onChange={(e) => {
-            console.log("hello");
-            const selectedId = Number(e.target.value);
-            setModelId(selectedId);
-            localStorage.setItem("model_id", selectedId.toString());
-          }}
-        >
-          <option className="disabled" value="">
-            Select Model
-          </option>
-          <option value="1">Year 1 Classification</option>
-        </select>
-      </div> */}
       <div className="flex flex-col space-y-6 md:flex-row md:space-y-0 md:justify-between md:space-x-6">
         <div className="w-full md:w-1/2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-md">
           <div className="bg-gray-200 dark:bg-gray-700 p-3 text-center">
