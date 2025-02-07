@@ -1,20 +1,14 @@
 import React from "react";
 import { Grid } from "@mui/material";
 import { Timeline, CheckCircle, Cancel, QueryStats } from "@mui/icons-material";
+import DistrictStats from "../../src/components/Tables/DistrictStats";
+import ClusterStats from "../components/Tables/ClusterStats";
 
 interface DashboardStats {
   total_predictions: number;
   positive_predictions: number;
   negative_predictions: number;
   accuracy: number;
-}
-
-interface ClusterStat {
-  district: string;
-  cluster: string;
-  avg_prediction: number;
-  avg_income: number;
-  evaluation_month: string;
 }
 
 const HomePage: React.FC = () => {
@@ -24,11 +18,11 @@ const HomePage: React.FC = () => {
     negative_predictions: 0,
     accuracy: 0,
   });
-  const [clusterStats, setClusterStats] = React.useState<ClusterStat[]>([]);
+
+  const [selectedStats, setSelectedStats] = React.useState("district");
 
   React.useEffect(() => {
     fetchDashboardStats();
-    fetchClusterStats();
   }, []);
 
   const fetchDashboardStats = async () => {
@@ -41,20 +35,10 @@ const HomePage: React.FC = () => {
     }
   };
 
-  const fetchClusterStats = async () => {
-    try {
-      const response = await fetch("/api/cluster-stats/");
-      const data = await response.json();
-      setClusterStats(data);
-    } catch (error) {
-      console.error("Error fetching cluster stats:", error);
-    }
-  };
-
   const StatCard = ({ title, value, icon, color }: any) => (
-    <div className="bg-white shadow-md rounded-sm p-6 flex justify-between items-center transition-all duration-300 hover:shadow-2xl">
+    <div className="bg-white shadow-md rounded-sm p-6 flex justify-between items-center transition-all duration-300 hover:shadow-2xl border border-gray-300">
       <div>
-        <p className="text-gray-500 ">{title}</p>
+        <p className="">{title}</p>
         <h3 className="text-3xl font-bold mt-1">{value}</h3>
       </div>
       <div className={`${color} text-4xl`}>{icon}</div>
@@ -62,7 +46,7 @@ const HomePage: React.FC = () => {
   );
 
   return (
-    <div className="p-6">
+    <div className="">
       <h2 className="text-2xl font-bold mb-6">Predictions Dashboard</h2>
 
       <Grid container spacing={3}>
@@ -100,51 +84,19 @@ const HomePage: React.FC = () => {
         </Grid>
       </Grid>
 
-      <h3 className="text-xl font-bold mt-8 mb-4">Cluster Statistics</h3>
-      <div className="overflow-x-auto shadow-md rounded-lg">
-        <table className="min-w-full table-auto">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 font-medium uppercase tracking-wider">
-                District
-              </th>
-              <th className="px-6 py-3 font-medium uppercase tracking-wider">
-                Cluster
-              </th>
-              <th className="px-6 py-3 font-medium uppercase tracking-wider">
-                  EVALUATION MONTH
-              </th>
-              <th className="px-6 py-3 font-medium uppercase tracking-wider">
-                AVERAGE PREDICTION
-              </th>
-              <th className="px-6 py-3 font-medium uppercase tracking-wider">
-                AVERAGE INCOME
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {clusterStats.map((stat, index) => (
-              <tr key={index} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap text-center">
-                  {stat.district}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center">
-                  {stat.cluster}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center">
-                  {stat.evaluation_month}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center">
-                  {(stat.avg_prediction * 100).toFixed(1)}%
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center">
-                  ${stat.avg_income.toFixed(2)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div>
+        <select
+          name=""
+          id=""
+          onChange={(e) => setSelectedStats(e.target.value)}
+          className="text-xl font-bold mt-8 mb-4 outline-none border-transparent" 
+        >
+          <option value="" className="p-3 text-bold">Select Stats</option>
+          <option value="cluster" className="p-3 text-bold bg-gray-300">Cluster</option>
+          <option value="district" className="p-3 text-bold bg-gray-300">District</option>
+        </select>
       </div>
+      {selectedStats === "cluster" ? <ClusterStats /> : <DistrictStats />}
     </div>
   );
 };

@@ -221,16 +221,11 @@ const IndividualPredictionPage: React.FC = () => {
                   <div className="flex flex-col xl:flex-row pb-6">
                     <p className="min-w-fit pr-3">Agriculture Land </p>
                     <input
-                      min={0}
-                      max={10}
-                      value={landValue}
                       onChange={(e) => {
-                        setLandValue(Number(e.target.value));
+                        setLandValue(parseFloat(e.target.value));
                         setFormData({
                           ...formData,
-                          Land_size_for_Crop_Agriculture_Acres: [
-                            Number(landValue),
-                          ],
+                          Land_size_for_Crop_Agriculture_Acres: [landValue],
                         });
                       }}
                       className="p-2 border border-gray-400 outline-none rounded-sm"
