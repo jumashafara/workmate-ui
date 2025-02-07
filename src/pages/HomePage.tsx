@@ -19,7 +19,7 @@ const HomePage: React.FC = () => {
     accuracy: 0,
   });
 
-  const [selectedStats, setSelectedStats] = React.useState("district");
+  const [selectedStats, setSelectedStats] = React.useState("cluster");
 
   React.useEffect(() => {
     fetchDashboardStats();
@@ -60,7 +60,7 @@ const HomePage: React.FC = () => {
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
-            title="Positive Predictions"
+            title="Achieved"
             value={stats.positive_predictions}
             icon={<CheckCircle fontSize="inherit" />}
             color="text-green-400"
@@ -68,7 +68,7 @@ const HomePage: React.FC = () => {
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
-            title="Negative Predictions"
+            title="Not Achieved"
             value={stats.negative_predictions}
             icon={<Cancel fontSize="inherit" />}
             color="text-red-400"
@@ -89,11 +89,17 @@ const HomePage: React.FC = () => {
           name=""
           id=""
           onChange={(e) => setSelectedStats(e.target.value)}
-          className="text-xl font-bold mt-8 mb-4 outline-none border-transparent" 
+          className="text-lg font-bold mt-6 mb-3 outline-none"
         >
-          <option value="" className="p-3 text-bold">Select Stats</option>
-          <option value="cluster" className="p-3 text-bold bg-gray-300">Cluster</option>
-          <option value="district" className="p-3 text-bold bg-gray-300">District</option>
+          <option value="" className="p-3 text-bold bg-transparent">
+            Select Stats ({selectedStats})
+          </option>
+          <option value="cluster" className="p-3 text-bold bg-gray-300">
+          Cluster
+          </option>
+          <option value="district" className="p-3 text-bold">
+          District
+          </option>
         </select>
       </div>
       {selectedStats === "cluster" ? <ClusterStats /> : <DistrictStats />}

@@ -47,20 +47,20 @@ const ClusterStats: React.FC = () => {
               {" "}
               {/* Sticky header */}
               <tr>
-                <th className="px-6 py-3 font-medium uppercase tracking-wider text-center">
+                <th className="px-6 py-3 uppercase tracking-wider text-center">
                   District
                 </th>
-                <th className="px-6 py-3 font-medium uppercase tracking-wider text-center">
+                <th className="px-6 py-3 uppercase tracking-wider text-center">
                   Cluster
                 </th>
-                <th className="px-6 py-3 font-medium uppercase tracking-wider text-center">
+                <th className="px-6 py-3 uppercase tracking-wider text-center">
                   Evaluation Month
                 </th>
-                <th className="px-6 py-3 font-medium uppercase tracking-wider text-center">
-                  Average Prediction
+                <th className="px-6 py-3 uppercase tracking-wider text-center">
+                  Percentage Predicted
                 </th>
-                <th className="px-6 py-3 font-medium uppercase tracking-wider text-center">
-                  Average Income
+                <th className="px-6 py-3 uppercase tracking-wider text-center">
+                  Predicted Income + Production
                 </th>
               </tr>
             </thead>
@@ -92,7 +92,7 @@ const ClusterStats: React.FC = () => {
       {/* Pagination Controls */}
       <div className="flex justify-between items-center mt-4">
         <button
-          className={`px-4 py-2 rounded ${
+          className={`px-4 py-2 rounded-sm ${
             currentPage === 1
               ? "bg-gray-300 cursor-not-allowed"
               : "bg-gray-500 hover:bg-gray-600"
@@ -108,7 +108,7 @@ const ClusterStats: React.FC = () => {
         </span>
 
         <button
-          className={`px-4 py-2 rounded ${
+          className={`px-4 py-2 rounded-sm ${
             currentPage === totalPages
               ? "bg-gray-300 cursor-not-allowed"
               : "bg-orange-500 hover:bg-orange-600"

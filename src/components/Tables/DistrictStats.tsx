@@ -1,5 +1,4 @@
 import React from "react";
-import { Timeline, CheckCircle, Cancel, QueryStats } from "@mui/icons-material";
 
 interface DistrictStat {
   district: string;
@@ -33,16 +32,6 @@ const DistrictStats: React.FC = () => {
   const currentRows = districtStats.slice(indexOfFirstRow, indexOfLastRow);
   const totalPages = Math.ceil(districtStats.length / rowsPerPage);
 
-  const StatCard = ({ title, value, icon, color }: any) => (
-    <div className="bg-white shadow-md rounded-sm p-6 flex justify-between items-center transition-all duration-300 hover:shadow-2xl border border-gray-300">
-      <div>
-        <p className="">{title}</p>
-        <h3 className="text-3xl font-bold mt-1">{value}</h3>
-      </div>
-      <div className={`${color} text-4xl`}>{icon}</div>
-    </div>
-  );
-
   return (
     <div className="">
       {/* <h3 className="text-xl font-bold mt-8 mb-4">District Statistics</h3> */}
@@ -62,10 +51,10 @@ const DistrictStats: React.FC = () => {
                   Evaluation Month
                 </th>
                 <th className="px-6 py-3 font-medium uppercase tracking-wider text-center">
-                  Average Prediction
+                  Percentage Predicted
                 </th>
                 <th className="px-6 py-3 font-medium uppercase tracking-wider text-center">
-                  Average Income
+                    Predicted Income + Production
                 </th>
               </tr>
             </thead>
@@ -94,7 +83,7 @@ const DistrictStats: React.FC = () => {
       {/* Pagination Controls */}
       <div className="flex justify-between items-center mt-4">
         <button
-          className={`px-4 py-2 rounded ${
+          className={`px-4 py-2 rounded-sm ${
             currentPage === 1
               ? "bg-gray-300 cursor-not-allowed"
               : "bg-gray-500 hover:bg-gray-600"
@@ -110,7 +99,7 @@ const DistrictStats: React.FC = () => {
         </span>
 
         <button
-          className={`px-4 py-2 rounded ${
+          className={`px-4 py-2 rounded-sm ${
             currentPage === totalPages
               ? "bg-gray-300 cursor-not-allowed"
               : "bg-orange-500 hover:bg-orange-600"
