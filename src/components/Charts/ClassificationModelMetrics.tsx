@@ -1,11 +1,11 @@
 import React from "react";
-import { MetricsProps } from "../../types/modelmetrics";
+import { ClassificationMetricsProps } from "../../types/modelmetrics";
 
-interface ModelMetrics {
-  model_metrics: MetricsProps | null;
+interface ClassificationModelMetrics {
+  model_metrics: ClassificationMetricsProps | null;
 }
 
-const ModelStatsTable: React.FC<ModelMetrics> = ({ model_metrics }) => {
+const ClassificationModelStatsTable: React.FC<ClassificationModelMetrics> = ({ model_metrics }) => {
   return (
     <div className="overflow-x-auto border border-gray-300 p-4 bg-white dark:bg-gray-800 dark:border-gray-700 shadow-md">
       {/* select model */}
@@ -107,4 +107,4 @@ const ModelStatsTable: React.FC<ModelMetrics> = ({ model_metrics }) => {
   );
 };
 
-export default ModelStatsTable;
+export default ClassificationModelStatsTable;

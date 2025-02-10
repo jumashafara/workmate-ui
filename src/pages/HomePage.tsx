@@ -36,7 +36,7 @@ const HomePage: React.FC = () => {
   };
 
   const StatCard = ({ title, value, icon, color }: any) => (
-    <div className="bg-white shadow-md rounded-sm p-6 flex justify-between items-center transition-all duration-300 hover:shadow-2xl border border-gray-300">
+    <div className="bg-white shadow-md rounded-sm p-6 flex justify-between items-center transition-all duration-300 hover:shadow-2xl border border-gray-300 dark:border-gray-600 dark:bg-gray-800">
       <div>
         <p className="">{title}</p>
         <h3 className="text-3xl font-bold mt-1">{value}</h3>
@@ -89,12 +89,12 @@ const HomePage: React.FC = () => {
           name=""
           id=""
           onChange={(e) => setSelectedStats(e.target.value)}
-          className="text-lg font-bold mt-6 mb-3 outline-none"
+          className="text-lg font-bold mt-6 mb-3 outline-none dark:bg-gray-800"
         >
           <option value="" className="p-3 text-bold bg-transparent">
             Select Stats ({selectedStats})
           </option>
-          <option value="cluster" className="p-3 text-bold bg-gray-300">
+          <option value="cluster" className="p-3 text-bold bg-gray-300 dark:bg-gray-600">
           Cluster
           </option>
           <option value="district" className="p-3 text-bold">

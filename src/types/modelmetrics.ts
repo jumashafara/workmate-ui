@@ -1,4 +1,4 @@
-export interface MetricsProps {
+export interface ClassificationMetricsProps {
   id: number;
   name: string;
   description: string;
@@ -19,4 +19,21 @@ export interface MetricsProps {
   version: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface RegressionMetricsProps {
+  id: number;
+  name: string;
+  description: string;
+  file_path: string;
+  r_squared: number;
+  adjusted_r_squared: number;
+  mean_squared_error: number;
+  correlation: number;
+  accuracy: number;
+  version: number;
+  created_at: string;
+  updated_at: string;
+
+  // R²	Adjusted R²	MSE	Correlation
 }

@@ -35,12 +35,12 @@ const DistrictStats: React.FC = () => {
   return (
     <div className="">
       {/* <h3 className="text-xl font-bold mt-8 mb-4">District Statistics</h3> */}
-      <div className="overflow-x-auto border border-gray-300 shadow-md rounded-sm">
+      <div className="overflow-x-auto border border-gray-300 dark:border-gray-600 shadow-md rounded-sm">
         <div className="max-h-80 overflow-y-auto">
           {" "}
           {/* Enables vertical scrolling */}
-          <table className="min-w-full table-auto">
-            <thead className="bg-gray-200 sticky top-0">
+          <table className="min-w-full table-auto dark:bg-gray-800">
+            <thead className="bg-gray-200 sticky top-0 dark:bg-gray-800">
               {" "}
               {/* Sticky header */}
               <tr>
@@ -58,9 +58,9 @@ const DistrictStats: React.FC = () => {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800">
               {currentRows.map((stat, index) => (
-                <tr key={index} className="hover:bg-gray-50 transition-colors">
+                <tr key={index} className="hover:bg-gray-50 hover:dark:bg-gray-700 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap text-center">
                     {stat.district}
                   </td>
@@ -85,8 +85,8 @@ const DistrictStats: React.FC = () => {
         <button
           className={`px-4 py-2 rounded-sm ${
             currentPage === 1
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-gray-500 hover:bg-gray-600"
+              ? "bg-gray-300 cursor-not-allowed dark:bg-gray-600"
+              : "bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700"
           } text-white`}
           onClick={() => setCurrentPage(currentPage - 1)}
           disabled={currentPage === 1}
@@ -101,7 +101,7 @@ const DistrictStats: React.FC = () => {
         <button
           className={`px-4 py-2 rounded-sm ${
             currentPage === totalPages
-              ? "bg-gray-300 cursor-not-allowed"
+              ? "bg-gray-300 cursor-not-allowed dark:bg-gray-600"
               : "bg-orange-500 hover:bg-orange-600"
           } text-white`}
           onClick={() => setCurrentPage(currentPage + 1)}
