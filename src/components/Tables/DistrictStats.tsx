@@ -10,6 +10,11 @@ interface DistrictStat {
 const DistrictStats: React.FC = () => {
   const [districtStats, setDistrictStats] = React.useState<DistrictStat[]>([]);
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [sortField, setSortField] =
+    React.useState<keyof DistrictStat>("district");
+  const [sortDirection, setSortDirection] = React.useState<"asc" | "desc">(
+    "asc"
+  );
   const rowsPerPage = 10; // Number of rows per page
 
   React.useEffect(() => {
@@ -24,6 +29,31 @@ const DistrictStats: React.FC = () => {
     } catch (error) {
       console.error("Error fetching cluster stats:", error);
     }
+  };
+
+  const handleSort = (field: keyof DistrictStat) => {
+    const newDirection =
+      field === sortField && sortDirection === "asc" ? "desc" : "asc";
+    setSortField(field);
+    setSortDirection(newDirection);
+
+    const sortedStats = [...districtStats].sort((a, b) => {
+      if (field === "avg_prediction" || field === "avg_income") {
+        return sortDirection === "asc"
+          ? a[field] - b[field]
+          : b[field] - a[field];
+      }
+      return sortDirection === "asc"
+        ? String(a[field]).localeCompare(String(b[field]))
+        : String(b[field]).localeCompare(String(a[field]));
+    });
+
+    setDistrictStats(sortedStats);
+  };
+
+  const getSortIcon = (field: keyof DistrictStat) => {
+    if (sortField !== field) return "↕️";
+    return sortDirection === "asc" ? "↑" : "↓";
   };
 
   // Calculate pagination values
@@ -44,23 +74,38 @@ const DistrictStats: React.FC = () => {
               {" "}
               {/* Sticky header */}
               <tr>
-                <th className="px-6 py-3 font-medium uppercase tracking-wider text-center">
-                  District
+                <th
+                  className="px-6 py-3 uppercase tracking-wider text-center cursor-pointer hover:bg-gray-300"
+                  onClick={() => handleSort("district")}
+                >
+                  District {getSortIcon("district")}
                 </th>
-                <th className="px-6 py-3 font-medium uppercase tracking-wider text-center">
-                  Evaluation Month
+                <th
+                  className="px-6 py-3 uppercase tracking-wider text-center cursor-pointer hover:bg-gray-300"
+                  onClick={() => handleSort("evaluation_month")}
+                >
+                  Evaluation Month {getSortIcon("evaluation_month")}
                 </th>
-                <th className="px-6 py-3 font-medium uppercase tracking-wider text-center">
-                  Percentage Predicted
+                <th
+                  className="px-6 py-3 uppercase tracking-wider text-center cursor-pointer hover:bg-gray-300"
+                  onClick={() => handleSort("avg_prediction")}
+                >
+                  Percentage Predicted {getSortIcon("avg_prediction")}
                 </th>
-                <th className="px-6 py-3 font-medium uppercase tracking-wider text-center">
-                    Predicted Income + Production
+                <th
+                  className="px-6 py-3 uppercase tracking-wider text-center cursor-pointer hover:bg-gray-300"
+                  onClick={() => handleSort("avg_income")}
+                >
+                  Predicted Income + Production {getSortIcon("avg_income")}
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800">
               {currentRows.map((stat, index) => (
-                <tr key={index} className="hover:bg-gray-50 hover:dark:bg-gray-700 transition-colors">
+                <tr
+                  key={index}
+                  className="hover:bg-gray-50 hover:dark:bg-gray-700 transition-colors from-gray-200 to-gray-300"
+                >
                   <td className="px-6 py-4 whitespace-nowrap text-center">
                     {stat.district}
                   </td>

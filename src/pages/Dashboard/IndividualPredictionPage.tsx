@@ -1,28 +1,34 @@
 import React, { useState } from "react";
-import PieChart from "../../components/Charts/PieChart";
-import SelectGroupOne from "../../components/Forms/SelectGroup/SelectGroupOne";
-import CheckboxTwo from "../../components/Checkboxes/CheckboxTwo";
-import { BounceLoader, PuffLoader } from "react-spinners";
+// import SelectHousehold from "../../components/Prediction/SelectHousehold";
+import PredictionDisplay from "../../components/Prediction/PredictionDisplay";
+import FeatureInput from "../../components/Prediction/FeatureInput";
 import getPrediction from "../../api/Predictions";
 import { Features } from "../../types/features";
 
 const IndividualPredictionPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [cutoffValue, setCutoffValue] = useState<number>(0.5);
+  // const [cutoffValue, setCutoffValue] = useState<number>(0.5);
   const [landValue, setLandValue] = useState<number>(1);
   const [memberValue, setMemberValue] = useState<number>(5);
   const [waterValue, setWaterValue] = useState<number>(1);
   const [farmImplementsValue, setFarmImplementsValue] = useState<number>(1);
   const [prediction, setPrediction] = useState<number>(0.5);
   const [probabilities, setProbabilities] = useState<Array<number>>([0.5, 0.5]);
-
+  const [predictedIncomeProduction, setPredictedIncomeProduction] =
+    useState<number>(0);
   // pre-data
   // const [selectedHousehold, setSelectedHousehold] = useState<string>("");
   const [district, setDistrict] = useState<string>("");
   const [village, setVillage] = useState<string>("");
   const [cluster, setCluster] = useState<string>("");
   const [evaluationMonth, setEvaluationMonth] = useState<number>(1);
+
+  // Add new state variables
+  const [distanceToOPD, setDistanceToOPD] = useState<number>(1);
+  const [waterCollectionTime, setWaterCollectionTime] = useState<number>(30);
+  const [compostsNum, setCompostsNum] = useState<number>(0);
+  const [educationLevel, setEducationLevel] = useState<number>(0);
 
   // const handleHouseholdChange = async (
   //   event: React.ChangeEvent<HTMLSelectElement>
@@ -49,347 +55,96 @@ const IndividualPredictionPage: React.FC = () => {
     farm_implements_owned: [0],
     vsla_participation: [true],
     Average_Water_Consumed_Per_Day: [0],
+    Distance_travelled_one_way_OPD_treatment: [0],
+    hh_water_collection_Minutes: [0],
+    composts_num: [0],
+    perennial_crops_grown_coffee: [false],
+    sorghum: [false],
+    hh_produce_lq_manure: [false],
+    hh_produce_organics: [false],
+    non_bio_waste_mgt_present: [false],
+    soap_ash_present: [false],
+    education_level_encoded: [0],
+    tippy_tap_present: [false],
+    hhh_sex: [false],
   });
 
   const handleGetPrediction = async (data: Features) => {
-    // console.log(data)
     setLoading(true);
-    const response = await getPrediction(data);
-    const prediction = response.data.prediction;
-    const probabiliy = response.data.probability;
-    setPrediction(prediction);
-    setProbabilities([probabiliy, 1 - probabiliy]);
-    setLoading(false);
+    try {
+      const response = await getPrediction(data);
+      const prediction = response.data.prediction;
+      const probabiliy = response.data.probability;
+      setPrediction(prediction);
+      setPredictedIncomeProduction(response.data.predicted_income_production);
+      setProbabilities([probabiliy, 1 - probabiliy]);
+    } catch (error) {
+      console.error("Prediction failed:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="">
-      <div className="flex flex-col space-y-6 md:flex-row md:space-y-0 md:justify-between md:space-x-6">
-        <div className="w-full md:w-1/2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-md">
-          <div className="bg-gray-200 dark:bg-gray-700 p-3 text-center">
-            <h2 className="text-lg font-semibold mb-4 w-full text-gray-900 dark:text-white">
-              Select Household
-            </h2>
-            <p>Select from list or pick at random</p>
-          </div>
-          <div className="flex flex-col md:flex-row justify-between md:space-x-3 p-6">
-            <div className="md:w-1/2">
-              <SelectGroupOne />
-            </div>
-            <button className="inline-flex items-center justify-center bg-primary py-3 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10">
-              Random Household
-            </button>
-          </div>
-          <div className="flex flex-col">
-            <div className="slider-container flex flex-row px-6 pb-6 justify-between">
-              <h2 className="text-center px-3">Select cutoff probability</h2>
-              <input
-                type="number"
-                min={0.1}
-                max={0.9}
-                step={0.1}
-                value={cutoffValue}
-                onChange={(e) => setCutoffValue(Number(e.target.value))}
-                className="p-2 border border-gray-400 outline-none rounded-sm"
-              />
-            </div>
-          </div>
-        </div>
-        <div className="w-full md:w-1/2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-md">
-          <div className="bg-gray-200 dark:bg-gray-700 p-3 text-center">
-            <h2 className="text-lg font-semibold mb-4 w-full text-gray-900 dark:text-white">
-              Prediction
-            </h2>
-            <p>What are the chances of achieving the target?</p>
-          </div>
-          <div className="p-6 flex flex-col md:flex-row">
-            <div className="md:w-1/2">
-              {/* Results table */}
-              <table className="w-full bg-white">
-                <thead>
-                  <tr className="">
-                    <th className="px-4 py-2 border-b text-left">Status</th>
-                    <th className="px-4 py-2 border-b text-left">
-                      Probability
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="">
-                    <td className="px-4 py-2 border-b text-left">Achieving</td>
-                    <td className="px-4 py-2 border-b text-left">
-                      {probabilities[0].toFixed(2)}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-2 border-b text-left">
-                      Not Achieving
-                    </td>
-                    <td className="px-4 py-2 border-b text-left">
-                      {probabilities[1].toFixed(2)}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-2 border-b text-left">Predicted</td>
-                    <td className="px-4 py-2 border-b text-left">
-                      {prediction == 1 ? "Achieved" : "Not Achieved"}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div className="md:w-1/2 p-6">
-              <PieChart data={probabilities} />
-            </div>
-          </div>
+      <div className="flex flex-col space-y-6 md:flex-row md:space-y-0 md:justify-between md:space-x-6 md:items-stretch">
+        {/* <div className="w-full h-full md:w-1/2">
+          <SelectHousehold
+            cutoffValue={cutoffValue}
+            onCutoffChange={setCutoffValue}
+          />
+        </div> */}
+        <div className="w-full">
+          <PredictionDisplay
+            probabilities={probabilities}
+            prediction={prediction}
+            predicted_income_production={predictedIncomeProduction}
+          />
         </div>
       </div>
-      <div className="flex flex-col md:flex-row mt-6 md:justify-between md:space-x-6">
-        <div className="border border-gray-300 md:w-3/4 bg-white mb-6 md:mb-0">
-          <div className="bg-gray-200 dark:bg-gray-700 p-3 text-center">
-            <h2 className="text-lg font-semibold mb-4 w-full text-gray-900 dark:text-white">
-              Feature Input
-            </h2>
-            <p>Adjust features to change the prediction</p>
-          </div>
-          <form action="" method="post" className="p-6">
-            <div className="flex flex-col">
-              {/* <h2 className="text-lg mb-4 text-gray-900 dark:text-white">
-                Categorical
-              </h2> */}
-              <div className="flex flex-col md:flex-row py-3 md:justify-evenly">
-                <div>
-                  <CheckboxTwo
-                    label="Food Banana"
-                    initialChecked={
-                      formData.perennial_crops_grown_food_banana[0]
-                    }
-                    onChange={(checked) =>
-                      setFormData({
-                        ...formData,
-                        perennial_crops_grown_food_banana: [checked],
-                      })
-                    }
-                  />
-                </div>
-                <div>
-                  <CheckboxTwo
-                    label="Ground Nuts"
-                    initialChecked={formData.ground_nuts[0]}
-                    onChange={(checked) =>
-                      setFormData({ ...formData, ground_nuts: [checked] })
-                    }
-                  />
-                </div>
-                <div>
-                  <CheckboxTwo
-                    label="Sweet Potatoes"
-                    initialChecked={formData.sweet_potatoes[0]}
-                    onChange={(checked) =>
-                      setFormData({ ...formData, sweet_potatoes: [checked] })
-                    }
-                  />
-                </div>
-                <div>
-                  <CheckboxTwo
-                    label="Cassava"
-                    initialChecked={formData.cassava[0]}
-                    onChange={(checked) =>
-                      setFormData({ ...formData, cassava: [checked] })
-                    }
-                  />
-                </div>
-                <div>
-                  <CheckboxTwo
-                    label="Business Participation"
-                    initialChecked={formData.business_participation[0]}
-                    onChange={(checked) =>
-                      setFormData({
-                        ...formData,
-                        business_participation: [checked],
-                      })
-                    }
-                  />
-                </div>
-              </div>
-              <div className="px-3">
-                {/* <h2 className="text-lg mb-4 w-full text-gray-900 dark:text-white">
-                Numerical
-              </h2> */}
-
-                <div className="flex flex-col md:flex-row md:justify-between">
-                  <div className="flex flex-col xl:flex-row pb-6">
-                    <p className="min-w-fit pr-3">Agriculture Land </p>
-                    <input
-                      onChange={(e) => {
-                        setLandValue(parseFloat(e.target.value));
-                        setFormData({
-                          ...formData,
-                          Land_size_for_Crop_Agriculture_Acres: [landValue],
-                        });
-                      }}
-                      className="p-2 border border-gray-400 outline-none rounded-sm"
-                    />
-                  </div>
-                  <div className="flex flex-col xl:flex-row pb-6">
-                    <p className="min-w-fit pr-3">Household Members </p>
-                    <input
-                      min={1}
-                      max={30}
-                      step={1}
-                      value={memberValue}
-                      onChange={(e) => {
-                        setMemberValue(Number(e.target.value));
-                        setFormData({
-                          ...formData,
-                          tot_hhmembers: [Number(memberValue)],
-                        });
-                      }}
-                      className="p-2 border border-gray-400 outline-none rounded-sm"
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-col md:flex-row md:justify-between">
-                  <div className="flex flex-col xl:flex-row pb-6">
-                    <p className="min-w-fit pr-3">Farm Implements </p>
-                    <input
-                      min={0}
-                      max={20}
-                      step={1}
-                      value={farmImplementsValue}
-                      onChange={(e) => {
-                        setFarmImplementsValue(Number(e.target.value));
-                        setFormData({
-                          ...formData,
-                          farm_implements_owned: [Number(farmImplementsValue)],
-                        });
-                      }}
-                      className="p-2 border border-gray-400 outline-none rounded-sm"
-                    />
-                  </div>
-                  <div className="flex flex-col xl:flex-row pb-6">
-                    <p className="min-w-fit pr-3">Daily Consumed Water</p>
-                    <input
-                      min={0.1}
-                      max={20}
-                      step={0.1}
-                      value={waterValue}
-                      onChange={(e) => {
-                        setWaterValue(Number(e.target.value));
-                        setFormData({
-                          ...formData,
-                          Average_Water_Consumed_Per_Day: [Number(waterValue)],
-                        });
-                      }}
-                      className="p-2 border border-gray-400 outline-none rounded-sm"
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-col md:flex-row justify-between">
-                  <div className="flex flex-col xl:flex-row pb-6">
-                    <p className="min-w-fit pr-3">District </p>
-                    <input
-                      min={0}
-                      max={3}
-                      step={1}
-                      value={district}
-                      placeholder="eg Kaliro"
-                      onChange={(e) => {
-                        setDistrict(e.target.value);
-                        setFormData({
-                          ...formData,
-                          district: e.target.value,
-                        });
-                      }}
-                      className="p-2 border border-gray-400 outline-none rounded-sm"
-                    />
-                  </div>
-                  <div className="flex flex-col xl:flex-row pb-6">
-                    <p className="min-w-fit pr-3">Village </p>
-                    <input
-                      min={0}
-                      max={3}
-                      step={1}
-                      value={village}
-                      placeholder="eg Buyunga"
-                      onChange={(e) => {
-                        setVillage(e.target.value);
-                        setFormData({
-                          ...formData,
-                          village: e.target.value,
-                        });
-                      }}
-                      className="p-2 border border-gray-400 outline-none rounded-sm"
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-col md:flex-row justify-between">
-                  <div className="flex flex-col xl:flex-row pb-6">
-                    <p className="min-w-fit pr-3">Cluster </p>
-                    <input
-                      min={0}
-                      max={3}
-                      step={1}
-                      value={cluster}
-                      placeholder="eg Mitooma"
-                      onChange={(e) => {
-                        setCluster(e.target.value);
-                        setFormData({
-                          ...formData,
-                          cluster: e.target.value,
-                        });
-                      }}
-                      className="p-2 border border-gray-400 outline-none rounded-sm"
-                    />
-                  </div>
-                  <div className="flex flex-col xl:flex-row pb-6">
-                    <p className="min-w-fit pr-3">Evaluation Month </p>
-                    <input
-                      min={0}
-                      max={3}
-                      step={1}
-                      value={evaluationMonth}
-                      onChange={(e) => {
-                        setEvaluationMonth(Number(e.target.value));
-                        setFormData({
-                          ...formData,
-                          evaluation_month: Number(e.target.value),
-                        });
-                      }}
-                      className="p-2 border border-gray-400 outline-none rounded-sm"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
-        <div className="border border-gray-300 md:w-1/4 bg-white">
-          <div className="bg-gray-200 dark:bg-gray-700 p-3 text-center">
-            <h2 className="text-lg font-semibold mb-4 w-full text-gray-900 dark:text-white">
-              Run prediction
-            </h2>
-            <p>All set? Get prediction</p>
-          </div>
-          <div className="flex flex-col m-auto h-3/4">
-            <div className="m-auto p-3 flex flex-col">
-              <div className="">
-                <PuffLoader loading={loading} color="#EA580C" />
-              </div>
-              <div>
-                <BounceLoader loading={!loading} color="#EA580C" />
-              </div>
-            </div>
-
-            <button
-              onClick={() => handleGetPrediction(formData)}
-              className="mt-auto inline-flex items-center justify-center bg-primary py-3 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10 m-3"
-            >
-              Get prediction
-            </button>
-          </div>
-        </div>
-      </div>
+      <FeatureInput
+        formData={formData}
+        setFormData={(newData) => {
+          setFormData(newData);
+          if (
+            newData.district === formData.district &&
+            newData.village === formData.village &&
+            newData.cluster === formData.cluster &&
+            newData.evaluation_month === formData.evaluation_month
+          ) {
+            handleGetPrediction(newData);
+          }
+        }}
+        loading={loading}
+        values={{
+          land: landValue,
+          member: memberValue,
+          water: waterValue,
+          farmImplements: farmImplementsValue,
+          district,
+          village,
+          cluster,
+          evaluationMonth,
+          distanceToOPD,
+          waterCollectionTime,
+          compostsNum,
+          educationLevel,
+        }}
+        setValues={{
+          setLand: setLandValue,
+          setMember: setMemberValue,
+          setWater: setWaterValue,
+          setFarmImplements: setFarmImplementsValue,
+          setDistrict,
+          setVillage,
+          setCluster,
+          setEvaluationMonth,
+          setDistanceToOPD,
+          setWaterCollectionTime,
+          setCompostsNum,
+          setEducationLevel,
+        }}
+      />
     </div>
   );
 };

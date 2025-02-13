@@ -84,20 +84,20 @@ const HomePage: React.FC = () => {
         </Grid>
       </Grid>
 
-      <div>
+      <div className="pt-6 pb-3">
         <select
           name=""
           id=""
           onChange={(e) => setSelectedStats(e.target.value)}
-          className="text-lg font-bold mt-6 mb-3 outline-none dark:bg-gray-800"
+          className="text-lg font-bold p-3  outline-none dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-sm"
         >
-          <option value="" className="p-3 text-bold bg-transparent">
+          <option value="" className="p-3 text-bold ">
             Select Stats ({selectedStats})
           </option>
-          <option value="cluster" className="p-3 text-bold bg-gray-300 dark:bg-gray-600">
+          <option value="cluster" className="p-3 text-bold bg-gray-300 dark:bg-gray-800">
           Cluster
           </option>
-          <option value="district" className="p-3 text-bold">
+          <option value="district" className="p-3 text-bold bg-gray-300 dark:bg-gray-800">
           District
           </option>
         </select>

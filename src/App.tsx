@@ -13,6 +13,7 @@ import IndividualPredictionPage from "./pages/Dashboard/IndividualPredictionPage
 import MultiplePredictionsPage from "./pages/Dashboard/MultiplePredictionsPage";
 import ChatPage from "./pages/ChatPage";
 import HomePage from "./pages/HomePage";
+import FloatingChat from "./components/FloatingChat";
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -106,6 +107,7 @@ function App() {
           }
         />
       </Routes>
+      <FloatingChat />
     </DefaultLayout>
   );
 }

@@ -9,9 +9,13 @@ interface ClusterStat {
 }
 
 const ClusterStats: React.FC = () => {
-
   const [clusterStats, setClusterStats] = React.useState<ClusterStat[]>([]);
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [sortField, setSortField] =
+    React.useState<keyof ClusterStat>("district");
+  const [sortDirection, setSortDirection] = React.useState<"asc" | "desc">(
+    "asc"
+  );
   const rowsPerPage = 10; // Number of rows per page
 
   React.useEffect(() => {
@@ -28,45 +32,87 @@ const ClusterStats: React.FC = () => {
     }
   };
 
+  const handleSort = (field: keyof ClusterStat) => {
+    const newDirection =
+      field === sortField && sortDirection === "asc" ? "desc" : "asc";
+    setSortField(field);
+    setSortDirection(newDirection);
+
+    const sortedStats = [...clusterStats].sort((a, b) => {
+      if (field === "avg_prediction" || field === "avg_income") {
+        return sortDirection === "asc"
+          ? a[field] - b[field]
+          : b[field] - a[field];
+      }
+      return sortDirection === "asc"
+        ? String(a[field]).localeCompare(String(b[field]))
+        : String(b[field]).localeCompare(String(a[field]));
+    });
+
+    setClusterStats(sortedStats);
+  };
+
+  const getSortIcon = (field: keyof ClusterStat) => {
+    if (sortField !== field) return "↕️";
+    return sortDirection === "asc" ? "↑" : "↓";
+  };
+
   // Calculate pagination values
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = clusterStats.slice(indexOfFirstRow, indexOfLastRow);
   const totalPages = Math.ceil(clusterStats.length / rowsPerPage);
 
-
   return (
     <div className="">
       {/* <h3 >Cluster Statistics</h3> */}
-      <div className="overflow-x-auto border border-gray-300 dark:border-gray-600 shadow-md rounded-sm ">
+      <div className="overflow-x-auto border border-gray-300 dark:border-gray-600 shadow-md rounded-sm">
         <div className="max-h-80 overflow-y-auto ">
           {" "}
           {/* Enables vertical scrolling */}
-          <table className="min-w-full table-auto dark:bg-gray-800">
+          <table className="min-w-full table-auto dark:bg-gray-800 ">
             <thead className="bg-gray-200 sticky top-0 dark:bg-gray-800">
               {" "}
               {/* Sticky header */}
               <tr>
-                <th className="px-6 py-3 uppercase tracking-wider text-center">
-                  District
+                <th
+                  className="px-6 py-3 uppercase tracking-wider text-center cursor-pointer hover:bg-gray-300"
+                  onClick={() => handleSort("district")}
+                >
+                  District {getSortIcon("district")}
                 </th>
-                <th className="px-6 py-3 uppercase tracking-wider text-center">
-                  Cluster
+                <th
+                  className="px-6 py-3 uppercase tracking-wider text-center cursor-pointer hover:bg-gray-300"
+                  onClick={() => handleSort("cluster")}
+                >
+                  Cluster {getSortIcon("cluster")}
                 </th>
-                <th className="px-6 py-3 uppercase tracking-wider text-center">
-                  Evaluation Month
+                <th
+                  className="px-6 py-3 uppercase tracking-wider text-center cursor-pointer hover:bg-gray-300"
+                  onClick={() => handleSort("evaluation_month")}
+                >
+                  Evaluation Month {getSortIcon("evaluation_month")}
                 </th>
-                <th className="px-6 py-3 uppercase tracking-wider text-center">
-                  Percentage Predicted
+                <th
+                  className="px-6 py-3 uppercase tracking-wider text-center cursor-pointer hover:bg-gray-300"
+                  onClick={() => handleSort("avg_prediction")}
+                >
+                  Percentage Predicted {getSortIcon("avg_prediction")}
                 </th>
-                <th className="px-6 py-3 uppercase tracking-wider text-center">
-                  Predicted Income + Production
+                <th
+                  className="px-6 py-3 uppercase tracking-wider text-center cursor-pointer hover:bg-gray-300"
+                  onClick={() => handleSort("avg_income")}
+                >
+                  Predicted Income + Production {getSortIcon("avg_income")}
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800">
               {currentRows.map((stat, index) => (
-                <tr key={index} className="hover:bg-gray-50 hover:dark:bg-gray-700 transition-colors">
+                <tr
+                  key={index}
+                  className="hover:bg-gray-50 hover:dark:bg-gray-700 transition-colors"
+                >
                   <td className="px-6 py-4 whitespace-nowrap text-center">
                     {stat.district}
                   </td>
@@ -90,7 +136,7 @@ const ClusterStats: React.FC = () => {
       </div>
 
       {/* Pagination Controls */}
-      <div className="flex justify-between items-center mt-4">
+      <div className="flex justify-around items-center mt-4">
         <button
           className={`px-4 py-2 rounded-sm ${
             currentPage === 1

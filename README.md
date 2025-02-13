@@ -159,4 +159,3 @@ Refer to the attached document for development timelines and milestones.
 |-------------|-----------|-----------------------------|
 | **log_id**  | UUID      | Unique log identifier.      |
 | **action**  | String    | Description of user action. |
-

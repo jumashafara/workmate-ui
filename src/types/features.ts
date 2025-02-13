@@ -4,16 +4,32 @@ export interface Features {
   village: string;
   cluster: string;
   evaluation_month: number;
-  cassava: Array<boolean>;
-  maize: Array<boolean>;
-  ground_nuts: Array<boolean>;
-  irish_potatoes: Array<boolean>;
-  sweet_potatoes: Array<boolean>;
-  perennial_crops_grown_food_banana: Array<boolean>;
-  tot_hhmembers: Array<number>;
-  business_participation: Array<boolean>;
+
+  // Numeric fields
   Land_size_for_Crop_Agriculture_Acres: Array<number>;
   farm_implements_owned: Array<number>;
-  vsla_participation: Array<boolean>;
+  tot_hhmembers: Array<number>;
+  Distance_travelled_one_way_OPD_treatment: Array<number>;
   Average_Water_Consumed_Per_Day: Array<number>;
+  hh_water_collection_Minutes: Array<number>;
+  composts_num: Array<number>;
+  education_level_encoded: Array<number>;
+
+  // Categorical fields (encoded as numbers)
+  vsla_participation: Array<boolean>;
+  ground_nuts: Array<boolean>;
+  perennial_crops_grown_food_banana: Array<boolean>;
+  sweet_potatoes: Array<boolean>;
+  perennial_crops_grown_coffee: Array<boolean>;
+  irish_potatoes: Array<boolean>;
+  business_participation: Array<boolean>;
+  cassava: Array<boolean>;
+  hh_produce_lq_manure: Array<boolean>;
+  hh_produce_organics: Array<boolean>;
+  maize: Array<boolean>;
+  sorghum: Array<boolean>;
+  non_bio_waste_mgt_present: Array<boolean>;
+  soap_ash_present: Array<boolean>;
+  tippy_tap_present: Array<boolean>;
+  hhh_sex: Array<boolean>;
 }

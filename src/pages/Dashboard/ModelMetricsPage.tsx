@@ -44,12 +44,12 @@ const ModelMetrics: React.FC = () => {
   }, [model.name]);
   return (
     <>
-      <div className="">
+      <div className="pb-3">
         <select
           value={model.name}
           name="modelSelect"
           id="modelSelect"
-          className="p-2 bg-transparent outline-none"
+          className="p-3 bg-transparent outline-none border border-gray-300 dark:border-gray-700 rounded-sm"
           onChange={(e) => {
             const selectedId = Number(e.target.value);
             const selectedModel = modelOptions.find((m) => m.id === selectedId);
@@ -62,7 +62,7 @@ const ModelMetrics: React.FC = () => {
         >
           <option value="">Select Model</option>
           {modelOptions.map((option) => (
-            <option key={option.id} value={option.id}>
+            <option key={option.id} value={option.id} className="dark:bg-gray-800">
               {option.name}
             </option>
           ))}
