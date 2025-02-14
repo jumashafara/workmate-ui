@@ -20,6 +20,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [conversationId] = useState<string>(crypto.randomUUID());
   const [user, setUser] = useState<string>("");
+  const [displayCount, setDisplayCount] = useState<number>(6);
 
   useEffect(() => {
     setUser(localStorage.getItem("user") || "");
@@ -92,6 +93,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
     setMessages((prevMessages) => [...prevMessages, botMessage]);
 
     try {
+      // https://iankagera-prod--askfsdl-backend-stream-qa.modal.run/
       const url = `https://iankagera-prod--askfsdl-backend-stream-qa.modal.run/?query=${encodeURIComponent(
         newMessage.text
       )}&request_id=${encodeURIComponent(`${user}`)}`;
@@ -238,7 +240,26 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
           isFloating ? "py-2" : "py-6"
         } space-y-2 px-2`}
       >
-        {messages.map((msg) => (
+        {messages.length > displayCount && (
+          <div className="flex justify-center mb-4">
+            <button
+              onClick={() => setDisplayCount(messages.length)}
+              className="text-primary hover:text-primary/80 flex items-center gap-1 text-sm"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="20"
+                width="20"
+                fill="currentColor"
+                viewBox="0 -960 960 960"
+              >
+                <path d="M480-528 296-344l-56-56 240-240 240 240-56 56-184-184Z" />
+              </svg>
+              Load Previous Messages ({messages.length - displayCount} more)
+            </button>
+          </div>
+        )}
+        {messages.slice(-displayCount).map((msg) => (
           <div
             key={msg.id}
             className={`flex ${
