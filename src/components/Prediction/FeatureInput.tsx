@@ -41,7 +41,7 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
   formData,
   setFormData,
   //   loading,
-//   values,
+  //   values,
   setValues: {
     setLand,
     setMember,
@@ -60,14 +60,14 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
   return (
     <div className="flex flex-col md:flex-row mt-6 md:justify-between md:space-x-6">
       <div className="border border-gray-300 rounded-sm shadow-lg w-full bg-white mb-6 md:mb-0 dark:border-gray-600 dark:bg-gray-800  ">
-        <div className="bg-gradient-to-r from-gray-200 to-gray-300 p-4 rounded-sm text-gray-700 dark:from-gray-800 dark:to-gray-900 dark:text-gray-200">
+        <div className="bg-gradient-to-r from-gray-200 to-gray-300 p-4 rounded-sm  dark:from-gray-800 dark:to-gray-900 dark:text-gray-200">
           <h2 className="text-xl font-bold mb-2 w-full">Feature Input</h2>
           <p className="">Adjust features to update the prediction</p>
           {/* {loading && (
             <PuffLoader className="mx-auto mt-2" color="#ffffff" size={20} />
           )} */}
         </div>
-          <form className="p-6 dark:bg-gray-800 ">
+        <form className="p-6 dark:bg-gray-800 ">
           <div className="flex flex-col space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
               <div>
@@ -147,85 +147,108 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
-                    Agriculture Land
+                  <label className="  mb-1 dark:text-gray-200">
+                    Agriculture Land (
+                    {formData.Land_size_for_Crop_Agriculture_Acres[0]} acres)
                   </label>
                   <input
+                    type="range"
+                    min="0"
+                    max="10"
+                    step="0.1"
+                    value={formData.Land_size_for_Crop_Agriculture_Acres[0]}
                     onChange={(e) => {
-                      const value =
-                        e.target.value === "" ? 0 : parseFloat(e.target.value);
+                      const value = parseFloat(e.target.value);
                       setLand(value);
                       setFormData({
                         ...formData,
                         Land_size_for_Crop_Agriculture_Acres: [value],
                       });
                     }}
-                    className="p-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all dark:bg-gray-800 dark:text-gray-200"
-                    type="number"
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 
+                        [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
+                        [&::-webkit-slider-thumb]:bg-orange-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
+                        [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-orange-500 
+                        [&::-moz-range-thumb]:border-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer"
                   />
                 </div>
                 <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
-                    Household Members
+                  <label className="  mb-1 dark:text-gray-200">
+                    Household Members ({formData.tot_hhmembers[0]})
                   </label>
                   <input
-                    min={1}
-                    max={30}
-                    step={1}
+                    type="range"
+                    min="1"
+                    max="15"
+                    step="1"
+                    value={formData.tot_hhmembers[0]}
                     onChange={(e) => {
-                      const value =
-                        e.target.value === "" ? 0 : Number(e.target.value);
+                      const value = parseInt(e.target.value);
                       setMember(value);
                       setFormData({
                         ...formData,
                         tot_hhmembers: [value],
                       });
                     }}
-                    className="p-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all dark:bg-gray-800 dark:text-gray-200"
-                    type="number"
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 
+[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
+[&::-webkit-slider-thumb]:bg-orange-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
+[&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-orange-500 
+[&::-moz-range-thumb]:border-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer"
                   />
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
-                    Farm Implements
+                  <label className="  mb-1 dark:text-gray-200">
+                    Farm Implements ({formData.farm_implements_owned[0]})
                   </label>
                   <input
-                    min={0}
-                    max={20}
-                    step={1}
+                    type="range"
+                    min="0"
+                    max="20"
+                    step="1"
+                    value={formData.farm_implements_owned[0]}
                     onChange={(e) => {
-                      const value = Number(e.target.value);
+                      const value = parseInt(e.target.value);
                       setFarmImplements(value);
                       setFormData({
                         ...formData,
                         farm_implements_owned: [value],
                       });
                     }}
-                    className="p-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all dark:bg-gray-800 dark:text-gray-200"
-                    type="number"
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 
+[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
+[&::-webkit-slider-thumb]:bg-orange-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
+[&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-orange-500 
+[&::-moz-range-thumb]:border-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer"
                   />
                 </div>
                 <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
-                    Daily Consumed Water
+                  <label className="  mb-1 dark:text-gray-200">
+                    Daily Consumed Water (
+                    {formData.Average_Water_Consumed_Per_Day[0]} L)
                   </label>
                   <input
-                    min={0.1}
-                    max={20}
-                    step={0.1}
+                    type="range"
+                    min="0.1"
+                    max="20"
+                    step="0.1"
+                    value={formData.Average_Water_Consumed_Per_Day[0]}
                     onChange={(e) => {
-                      const value = Number(e.target.value);
+                      const value = parseFloat(e.target.value);
                       setWater(value);
                       setFormData({
                         ...formData,
                         Average_Water_Consumed_Per_Day: [value],
                       });
                     }}
-                    className="p-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all dark:bg-gray-800 dark:text-gray-200"
-                    type="number"
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 
+[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
+[&::-webkit-slider-thumb]:bg-orange-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
+[&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-orange-500 
+[&::-moz-range-thumb]:border-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer"
                   />
                 </div>
               </div>
@@ -234,77 +257,108 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
-                    Distance to OPD (km)
+                  <label className="  mb-1 dark:text-gray-200">
+                    Distance to OPD (
+                    {formData.Distance_travelled_one_way_OPD_treatment[0]} km)
                   </label>
                   <input
+                    type="range"
+                    min="0"
+                    max="50"
+                    step="0.1"
+                    value={formData.Distance_travelled_one_way_OPD_treatment[0]}
                     onChange={(e) => {
-                      const value = Number(e.target.value);
+                      const value = parseFloat(e.target.value);
                       setDistanceToOPD(value);
                       setFormData({
                         ...formData,
                         Distance_travelled_one_way_OPD_treatment: [value],
                       });
                     }}
-                    className="p-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all dark:bg-gray-800 dark:text-gray-200"
-                    type="number"
-                    min={0}
-                    step={0.1}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 
+[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
+[&::-webkit-slider-thumb]:bg-orange-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
+[&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-orange-500 
+[&::-moz-range-thumb]:border-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer"
                   />
                 </div>
                 <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
-                    Water Collection Time (minutes)
+                  <label className="  mb-1 dark:text-gray-200">
+                    Water Collection Time (
+                    {formData.hh_water_collection_Minutes[0]} minutes)
                   </label>
                   <input
+                    type="range"
+                    min="0"
+                    max="180"
+                    step="1"
+                    value={formData.hh_water_collection_Minutes[0]}
                     onChange={(e) => {
-                      const value = Number(e.target.value);
+                      const value = parseInt(e.target.value);
                       setWaterCollectionTime(value);
                       setFormData({
                         ...formData,
                         hh_water_collection_Minutes: [value],
                       });
                     }}
-                    className="p-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all dark:bg-gray-800 dark:text-gray-200"
-                    type="number"
-                    min={0}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 
+[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
+[&::-webkit-slider-thumb]:bg-orange-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
+[&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-orange-500 
+[&::-moz-range-thumb]:border-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer"
                   />
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
-                    Composts Number
+                  <label className="  mb-1 dark:text-gray-200">
+                    Composts Number ({formData.composts_num[0]})
                   </label>
                   <input
+                    type="range"
+                    min="0"
+                    max="10"
+                    step="1"
+                    value={formData.composts_num[0]}
                     onChange={(e) => {
-                      const value = Number(e.target.value);
+                      const value = parseInt(e.target.value);
                       setCompostsNum(value);
                       setFormData({
                         ...formData,
                         composts_num: [value],
                       });
                     }}
-                    className="p-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all dark:bg-gray-800 dark:text-gray-200"
-                    type="number"
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 
+[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
+[&::-webkit-slider-thumb]:bg-orange-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
+[&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-orange-500 
+[&::-moz-range-thumb]:border-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer"
                   />
                 </div>
                 <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
-                    Education Level
+                  <label className="  mb-1 dark:text-gray-200">
+                    Education Level ({formData.education_level_encoded[0]})
                   </label>
                   <input
+                    type="range"
+                    min="0"
+                    max="3"
+                    step="1"
+                    value={formData.education_level_encoded[0]}
                     onChange={(e) => {
-                      const value = Number(e.target.value);
+                      const value = parseInt(e.target.value);
                       setEducationLevel(value);
                       setFormData({
                         ...formData,
                         education_level_encoded: [value],
                       });
                     }}
-                    className="p-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all dark:bg-gray-800 dark:text-gray-200"
-                    type="number"
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 
+[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
+[&::-webkit-slider-thumb]:bg-orange-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
+[&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-orange-500 
+[&::-moz-range-thumb]:border-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer"
                   />
                 </div>
               </div>
@@ -313,7 +367,7 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-700 mb-1 dark:text-gray-200 ">
+                  <label className="  mb-1 dark:text-gray-200 ">
                     District
                   </label>
                   <input
@@ -329,7 +383,7 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
                   />
                 </div>
                 <div className="flex flex-col">
-                        <label className="text-sm font-medium text-gray-700 mb-1 dark:text-gray-200   ">
+                  <label className="  mb-1 dark:text-gray-200   ">
                     Village
                   </label>
                   <input
@@ -348,7 +402,7 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
 
               <div className="space-y-4">
                 <div className="flex flex-col">
-                    <label className="text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
+                  <label className="  mb-1 dark:text-gray-200">
                     Cluster
                   </label>
                   <input
@@ -364,7 +418,7 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
                   />
                 </div>
                 <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
+                  <label className="  mb-1 dark:text-gray-200">
                     Evaluation Month
                   </label>
                   <input

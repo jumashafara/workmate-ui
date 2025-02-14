@@ -143,10 +143,11 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
           conversation_id: conversationId,
         }),
       });
-
-      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
     }
   };
 
