@@ -20,11 +20,17 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [input, setInput] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [conversationId] = useState<string>(crypto.randomUUID());
+  const [conversationId] = useState<string>(
+    // Use a fallback for environments where crypto.randomUUID isn't available
+    typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : Math.random().toString(36).substring(2, 15) +
+          Math.random().toString(36).substring(2, 15)
+  );
   const [user, setUser] = useState<string>("");
 
   useEffect(() => {
-    setUser(localStorage.getItem("user") || "");
+    setUser(localStorage.getItem("user") || "demo@raisingthevillage.org");
     console.log(user);
   }, []);
 
