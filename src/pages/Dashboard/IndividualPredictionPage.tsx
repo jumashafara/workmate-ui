@@ -4,6 +4,7 @@ import PredictionDisplay from "../../components/Prediction/PredictionDisplay";
 import FeatureInput from "../../components/Prediction/FeatureInput";
 import getPrediction from "../../api/Predictions";
 import { Features } from "../../types/features";
+import FeatureContributionsChart from "../../components/Charts/ContributionsPlot";
 
 const IndividualPredictionPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -17,6 +18,7 @@ const IndividualPredictionPage: React.FC = () => {
   const [probabilities, setProbabilities] = useState<Array<number>>([0.5, 0.5]);
   const [predictedIncomeProduction, setPredictedIncomeProduction] =
     useState<number>(0);
+  const [contributions, setContributions] = useState({});
   // pre-data
   // const [selectedHousehold, setSelectedHousehold] = useState<string>("");
   const [district, setDistrict] = useState<string>("");
@@ -76,6 +78,7 @@ const IndividualPredictionPage: React.FC = () => {
       const prediction = response.data.prediction;
       const probabiliy = response.data.probability;
       setPrediction(prediction);
+      setContributions(response.data.contributions);
       setPredictedIncomeProduction(response.data.predicted_income_production);
       setProbabilities([probabiliy, 1 - probabiliy]);
     } catch (error) {
@@ -87,64 +90,69 @@ const IndividualPredictionPage: React.FC = () => {
 
   return (
     <div className="">
-      <div className="flex flex-col space-y-6 md:flex-row md:space-y-0 md:justify-between md:space-x-6 md:items-stretch">
+      <div className="flex flex-col space-y-6">
         {/* <div className="w-full h-full md:w-1/2">
           <SelectHousehold
             cutoffValue={cutoffValue}
             onCutoffChange={setCutoffValue}
           />
         </div> */}
-        <div className="w-full">
+        <div className="">
+          <FeatureInput
+            formData={formData}
+            setFormData={(newData) => {
+              setFormData(newData);
+              if (
+                newData.district === formData.district &&
+                newData.village === formData.village &&
+                newData.cluster === formData.cluster &&
+                newData.evaluation_month === formData.evaluation_month
+              ) {
+                handleGetPrediction(newData);
+              }
+            }}
+            loading={loading}
+            values={{
+              land: landValue,
+              member: memberValue,
+              water: waterValue,
+              farmImplements: farmImplementsValue,
+              district,
+              village,
+              cluster,
+              evaluationMonth,
+              distanceToOPD,
+              waterCollectionTime,
+              compostsNum,
+              educationLevel,
+            }}
+            setValues={{
+              setLand: setLandValue,
+              setMember: setMemberValue,
+              setWater: setWaterValue,
+              setFarmImplements: setFarmImplementsValue,
+              setDistrict,
+              setVillage,
+              setCluster,
+              setEvaluationMonth,
+              setDistanceToOPD,
+              setWaterCollectionTime,
+              setCompostsNum,
+              setEducationLevel,
+            }}
+          />
+        </div>
+        <div>
           <PredictionDisplay
             probabilities={probabilities}
             prediction={prediction}
             predicted_income_production={predictedIncomeProduction}
           />
         </div>
+        <div>
+          <FeatureContributionsChart contributions={contributions} />
+        </div>
       </div>
-      <FeatureInput
-        formData={formData}
-        setFormData={(newData) => {
-          setFormData(newData);
-          if (
-            newData.district === formData.district &&
-            newData.village === formData.village &&
-            newData.cluster === formData.cluster &&
-            newData.evaluation_month === formData.evaluation_month
-          ) {
-            handleGetPrediction(newData);
-          }
-        }}
-        loading={loading}
-        values={{
-          land: landValue,
-          member: memberValue,
-          water: waterValue,
-          farmImplements: farmImplementsValue,
-          district,
-          village,
-          cluster,
-          evaluationMonth,
-          distanceToOPD,
-          waterCollectionTime,
-          compostsNum,
-          educationLevel,
-        }}
-        setValues={{
-          setLand: setLandValue,
-          setMember: setMemberValue,
-          setWater: setWaterValue,
-          setFarmImplements: setFarmImplementsValue,
-          setDistrict,
-          setVillage,
-          setCluster,
-          setEvaluationMonth,
-          setDistanceToOPD,
-          setWaterCollectionTime,
-          setCompostsNum,
-          setEducationLevel,
-        }}
-      />
     </div>
   );
 };

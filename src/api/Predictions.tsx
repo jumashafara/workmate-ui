@@ -1,6 +1,7 @@
 import { Features } from "../types/features";
+import { PredictionResult } from "../types/prediction_result";
 
-const getPrediction = async (features: Features) => {
+const getPrediction = async (features: Features): Promise<PredictionResult> => {
     const response = await fetch(
         "http://localhost:8000/api/single-prediction/",
         {
