@@ -9,7 +9,7 @@ interface PieChartProps {
 const PieChart: React.FC<PieChartProps> = ({ data }) => {
   const chartOptions = {
     chart: {
-      type: "pie",
+      type: "pie" as const,
     },
     labels: ["Acheived", "Not Achieved"],
     colors: ["#EA580C", "#1c2434"],

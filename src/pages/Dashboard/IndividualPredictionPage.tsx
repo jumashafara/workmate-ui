@@ -31,6 +31,9 @@ const IndividualPredictionPage: React.FC = () => {
   const [waterCollectionTime, setWaterCollectionTime] = useState<number>(30);
   const [compostsNum, setCompostsNum] = useState<number>(0);
   const [educationLevel, setEducationLevel] = useState<number>(0);
+  const [tippyTapPresent, setTippyTapPresent] = useState<number>(0);
+  const [nonBioWasteManagement, setNonBioWasteManagement] = useState<number>(0);
+  const [organicsProduction, setOrganicsProduction] = useState<number>(0);
 
   // const handleHouseholdChange = async (
   //   event: React.ChangeEvent<HTMLSelectElement>
@@ -45,20 +48,20 @@ const IndividualPredictionPage: React.FC = () => {
     village: "",
     cluster: "",
     evaluation_month: 0,
-    cassava: [true], //done
-    maize: [true], //
-    ground_nuts: [true], //done
-    irish_potatoes: [true], //
-    sweet_potatoes: [true], //done
-    perennial_crops_grown_food_banana: [true], //done
-    tot_hhmembers: [0], // done
-    business_participation: [true],
-    Land_size_for_Crop_Agriculture_Acres: [0], //done
-    farm_implements_owned: [0],
+    cassava: [false], //done
+    maize: [false], //
+    ground_nuts: [false], //done
+    irish_potatoes: [false], //
+    sweet_potatoes: [false], //done
+    perennial_crops_grown_food_banana: [false], //done
     vsla_participation: [true],
+    business_participation: [false],
+    tot_hhmembers: [1], // done
+    Land_size_for_Crop_Agriculture_Acres: [0.1], //done
+    hh_water_collection_Minutes: [1],
+    farm_implements_owned: [1],
     Average_Water_Consumed_Per_Day: [0],
     Distance_travelled_one_way_OPD_treatment: [0],
-    hh_water_collection_Minutes: [0],
     composts_num: [0],
     perennial_crops_grown_coffee: [false],
     sorghum: [false],
@@ -75,12 +78,14 @@ const IndividualPredictionPage: React.FC = () => {
     setLoading(true);
     try {
       const response = await getPrediction(data);
-      const prediction = response.data.prediction;
-      const probabiliy = response.data.probability;
+      const prediction = response.prediction;
+      const probability = response.probability;
       setPrediction(prediction);
-      setContributions(response.data.contributions);
-      setPredictedIncomeProduction(response.data.predicted_income_production);
-      setProbabilities([probabiliy, 1 - probabiliy]);
+      setContributions(response.contributions);
+
+      setPredictedIncomeProduction(response.predicted_income_production); // Set as a number
+
+      setProbabilities([probability, 1 - probability]);
     } catch (error) {
       console.error("Prediction failed:", error);
     } finally {
@@ -125,6 +130,9 @@ const IndividualPredictionPage: React.FC = () => {
               waterCollectionTime,
               compostsNum,
               educationLevel,
+              tippyTapPresent,
+              nonBioWasteManagement,
+              organicsProduction,
             }}
             setValues={{
               setLand: setLandValue,
@@ -139,6 +147,9 @@ const IndividualPredictionPage: React.FC = () => {
               setWaterCollectionTime,
               setCompostsNum,
               setEducationLevel,
+              setTippyTapPresent,
+              setNonBioWasteManagement,
+              setOrganicsProduction,
             }}
           />
         </div>

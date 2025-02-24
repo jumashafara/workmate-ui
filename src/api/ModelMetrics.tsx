@@ -6,8 +6,14 @@ import {
 const fetchClassificationModelMetrics = async (name: string) => {
   const response = await fetch(`/api/models/classification/${name}`);
   const data = await response.json();
-  const metrics: ClassificationMetricsProps = data.model;
-  console.log(metrics);
+  const model = data.model;
+  const confusion_matrix = data.confusion_matrix;
+  console.log(model);
+  console.log(confusion_matrix);
+  const metrics: ClassificationMetricsProps = {
+    model,
+    confusion_matrix,
+  };
   return metrics;
 };
 

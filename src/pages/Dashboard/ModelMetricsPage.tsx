@@ -15,6 +15,7 @@ import RegressionModelStatsTable from "../../components/Tables/RegressionModelMe
 const ModelMetrics: React.FC = () => {
   const [classificationModelMetrics, setClassificationModelMetrics] =
     useState<ClassificationMetricsProps | null>(null);
+  const [confusionMatrixData, setConfusionMetrixData] = useState();
   const [regressionModelMetrics, setRegressionModelMetrics] =
     useState<RegressionMetricsProps | null>(null);
   const [model, setModel] = useState<{ name: string; type: string }>({
@@ -31,8 +32,9 @@ const ModelMetrics: React.FC = () => {
 
   const getModelMetrics = async (name: string, type: string) => {
     if (type === "classification") {
-      const metrics = await fetchClassificationModelMetrics(name);
-      setClassificationModelMetrics(metrics);
+      const data = await fetchClassificationModelMetrics(name);
+      setClassificationModelMetrics(data.model);
+      setConfusionMetrixData(data.confusion_matrix)
     } else {
       const metrics = await fetchRegressionModelMetrics(name);
       setRegressionModelMetrics(metrics);
@@ -62,7 +64,11 @@ const ModelMetrics: React.FC = () => {
         >
           <option value="">Select Model</option>
           {modelOptions.map((option) => (
-            <option key={option.id} value={option.id} className="dark:bg-gray-800">
+            <option
+              key={option.id}
+              value={option.id}
+              className="dark:bg-gray-800"
+            >
               {option.name}
             </option>
           ))}
@@ -80,7 +86,7 @@ const ModelMetrics: React.FC = () => {
       {model.type === "classification" ? (
         <div className="flex flex-col md:flex-row md:space-x-3 mt-6">
           <div className="md:w-1/2">
-            <ConfusionMatrix model_metrics={classificationModelMetrics} />
+            <ConfusionMatrix confusion_matrix_data={confusionMatrixData} />
           </div>
           <div className="md:w-1/2">
             <ROCCurve />

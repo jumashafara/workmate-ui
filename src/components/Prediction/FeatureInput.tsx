@@ -20,6 +20,10 @@ interface FeatureInputProps {
     waterCollectionTime: number;
     compostsNum: number;
     educationLevel: number;
+    // new additions
+    tippyTapPresent: number;
+    nonBioWasteManagement: number;
+    organicsProduction: number;
   };
   setValues: {
     setLand: (value: number) => void;
@@ -34,6 +38,9 @@ interface FeatureInputProps {
     setWaterCollectionTime: (value: number) => void;
     setCompostsNum: (value: number) => void;
     setEducationLevel: (value: number) => void;
+    setTippyTapPresent: (value: number) => void;
+    setNonBioWasteManagement: (value: number) => void;
+    setOrganicsProduction: (value: number) => void;
   };
 }
 
@@ -55,6 +62,9 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
     setWaterCollectionTime,
     setCompostsNum,
     setEducationLevel,
+    // setTippyTapPresent,
+    // setWasteManagement,
+    // setOrganicsProduction,
   },
 }) => {
   return (
@@ -142,6 +152,39 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
                   }
                 />
               </div>
+              <div>
+                <CheckboxTwo
+                  label="Tippy Tap"
+                  initialChecked={formData.tippy_tap_present[0]}
+                  onChange={(checked) =>
+                    setFormData({ ...formData, tippy_tap_present: [checked] })
+                  }
+                />
+              </div>
+              <div>
+                <CheckboxTwo
+                  label="Waste Mgt"
+                  initialChecked={formData.non_bio_waste_mgt_present[0]}
+                  onChange={(checked) =>
+                    setFormData({
+                      ...formData,
+                      non_bio_waste_mgt_present: [checked],
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <CheckboxTwo
+                  label="Organics Production"
+                  initialChecked={formData.hh_produce_organics[0]}
+                  onChange={(checked) =>
+                    setFormData({
+                      ...formData,
+                      hh_produce_organics: [checked],
+                    })
+                  }
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -153,7 +196,7 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
                   </label>
                   <input
                     type="range"
-                    min="0"
+                    min="0.1"
                     max="10"
                     step="0.1"
                     value={formData.Land_size_for_Crop_Agriculture_Acres[0]}
@@ -206,7 +249,7 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
                   </label>
                   <input
                     type="range"
-                    min="0"
+                    min="1"
                     max="20"
                     step="1"
                     value={formData.farm_implements_owned[0]}
@@ -367,9 +410,7 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div className="flex flex-col">
-                  <label className="  mb-1 dark:text-gray-200 ">
-                    District
-                  </label>
+                  <label className="  mb-1 dark:text-gray-200 ">District</label>
                   <input
                     placeholder="eg Kaliro"
                     onChange={(e) => {
@@ -402,9 +443,7 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
 
               <div className="space-y-4">
                 <div className="flex flex-col">
-                  <label className="  mb-1 dark:text-gray-200">
-                    Cluster
-                  </label>
+                  <label className="  mb-1 dark:text-gray-200">Cluster</label>
                   <input
                     placeholder="eg Mitooma"
                     onChange={(e) => {

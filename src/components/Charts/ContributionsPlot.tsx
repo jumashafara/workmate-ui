@@ -23,7 +23,7 @@ const featureLabelMap: Record<string, string> = {
   composts_num: "Composts",
   hh_produce_lq_manure: "Liquid Manure Production",
   maize: "Maize Production",
-  hh_produce_organics: "Organic Waste Mgt",
+  hh_produce_organics: "Organics Production",
   sorghum: "Sorghum Production",
   education_level_encoded: "Education Level",
   soap_ash_present: "Soap & Ash Available",
@@ -43,18 +43,17 @@ const FeatureContributionsChart: React.FC<FeatureContributionsChartProps> = ({
   const featureValues = featureEntries.map(([, value]) => Number(value)); // Ensure values are numbers
 
   const colors = featureValues.map((value) =>
-    value >= 0 ? "#EA580C" : "#1c2434"
+    value >= 0 ? "#EA580C" : "#374151"
   );
 
   const chartOptions = {
     chart: {
-      type: "bar",
+      type: "bar" as const,
       toolbar: { show: false },
-      background: "#ffffff",
+      //   background: "#ffffff",
       foreColor: "#333",
-      padding: "5px"
-    //   increase bar size
-    
+      padding: "5px",
+      //   increase bar size
     },
     colors,
     xaxis: {
@@ -78,7 +77,7 @@ const FeatureContributionsChart: React.FC<FeatureContributionsChartProps> = ({
       bar: {
         horizontal: true,
         distributed: true,
-        barHeight: "90%"
+        barHeight: "90%",
       },
     },
     dataLabels: {
@@ -99,19 +98,21 @@ const FeatureContributionsChart: React.FC<FeatureContributionsChartProps> = ({
   ];
 
   return (
-    <div className="bg-white rounded-sm shadow-md">
+    <div className="bg-white rounded-sm shadow-md border border-gray-300 dark:border-gray-700">
       <div className="bg-gradient-to-r from-gray-200 to-gray-300 p-4 rounded-sm  dark:from-gray-800 dark:to-gray-900 dark:text-gray-200">
-        <h2 className="text-lg font-semibold mb-3 text-gray-700">
+        <h2 className="text-lg font-semibold mb-3 text-gray-700 dark:text-gray-300">
           Feature Contributions
         </h2>
         <p>How has each feature contributed to the prediction?</p>
       </div>
-      <Chart
-        options={chartOptions}
-        series={chartSeries}
-        type="bar"
-        height={500}
-      />
+      <div className="dark:bg-gray-800">
+        <Chart
+          options={chartOptions}
+          series={chartSeries}
+          type="bar"
+          height={500}
+        />
+      </div>
     </div>
   );
 };

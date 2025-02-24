@@ -1,31 +1,39 @@
 import React, { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
-import { MetricsProps } from "../../types/modelmetrics";
 
 interface ConfusionMatrixProps {
-  model_metrics: MetricsProps | null;
+  confusion_matrix_data:
+    | {
+        true_positives: number;
+        false_positives: number;
+        true_negatives: number;
+        false_negatives: number;
+      }
+    | undefined;
 }
 
-const ConfusionMatrix: React.FC<ConfusionMatrixProps> = ({ model_metrics }) => {
+const ConfusionMatrix: React.FC<ConfusionMatrixProps> = ({
+  confusion_matrix_data,
+}) => {
   const [matrix_data, setMatrixData] = useState<number[][]>([
     [0, 0],
     [0, 0],
   ]);
 
   useEffect(() => {
-    if (model_metrics) {
+    if (confusion_matrix_data) {
       setMatrixData([
         [
-          model_metrics.true_negative,
-          model_metrics.false_negative,
+          confusion_matrix_data.true_negatives,
+          confusion_matrix_data.false_negatives,
         ],
         [
-          model_metrics.false_positive,
-          model_metrics.true_positive,
+          confusion_matrix_data.false_positives,
+          confusion_matrix_data.true_positives,
         ],
       ]);
     }
-  }, [model_metrics])
+  }, [confusion_matrix_data]);
 
   const categories = ["Negative", "Positive"];
 

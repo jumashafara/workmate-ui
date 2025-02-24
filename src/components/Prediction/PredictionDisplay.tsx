@@ -31,13 +31,13 @@ const PredictionDisplay: React.FC<PredictionDisplayProps> = ({
               <tr>
                 <td className="px-4 py-2 border-b text-left">Achieving</td>
                 <td className="px-4 py-2 border-b text-left">
-                  {probabilities[0].toFixed(2)}
+                  {probabilities[0].toFixed(3)}
                 </td>
               </tr>
               <tr>
                 <td className="px-4 py-2 border-b text-left">Not Achieving</td>
                 <td className="px-4 py-2 border-b text-left">
-                  {probabilities[1].toFixed(2)}
+                  {probabilities[1].toFixed(3)}
                 </td>
               </tr>
               <tr>
@@ -51,7 +51,7 @@ const PredictionDisplay: React.FC<PredictionDisplayProps> = ({
                   Predicted Income Production
                 </td>
                 <td className="px-4 py-2 border-b text-left">
-                  {predicted_income_production}
+                  {predicted_income_production.toFixed(3)}
                 </td>
               </tr>
             </tbody>

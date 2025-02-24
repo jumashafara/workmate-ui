@@ -15,7 +15,7 @@ const getPrediction = async (features: Features): Promise<PredictionResult> => {
     const data = await response.json();
 
     console.log(data)
-    return data;
+    return data.data;
 };
 
 export default getPrediction;
