@@ -8,20 +8,17 @@ const FeatureImportanceChart: React.FC = () => {
     "year1_classification"
   );
 
-  const getFeatureImportances = async () => {
+  const getFeatureImportances = async (model: string | undefined) => {
     const response = await fetch(
       `/api/models/feature-importances/?model=${model}`
     );
     const data = await response.json();
-
     console.log(data);
     return data;
   };
 
   useEffect(() => {
-    getFeatureImportances();
-
-    getFeatureImportances().then((data) => {
+    getFeatureImportances(model).then((data) => {
       const features = Object.keys(data.feature_importances);
       const importances = Object.values(data.feature_importances) as number[];
       setFeatureName(features);
@@ -77,14 +74,6 @@ const FeatureImportanceChart: React.FC = () => {
     tooltip: {
       shared: true,
       intersect: false,
-    },
-    title: {
-      text: "Feature Importance",
-      align: "center",
-      style: {
-        fontSize: "20px",
-        color: "#333",
-      },
     },
   };
 

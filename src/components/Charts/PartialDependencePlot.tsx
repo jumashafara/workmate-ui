@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
-// import { Features } from "../../types/features";
-
-// interface PartialDependencePlotProps {
-//   model: string;
-// }
 
 const PartialDependencePlot: React.FC = () => {
   const [model, setModel] = useState<string>("year1_classification");
@@ -40,7 +35,7 @@ const PartialDependencePlot: React.FC = () => {
     };
 
     fetchData();
-  }, [feature]);
+  }, [model, feature]);
 
   const chartOptions = {
     chart: {
@@ -59,7 +54,7 @@ const PartialDependencePlot: React.FC = () => {
         formatter: (value: number) => value?.toFixed(2),
       },
     },
-    
+
     yaxis: {
       title: {
         text: "Average Probability",
@@ -103,6 +98,9 @@ const PartialDependencePlot: React.FC = () => {
               >
                 <option value="year1_classification" className="bg-transparent">
                   Year 1 Classification
+                </option>
+                <option value="year2_classification" className="bg-transparent">
+                  Year 2 Classification
                 </option>
               </select>
               <select
