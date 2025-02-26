@@ -9,7 +9,7 @@ import {
   ClassificationMetricsProps,
   RegressionMetricsProps,
 } from "../../types/modelmetrics";
-import ClassificationModelStatsTable from "../../components/Charts/ClassificationModelMetrics";
+import ClassificationModelStatsTable from "../../components/Tables/ClassificationModelMetrics";
 import RegressionModelStatsTable from "../../components/Tables/RegressionModelMetrics";
 
 const ModelMetrics: React.FC = () => {
@@ -34,7 +34,7 @@ const ModelMetrics: React.FC = () => {
     if (type === "classification") {
       const data = await fetchClassificationModelMetrics(name);
       setClassificationModelMetrics(data.model);
-      setConfusionMetrixData(data.confusion_matrix)
+      setConfusionMetrixData(data.confusion_matrix);
     } else {
       const metrics = await fetchRegressionModelMetrics(name);
       setRegressionModelMetrics(metrics);
@@ -46,12 +46,18 @@ const ModelMetrics: React.FC = () => {
   }, [model.name]);
   return (
     <>
-      <div className="pb-3">
+      <div className="flex justify-between p-3 mb-0 bg-gray-200 border border-gray-300 dark:bg-gray-700">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Model Metrics
+          </h2>
+          <p className="text-gray-800">How is our model performing? </p>
+        </div>
         <select
           value={model.name}
           name="modelSelect"
           id="modelSelect"
-          className="p-3 bg-transparent outline-none border border-gray-300 dark:border-gray-700 rounded-sm"
+          className="p-3 outline-none border border-gray-300 bg-gray-100 dark:border-gray-800 dark:bg-gray-800 rounded-sm"
           onChange={(e) => {
             const selectedId = Number(e.target.value);
             const selectedModel = modelOptions.find((m) => m.id === selectedId);

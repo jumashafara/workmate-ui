@@ -9,12 +9,8 @@ const RegressionModelStatsTable: React.FC<RegressionModelMetrics> = ({
   model_metrics,
 }) => {
   return (
-    <div className="overflow-x-auto border border-gray-300 p-4 bg-white dark:bg-gray-800 dark:border-gray-700 shadow-md">
+    <div className="overflow-x-auto border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-700 shadow-md">
       {/* select model */}
-
-      <h2 className="text-lg font-semibold mb-4 text-center text-gray-900 dark:text-white">
-        Model Metrics
-      </h2>
       <table className="min-w-full table-auto border-collapse border border-gray-200 dark:border-gray-600">
         <thead>
           <tr className="bg-gray-100 dark:bg-gray-700">
