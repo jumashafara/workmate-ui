@@ -343,7 +343,7 @@ const StandardEvaluations: React.FC = () => {
                       <Percent sx={{ fontSize: 40, color: 'success.main', mr: 2 }} />
                       <Box>
                         <Typography variant="h6" component="div">
-                          Avg Prediction
+                          Avg Achieved
                         </Typography>
                         <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
                           {averages.avgPrediction.toFixed(2)}%
@@ -359,7 +359,7 @@ const StandardEvaluations: React.FC = () => {
                       <AttachMoney sx={{ fontSize: 40, color: 'warning.main', mr: 2 }} />
                       <Box>
                         <Typography variant="h6" component="div">
-                          Avg Income
+                          Avg Income + Production
                         </Typography>
                         <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
                           ${averages.avgIncome.toFixed(2)}

@@ -274,8 +274,8 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
             boxShadow: 3,
             bgcolor: 'background.paper'
           }}
-        >
-          {/* Header */}
+    >
+      {/* Header */}
           <CardHeader
             title={
               <Typography variant="h6" component="div">
@@ -285,7 +285,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
             action={
               isFloating && onClose && (
                 <IconButton 
-                  onClick={onClose} 
+              onClick={onClose}
                   color="inherit" 
                   aria-label="close"
                 >
@@ -301,7 +301,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
           />
 
           {/* Sample Questions */}
-          {!isFloating && (
+      {!isFloating && (
             <Paper 
               variant="outlined" 
               sx={{ 
@@ -352,18 +352,18 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
                 <Button 
                   variant="outlined" 
                   size="small" 
-                  onClick={handleLoadMore}
+              onClick={handleLoadMore}
                   startIcon={<ExpandMoreIcon />}
                   color="primary"
-                >
-                  Load More
+            >
+              Load More
                 </Button>
               </Box>
-            )}
+        )}
 
-            {displayedMessages.map((msg) => (
+        {displayedMessages.map((msg) => (
               <Box
-                key={msg.id}
+            key={msg.id}
                 sx={{
                   display: 'flex',
                   justifyContent: msg.sender === "user" ? 'flex-end' : 'flex-start',
@@ -390,7 +390,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
                   }}
                 >
                   <Typography variant="body1">
-                    {renderMessageText(msg.text)}
+                  {renderMessageText(msg.text)}
                   </Typography>
                   <Typography 
                     variant="caption" 
@@ -407,7 +407,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
               </Box>
             ))}
 
-            {loading && (
+        {loading && (
               <Box
                 sx={{
                   display: 'flex',
@@ -425,14 +425,14 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
 
           <Divider />
 
-          {/* Input Area */}
+      {/* Input Area */}
           <Box sx={{ p: 2, bgcolor: 'background.paper' }}>
             <TextField
               fullWidth
               placeholder="Type your message..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={handleKeyPress}
               variant="outlined"
               size="small"
               inputRef={inputRef}
@@ -465,17 +465,17 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
                 }
               }}
             />
-            
-            {/* Clear Chat Button */}
+
+      {/* Clear Chat Button */}
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
               <Button
                 startIcon={<DeleteIcon />}
-                onClick={() => setMessages([])}
+          onClick={() => setMessages([])}
                 color="primary"
                 size="small"
                 variant="text"
               >
-                Clear chat
+          Clear chat
               </Button>
             </Box>
           </Box>

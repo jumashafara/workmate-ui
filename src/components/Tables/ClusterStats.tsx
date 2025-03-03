@@ -171,9 +171,9 @@ const ClusterStats: React.FC<ClusterStatsProps> = ({ apiUrl = "/api/cluster-stat
             </TableRow>
           </TableHead>
           <TableBody>
-            {currentRows.map((stat, index) => (
+              {currentRows.map((stat, index) => (
               <TableRow
-                key={index}
+                  key={index}
                 hover
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >

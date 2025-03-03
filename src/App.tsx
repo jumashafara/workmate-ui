@@ -13,7 +13,7 @@ import DefaultLayout from "./layout/DefaultLayout";
 import IndividualPredictionPage from "./pages/Dashboard/IndividualPredictionPage";
 import MultiplePredictionsPage from "./pages/Dashboard/MultiplePredictionsPage";
 import ChatPage from "./pages/ChatPage";
-import HomePage from "./pages/HomePage";
+import HomePage from "./pages/Reports/HomePage";
 import FloatingChat from "./components/FloatingChat";
 import Settings from "./pages/Settings";
 

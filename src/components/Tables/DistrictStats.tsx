@@ -133,7 +133,7 @@ const DistrictStats: React.FC<DistrictStatsProps> = ({ apiUrl = "/api/district-s
                   direction={sortField === 'avg_prediction' ? sortDirection : 'asc'}
                   onClick={() => handleSort('avg_prediction')}
                 >
-                  Percentage Predicted
+                  Percentage Achieved
                 </TableSortLabel>
               </TableCell>
               <TableCell>
@@ -142,7 +142,7 @@ const DistrictStats: React.FC<DistrictStatsProps> = ({ apiUrl = "/api/district-s
                   direction={sortField === 'avg_income' ? sortDirection : 'asc'}
                   onClick={() => handleSort('avg_income')}
                 >
-                  Predicted Income
+                  Predicted Income + Production
                 </TableSortLabel>
               </TableCell>
               {districtStats[0]?.count !== undefined && (

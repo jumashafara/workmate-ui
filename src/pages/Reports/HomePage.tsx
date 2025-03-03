@@ -19,13 +19,14 @@ import {
   TrendingUp,
   Assessment
 } from "@mui/icons-material";
-import DistrictStats from "../../src/components/Tables/DistrictStats";
-import ClusterStats from "../components/Tables/ClusterStats";
+import DistrictStats from "../../components/Tables/DistrictStats";
+import ClusterStats from "../../components/Tables/ClusterStats";
 
 interface DashboardStats {
   total_predictions: number;
   positive_predictions: number;
   negative_predictions: number;
+  average_income: number;
   accuracy: number;
 }
 
@@ -34,6 +35,7 @@ const HomePage: React.FC = () => {
     total_predictions: 0,
     positive_predictions: 0,
     negative_predictions: 0,
+    average_income: 0,
     accuracy: 0,
   });
   const [loading, setLoading] = React.useState(true);
@@ -95,31 +97,27 @@ const HomePage: React.FC = () => {
             title="Total Predictions"
             value={stats.total_predictions}
             icon={<Assessment sx={{ fontSize: 28, color: 'primary.main' }} />}
-            color="primary"
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
-            title="Positive Predictions"
-            value={stats.positive_predictions}
+            title="Achieved"
+            value={`${((stats.positive_predictions / stats.total_predictions) * 100).toFixed(1)}%`}
             icon={<CheckCircle sx={{ fontSize: 28, color: 'success.main' }} />}
-            color="success"
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
-            title="Negative Predictions"
-            value={stats.negative_predictions}
+            title="Not achieved"
+            value={`${((stats.negative_predictions / stats.total_predictions) * 100).toFixed(1)}%`}
             icon={<Cancel sx={{ fontSize: 28, color: 'error.main' }} />}
-            color="error"
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
-            title="Accuracy"
-            value={`${(stats.accuracy * 100).toFixed(1)}%`}
+            title="Avg Income + Production"
+            value={`${(stats.average_income).toFixed(1)}%`}
             icon={<TrendingUp sx={{ fontSize: 28, color: 'info.main' }} />}
-            color="info"
           />
         </Grid>
       </Grid>
