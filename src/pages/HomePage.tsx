@@ -1,6 +1,24 @@
 import React from "react";
-import { Grid } from "@mui/material";
-import { Timeline, CheckCircle, Cancel, QueryStats } from "@mui/icons-material";
+import { 
+  Grid, 
+  Card, 
+  CardContent, 
+  Typography, 
+  Box, 
+  FormControl, 
+  InputLabel, 
+  Select, 
+  MenuItem 
+} from "@mui/material";
+import { 
+  Timeline, 
+  CheckCircle, 
+  Cancel, 
+  QueryStats,
+  BarChart,
+  TrendingUp,
+  Assessment
+} from "@mui/icons-material";
 import DistrictStats from "../../src/components/Tables/DistrictStats";
 import ClusterStats from "../components/Tables/ClusterStats";
 
@@ -18,8 +36,8 @@ const HomePage: React.FC = () => {
     negative_predictions: 0,
     accuracy: 0,
   });
-
-  const [selectedStats, setSelectedStats] = React.useState("cluster");
+  const [loading, setLoading] = React.useState(true);
+  const [groupBy, setGroupBy] = React.useState<string>("district");
 
   React.useEffect(() => {
     fetchDashboardStats();
@@ -30,80 +48,104 @@ const HomePage: React.FC = () => {
       const response = await fetch("/api/dashboard-stats/");
       const data = await response.json();
       setStats(data);
+      setLoading(false);
     } catch (error) {
-      console.error("Error fetching stats:", error);
+      console.error("Error fetching dashboard stats:", error);
+      setLoading(false);
     }
   };
 
   const StatCard = ({ title, value, icon, color }: any) => (
-    <div className="bg-white shadow-md rounded-sm p-6 flex justify-between items-center transition-all duration-300 hover:shadow-2xl border border-gray-300 dark:border-gray-600 dark:bg-gray-800">
-      <div>
-        <p className="">{title}</p>
-        <h3 className="text-3xl font-bold mt-1">{value}</h3>
-      </div>
-      <div className={`${color} text-4xl`}>{icon}</div>
-    </div>
+    <Card sx={{ height: '100%', boxShadow: 2 }}>
+      <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
+        {icon && (
+          <Box sx={{ 
+            mr: 2, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            backgroundColor: `${color}.light`,
+            borderRadius: '50%',
+            p: 1.5
+          }}>
+            {icon}
+          </Box>
+        )}
+        <Box>
+          <Typography variant="h6" component="div">
+            {title}
+          </Typography>
+          <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
+            {value}
+          </Typography>
+        </Box>
+      </CardContent>
+    </Card>
   );
 
   return (
-    <div className="">
-      <h2 className="text-2xl font-bold mb-6">Predictions Dashboard</h2>
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 'bold' }}>
+        Dashboard
+      </Typography>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Total Predictions"
             value={stats.total_predictions}
-            icon={<Timeline fontSize="inherit" />}
-            color="text-blue-400"
+            icon={<Assessment sx={{ fontSize: 28, color: 'primary.main' }} />}
+            color="primary"
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
-            title="Achieved"
+            title="Positive Predictions"
             value={stats.positive_predictions}
-            icon={<CheckCircle fontSize="inherit" />}
-            color="text-green-400"
+            icon={<CheckCircle sx={{ fontSize: 28, color: 'success.main' }} />}
+            color="success"
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
-            title="Not Achieved"
+            title="Negative Predictions"
             value={stats.negative_predictions}
-            icon={<Cancel fontSize="inherit" />}
-            color="text-red-400"
+            icon={<Cancel sx={{ fontSize: 28, color: 'error.main' }} />}
+            color="error"
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
-            title="Accuracy (c lass)"
-            value={`${stats.accuracy}%`}
-            icon={<QueryStats fontSize="inherit" />}
-            color="text-orange-400"
+            title="Accuracy"
+            value={`${(stats.accuracy * 100).toFixed(1)}%`}
+            icon={<TrendingUp sx={{ fontSize: 28, color: 'info.main' }} />}
+            color="info"
           />
         </Grid>
       </Grid>
 
-      <div className="pt-6 pb-3">
-        <select
-          name=""
-          id=""
-          onChange={(e) => setSelectedStats(e.target.value)}
-          className="text-lg font-bold p-3  outline-none dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-sm"
-        >
-          <option value="" className="p-3 text-bold ">
-            Select Stats ({selectedStats})
-          </option>
-          <option value="cluster" className="p-3 text-bold bg-gray-300 dark:bg-gray-800">
-          Cluster
-          </option>
-          <option value="district" className="p-3 text-bold bg-gray-300 dark:bg-gray-800">
-          District
-          </option>
-        </select>
-      </div>
-      {selectedStats === "cluster" ? <ClusterStats /> : <DistrictStats />}
-    </div>
+      <Box sx={{ mb: 3 }}>
+        <FormControl sx={{ minWidth: 200 }}>
+          <InputLabel id="group-by-label">Group By</InputLabel>
+          <Select
+            labelId="group-by-label"
+            id="group-by-select"
+            value={groupBy}
+            label="Group By"
+            onChange={(e) => setGroupBy(e.target.value)}
+          >
+            <MenuItem value="district">District</MenuItem>
+            <MenuItem value="cluster">Cluster</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+
+      {groupBy === "district" ? (
+        <DistrictStats />
+      ) : (
+        <ClusterStats />
+      )}
+    </Box>
   );
 };
 

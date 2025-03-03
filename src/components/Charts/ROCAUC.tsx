@@ -1,81 +1,82 @@
 import React from "react";
-import ReactApexChart from "react-apexcharts";
+import Plot from 'react-plotly.js';
 
-const ROCCurve: React.FC = () => {
-  const fpr = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
-  const tpr = [0, 0.3, 0.45, 0.6, 0.68, 0.75, 0.82, 0.89, 0.93, 0.97, 1];
-  const aucScore = 0.81;
+interface ROCCurveProps {
+  fpr?: number[];
+  tpr?: number[];
+  aucScore?: number;
+}
 
-  const series = [
+const ROCCurve: React.FC<ROCCurveProps> = ({ 
+  fpr = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+  tpr = [0, 0.3, 0.45, 0.6, 0.68, 0.75, 0.82, 0.89, 0.93, 0.97, 1],
+  aucScore = 0.81
+}) => {
+  
+  const data = [
     {
-      name: "ROC Curve",
-      data: fpr.map((val, idx) => [val, tpr[idx]]),
+      x: fpr,
+      y: tpr,
+      type: 'scatter',
+      mode: 'lines+markers',
+      name: 'ROC Curve (AUC = ' + aucScore.toFixed(2) + ')',
+      line: {
+        color: '#ea580c',
+        width: 2
+      },
+      marker: {
+        color: '#ea580c',
+        size: 6
+      }
     },
     {
-      name: "Random Classifier",
-      data: [
-        [0, 0],
-        [1, 1],
-      ],
-    },
+      x: [0, 1],
+      y: [0, 1],
+      type: 'scatter',
+      mode: 'lines',
+      name: 'Random Classifier',
+      line: {
+        color: '#9ca3af',
+        width: 2,
+        dash: 'dash'
+      }
+    }
   ];
 
-  const options = {
-    chart: {
-      type: "line",
-      height: 500,
-      zoom: {
-        enabled: false,
-      },
+  const layout = {
+    title: {
+      text: 'ROC Curve',
+      font: {
+        family: 'Arial, sans-serif',
+        size: 24
+      }
     },
     xaxis: {
-      title: {
-        text: "False Positive Rate",
-        style: {
-          color: "#000",
-        },
-      },
-      min: 0,
-      max: 1,
-      labels: {
-        style: {
-          colors: ["#000"],
-        },
-      },
+      title: 'False Positive Rate',
+      range: [0, 1]
     },
     yaxis: {
-      title: {
-        text: "True Positive Rate",
-        style: {
-          color: "#000",
-        },
-      },
-      min: 0,
-      max: 1,
-      labels: {
-        style: {
-          colors: ["#000"],
-        },
-      },
-    },
-    stroke: {
-      curve: "straight",
-      width: 2,
-    },
-    colors: ["#ea580c", "#9ca3af"],
-    markers: {
-      size: 4,
+      title: 'True Positive Rate',
+      range: [0, 1]
     },
     legend: {
-      position: "top",
-      labels: {
-        colors: ["#000"],
-      },
+      x: 0.1,
+      y: 0.9
     },
-    tooltip: {
-      shared: true,
-      intersect: false,
+    margin: {
+      l: 60,
+      r: 30,
+      b: 60,
+      t: 80
     },
+    hovermode: 'closest',
+    plot_bgcolor: 'white',
+    paper_bgcolor: 'white'
+  };
+
+  const config = {
+    responsive: true,
+    displayModeBar: false
   };
 
   return (
@@ -89,11 +90,11 @@ const ROCCurve: React.FC = () => {
         </p>
       </div>
       <div className="p-3">
-        <ReactApexChart
-          options={options}
-          series={series}
-          type="line"
-          height={500}
+        <Plot
+          data={data}
+          layout={layout}
+          config={config}
+          style={{ width: '100%', height: 500 }}
         />
       </div>
     </div>

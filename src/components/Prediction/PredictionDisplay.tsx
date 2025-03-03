@@ -1,5 +1,18 @@
 import React from "react";
 import PieChart from "../Charts/PieChart";
+import { 
+  Card, 
+  CardHeader, 
+  CardContent, 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableContainer, 
+  TableHead, 
+  TableRow, 
+  Paper, 
+  Grid 
+} from "@mui/material";
 
 interface PredictionDisplayProps {
   probabilities: number[];
@@ -13,55 +26,54 @@ const PredictionDisplay: React.FC<PredictionDisplayProps> = ({
   predicted_income_production,
 }) => {
   return (
-    <div className="w-full border border-gray-300 rounded-sm shadow-lg bg-white dark:border-gray-600 dark:bg-gray-800">
-      <div className="bg-gradient-to-r from-gray-200 to-gray-300 p-4 rounded-sm text-gray-700 dark:from-gray-800 dark:to-gray-900 dark:text-gray-200">
-        <h2 className="text-xl font-bold mb-2 w-full">Prediction</h2>
-        <p className="">What are the chances of achieving the target?</p>
-      </div>
-      <div className="p-6 flex flex-col md:flex-row">
-        <div className="md:w-1/2">
-          <table className="w-full bg-white dark:bg-gray-800">
-            <thead>
-              <tr>
-                <th className="px-4 py-2 border-b text-left">Status</th>
-                <th className="px-4 py-2 border-b text-left">Probability</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="px-4 py-2 border-b text-left">Achieving</td>
-                <td className="px-4 py-2 border-b text-left">
-                  {probabilities[0].toFixed(3)}
-                </td>
-              </tr>
-              <tr>
-                <td className="px-4 py-2 border-b text-left">Not Achieving</td>
-                <td className="px-4 py-2 border-b text-left">
-                  {probabilities[1].toFixed(3)}
-                </td>
-              </tr>
-              <tr>
-                <td className="px-4 py-2 border-b text-left">Predicted</td>
-                <td className="px-4 py-2 border-b text-left">
-                  {prediction === 1 ? "Achieved" : "Not Achieved"}
-                </td>
-              </tr>
-              <tr>
-                <td className="px-4 py-2 border-b text-left">
-                  Predicted Income Production
-                </td>
-                <td className="px-4 py-2 border-b text-left">
-                  {predicted_income_production.toFixed(3)}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div className="md:w-1/2 p-6">
-          <PieChart data={probabilities} />
-        </div>
-      </div>
-    </div>
+    <Card sx={{ width: '100%', boxShadow: 2 }}>
+      <CardHeader 
+        title="Prediction" 
+        subheader="What are the chances of achieving the target?"
+        sx={{ 
+          backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'grey.800' : 'grey.100',
+          backgroundImage: 'linear-gradient(to right, #e5e7eb, #d1d5db)',
+          padding: 3
+        }}
+      />
+      <CardContent>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={6}>
+            <TableContainer component={Paper} elevation={0}>
+              <Table aria-label="prediction results table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Probability</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>Achieving</TableCell>
+                    <TableCell>{probabilities[0].toFixed(3)}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Not Achieving</TableCell>
+                    <TableCell>{probabilities[1].toFixed(3)}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Predicted</TableCell>
+                    <TableCell>{prediction === 1 ? "Achieved" : "Not Achieved"}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Predicted Income Production</TableCell>
+                    <TableCell>{predicted_income_production.toFixed(3)}</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
+          <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <PieChart data={probabilities} />
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
   );
 };
 

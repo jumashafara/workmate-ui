@@ -1,161 +1,195 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableContainer, 
+  TableHead, 
+  TableRow, 
+  Paper, 
+  TableSortLabel,
+  Box,
+  Typography,
+  Pagination
+} from "@mui/material";
 
 interface DistrictStat {
   district: string;
   avg_prediction: number;
   avg_income: number;
   evaluation_month: string;
+  count?: number;
 }
 
-const DistrictStats: React.FC = () => {
-  const [districtStats, setDistrictStats] = React.useState<DistrictStat[]>([]);
-  const [currentPage, setCurrentPage] = React.useState(1);
-  const [sortField, setSortField] =
-    React.useState<keyof DistrictStat>("district");
-  const [sortDirection, setSortDirection] = React.useState<"asc" | "desc">(
-    "asc"
-  );
+interface DistrictStatsProps {
+  apiUrl?: string;
+  queryParams?: URLSearchParams;
+}
+
+const DistrictStats: React.FC<DistrictStatsProps> = ({ apiUrl = "/api/district-stats/", queryParams }) => {
+  const [districtStats, setDistrictStats] = useState<DistrictStat[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortField, setSortField] = useState<keyof DistrictStat>("district");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const rowsPerPage = 10; // Number of rows per page
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchDistrictStats();
-  }, []);
+  }, [apiUrl, queryParams]);
 
   const fetchDistrictStats = async () => {
     try {
-      const response = await fetch("/api/district-stats/");
+      setLoading(true);
+      let url = apiUrl;
+      
+      // If we're on the standard evaluations page with filters
+      if (queryParams) {
+        // Add group_by=district to the query params
+        const params = new URLSearchParams(queryParams);
+        params.set('group_by', 'district');
+        url = `/api/standard-evaluations/?${params.toString()}`;
+      }
+      
+      const response = await fetch(url);
       const data = await response.json();
-      setDistrictStats(data);
-    } catch (error) {
-      console.error("Error fetching cluster stats:", error);
+      
+      // Reset to first page when data changes
+      setCurrentPage(1);
+      
+      // Handle both array response and object with data property
+      const statsData = Array.isArray(data) ? data : data.data || [];
+      setDistrictStats(statsData);
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching district stats:", err);
+      setError("Failed to load district statistics");
+      setLoading(false);
     }
   };
 
+  // Handle sorting
   const handleSort = (field: keyof DistrictStat) => {
-    const newDirection =
-      field === sortField && sortDirection === "asc" ? "desc" : "asc";
+    const isAsc = sortField === field && sortDirection === "asc";
+    setSortDirection(isAsc ? "desc" : "asc");
     setSortField(field);
-    setSortDirection(newDirection);
-
-    const sortedStats = [...districtStats].sort((a, b) => {
-      if (field === "avg_prediction" || field === "avg_income") {
-        return sortDirection === "asc"
-          ? a[field] - b[field]
-          : b[field] - a[field];
-      }
-      return sortDirection === "asc"
-        ? String(a[field]).localeCompare(String(b[field]))
-        : String(b[field]).localeCompare(String(a[field]));
-    });
-
-    setDistrictStats(sortedStats);
   };
 
-  const getSortIcon = (field: keyof DistrictStat) => {
-    if (sortField !== field) return "↕️";
-    return sortDirection === "asc" ? "↑" : "↓";
-  };
-
-  // Calculate pagination values
+  // Get current rows for pagination
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = districtStats.slice(indexOfFirstRow, indexOfLastRow);
+  
+  // Sort data
+  const sortedData = [...districtStats].sort((a, b) => {
+    const aValue = a[sortField];
+    const bValue = b[sortField];
+    
+    if (typeof aValue === 'number' && typeof bValue === 'number') {
+      return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+    }
+    
+    // Handle string comparison
+    const aString = String(aValue || '');
+    const bString = String(bValue || '');
+    return sortDirection === 'asc' 
+      ? aString.localeCompare(bString) 
+      : bString.localeCompare(aString);
+  });
+  
+  const currentRows = sortedData.slice(indexOfFirstRow, indexOfLastRow);
   const totalPages = Math.ceil(districtStats.length / rowsPerPage);
 
+  if (loading) return <Typography>Loading district statistics...</Typography>;
+  if (error) return <Typography color="error">{error}</Typography>;
+
   return (
-    <div className="">
-      {/* <h3 className="text-xl font-bold mt-8 mb-4">District Statistics</h3> */}
-      <div className="overflow-x-auto border border-gray-300 dark:border-gray-600 shadow-md rounded-sm">
-        <div className="max-h-80 overflow-y-auto">
-          {" "}
-          {/* Enables vertical scrolling */}
-          <table className="min-w-full table-auto dark:bg-gray-800">
-            <thead className="bg-gray-200 sticky top-0 dark:bg-gray-800">
-              {" "}
-              {/* Sticky header */}
-              <tr>
-                <th
-                  className="px-6 py-3 uppercase tracking-wider text-center cursor-pointer hover:bg-gray-300"
-                  onClick={() => handleSort("district")}
+    <Box>
+      <TableContainer component={Paper} sx={{ maxHeight: 440, boxShadow: 2 }}>
+        <Table stickyHeader aria-label="district statistics table">
+          <TableHead>
+            <TableRow>
+              <TableCell>
+                <TableSortLabel
+                  active={sortField === 'district'}
+                  direction={sortField === 'district' ? sortDirection : 'asc'}
+                  onClick={() => handleSort('district')}
                 >
-                  District {getSortIcon("district")}
-                </th>
-                <th
-                  className="px-6 py-3 uppercase tracking-wider text-center cursor-pointer hover:bg-gray-300"
-                  onClick={() => handleSort("evaluation_month")}
+                  District
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={sortField === 'evaluation_month'}
+                  direction={sortField === 'evaluation_month' ? sortDirection : 'asc'}
+                  onClick={() => handleSort('evaluation_month')}
                 >
-                  Evaluation Month {getSortIcon("evaluation_month")}
-                </th>
-                <th
-                  className="px-6 py-3 uppercase tracking-wider text-center cursor-pointer hover:bg-gray-300"
-                  onClick={() => handleSort("avg_prediction")}
+                  Evaluation Month
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={sortField === 'avg_prediction'}
+                  direction={sortField === 'avg_prediction' ? sortDirection : 'asc'}
+                  onClick={() => handleSort('avg_prediction')}
                 >
-                  Percentage Predicted {getSortIcon("avg_prediction")}
-                </th>
-                <th
-                  className="px-6 py-3 uppercase tracking-wider text-center cursor-pointer hover:bg-gray-300"
-                  onClick={() => handleSort("avg_income")}
+                  Percentage Predicted
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={sortField === 'avg_income'}
+                  direction={sortField === 'avg_income' ? sortDirection : 'asc'}
+                  onClick={() => handleSort('avg_income')}
                 >
-                  Predicted Income + Production {getSortIcon("avg_income")}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800">
-              {currentRows.map((stat, index) => (
-                <tr
-                  key={index}
-                  className="hover:bg-gray-50 hover:dark:bg-gray-700 transition-colors from-gray-200 to-gray-300"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap text-center">
-                    {stat.district}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-center">
-                    {stat.evaluation_month}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-center">
-                    {(stat.avg_prediction * 100).toFixed(1)}%
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-center">
-                    ${(stat.avg_income / 3).toFixed(2)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                  Predicted Income
+                </TableSortLabel>
+              </TableCell>
+              {districtStats[0]?.count !== undefined && (
+                <TableCell>
+                  <TableSortLabel
+                    active={sortField === 'count'}
+                    direction={sortField === 'count' ? sortDirection : 'asc'}
+                    onClick={() => handleSort('count' as keyof DistrictStat)}
+                  >
+                    Count
+                  </TableSortLabel>
+                </TableCell>
+              )}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {currentRows.map((stat, index) => (
+              <TableRow
+                key={index}
+                hover
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              >
+                <TableCell>{stat.district}</TableCell>
+                <TableCell>{stat.evaluation_month}</TableCell>
+                <TableCell>{(stat.avg_prediction * 100).toFixed(1)}%</TableCell>
+                <TableCell>${(stat.avg_income / 3).toFixed(2)}</TableCell>
+                {stat.count !== undefined && (
+                  <TableCell>{stat.count}</TableCell>
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-      {/* Pagination Controls */}
-      <div className="flex justify-between items-center mt-4">
-        <button
-          className={`px-4 py-2 rounded-sm ${
-            currentPage === 1
-              ? "bg-gray-300 cursor-not-allowed dark:bg-gray-600"
-              : "bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700"
-          } text-white`}
-          onClick={() => setCurrentPage(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
-
-        <span className="text-lg font-medium">
-          Page {currentPage} of {totalPages}
-        </span>
-
-        <button
-          className={`px-4 py-2 rounded-sm ${
-            currentPage === totalPages
-              ? "bg-gray-300 cursor-not-allowed dark:bg-gray-600"
-              : "bg-orange-500 hover:bg-orange-600"
-          } text-white`}
-          onClick={() => setCurrentPage(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
-      </div>
-    </div>
+      {districtStats.length > 0 && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={(event, page) => setCurrentPage(page)}
+            color="primary"
+            shape="rounded"
+          />
+        </Box>
+      )}
+    </Box>
   );
 };
 

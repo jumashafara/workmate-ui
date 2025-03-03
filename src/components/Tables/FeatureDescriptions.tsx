@@ -1,4 +1,17 @@
 import React from "react";
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableContainer, 
+  TableHead, 
+  TableRow, 
+  Paper, 
+  Card, 
+  CardHeader, 
+  CardContent, 
+  Typography 
+} from "@mui/material";
 
 interface VariableDescription {
   name: string;
@@ -55,54 +68,47 @@ const variables = [
 
 const VariableDescriptions: React.FC<VariableDescriptionsProps> = () => {
   return (
-    <div className="w-full border border-gray-300 bg-white shadow-md dark:bg-gray-800 dark:border-gray-600">
-      <div className="bg-gray-200 p-3 dark:bg-gray-700">
-        <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
-          Variable Descriptions
-        </h2>
-        <p className="text-gray-900 dark:text-gray-100">
-          What do the feature names mean?
-        </p>
-      </div>
-
-      <table className="min-w-full border border-gray-300 dark:border-gray-600 bg-white shadow-md rounded-md dark:bg-gray-800">
-        <thead className="bg-gray-100 dark:bg-gray-700">
-          <tr>
-            <th className="px-4 py-2 border-b dark:border-gray-600 text-left text-gray-900 dark:text-gray-100">
-              Variable Name
-            </th>
-            <th className="px-4 py-2 border-b dark:border-gray-600 text-left text-gray-900 dark:text-gray-100">
-              Description
-            </th>
-            <th className="px-4 py-2 border-b dark:border-gray-600 text-left text-gray-900 dark:text-gray-100">
-              Type
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {variables.map((variable, index) => (
-            <tr
-              key={index}
-              className={`${
-                index % 2 === 0
-                  ? "bg-gray-50 dark:bg-gray-700"
-                  : "bg-white dark:bg-gray-800"
-              }`}
-            >
-              <td className="px-4 py-2 border-b dark:border-gray-600 text-gray-900 dark:text-gray-100">
-                {variable.name}
-              </td>
-              <td className="px-4 py-2 border-b dark:border-gray-600 text-gray-900 dark:text-gray-100">
-                {variable.description}
-              </td>
-              <td className="px-4 py-2 border-b dark:border-gray-600 text-gray-900 dark:text-gray-100">
-                {variable.type}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <Card sx={{ width: '100%', boxShadow: 2 }}>
+      <CardHeader 
+        title="Variable Descriptions" 
+        subheader="What do the feature names mean?"
+        sx={{ 
+          backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'grey.800' : 'grey.100',
+          padding: 3
+        }}
+      />
+      <CardContent sx={{ padding: 0 }}>
+        <TableContainer component={Paper} elevation={0}>
+          <Table sx={{ minWidth: 650 }} aria-label="feature descriptions table">
+            <TableHead>
+              <TableRow sx={{ backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'grey.800' : 'grey.50' }}>
+                <TableCell>Variable Name</TableCell>
+                <TableCell>Description</TableCell>
+                <TableCell>Type</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {variables.map((variable, index) => (
+                <TableRow
+                  key={index}
+                  hover
+                  sx={{ 
+                    '&:nth-of-type(odd)': {
+                      backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
+                    },
+                    '&:last-child td, &:last-child th': { border: 0 }
+                  }}
+                >
+                  <TableCell component="th" scope="row">{variable.name}</TableCell>
+                  <TableCell>{variable.description}</TableCell>
+                  <TableCell>{variable.type}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </CardContent>
+    </Card>
   );
 };
 

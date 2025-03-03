@@ -77,3 +77,22 @@ export const logout = async () => {
   const responseData = await response.json();
   return responseData;
 };
+
+export const updatePasswordAPI = async (
+  currentPassword: string,
+  newPassword: string
+) => {
+  // Implement the API call to update the password
+  const response = await fetch(
+    "http://localhost:8000/accounts/change-password/",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+      body: JSON.stringify({ currentPassword, newPassword }),
+    }
+  );
+  return response.json();
+};

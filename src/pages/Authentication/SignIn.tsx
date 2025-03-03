@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Breadcrumb from "../../components/Breadcrumbs/Breadcrumb";
 import LogoDark from "../../images/logo/RTV_Logo.png";
 import Logo from "../../images/logo/RTV_Logo.png";
+import { BeatLoader } from "react-spinners";
 import { login } from "../../api/Auth";
 import { toast } from "react-toastify";
 
@@ -15,15 +16,14 @@ const SignIn: React.FC = () => {
   const handleSignIn = async (e: any) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const data = await login({ username, password });
       // Save the tokens (you can use localStorage, cookies, or Context API)
       localStorage.setItem("access_token", data.access_token);
       localStorage.setItem("refresh_token", data.refresh_token);
       localStorage.setItem("username", data.user.username);
-      // setLoading(false)
-      //   redirect home
-      toast.success("Login successful");
-      // Move the redirect after a short delay
+      localStorage.setItem("email", data.user.email);
+      
       setTimeout(() => {
         window.location.href = "/";
       }, 5000); // Wait 1 second for the toast to show
@@ -271,12 +271,18 @@ const SignIn: React.FC = () => {
                 </div>
 
                 <div className="mb-5">
-                  <input
-                    type="submit"
-                    value="Sign In"
-                    onClick={handleSignIn}
-                    className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
-                  />
+                  {loading ? (
+                    <div className="text-center w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90">
+                      <BeatLoader size={10} color="white" />
+                    </div>
+                  ) : (
+                    <input
+                      type="submit"
+                      value="Sign In"
+                      onClick={handleSignIn}
+                      className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
+                    />
+                  )}
                 </div>
 
                 <button

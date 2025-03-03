@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import ReactApexChart from "react-apexcharts";
+import Plot from 'react-plotly.js';
 
 interface ConfusionMatrixProps {
   confusion_matrix_data:
@@ -36,76 +36,78 @@ const ConfusionMatrix: React.FC<ConfusionMatrixProps> = ({
   }, [confusion_matrix_data]);
 
   const categories = ["Negative", "Positive"];
+  
+  // Create z-values for the heatmap (transpose matrix_data for correct orientation)
+  const zValues = [
+    [matrix_data[0][0], matrix_data[1][0]], // First row: TN, FP
+    [matrix_data[0][1], matrix_data[1][1]], // Second row: FN, TP
+  ];
+  
+  // Create annotations for the heatmap cells
+  const annotations = [];
+  for (let i = 0; i < 2; i++) {
+    for (let j = 0; j < 2; j++) {
+      annotations.push({
+        x: j,
+        y: i,
+        text: zValues[i][j].toString(),
+        font: {
+          color: 'black',
+          size: 16,
+        },
+        showarrow: false,
+      });
+    }
+  }
 
-  const series = [
+  const data = [
     {
-      name: "Negative",
-      data: matrix_data[0],
-    },
-    {
-      name: "Positive",
-      data: matrix_data[1],
-    },
+      z: zValues,
+      x: categories,
+      y: categories,
+      type: 'heatmap',
+      colorscale: [
+        [0, '#fff7ed'],
+        [0.5, '#fdba74'],
+        [1, '#ea580c']
+      ],
+      showscale: false,
+    }
   ];
 
-  const options = {
-    chart: {
-      type: "heatmap",
-      toolbar: {
-        show: false,
-      },
-    },
-    plotOptions: {
-      heatmap: {
-        shadeIntensity: 0.5,
-        colorScale: {
-          ranges: [
-            {
-              from: 0,
-              to: 600,
-              color: "#fff7ed",
-              name: "Low",
-            },
-            {
-              from: 601,
-              to: 1600,
-              color: "#fdba74",
-              name: "Medium",
-            },
-            {
-              from: 1601,
-              to: 2000,
-              color: "#ea580c",
-              name: "High",
-            },
-          ],
-        },
-      },
-    },
-    dataLabels: {
-      enabled: true,
-      style: {
-        colors: ["#000"],
-      },
+  const layout = {
+    title: {
+      text: 'Confusion Matrix',
+      font: {
+        family: 'Arial, sans-serif',
+        size: 24
+      }
     },
     xaxis: {
-      categories: categories,
-      title: {
-        text: "Predicted Label",
-      },
+      title: 'Predicted Label',
+      tickvals: [0, 1],
+      ticktext: categories
     },
     yaxis: {
-      categories: categories,
-      reversed: true,
-      title: {
-        text: "True Label",
-      },
+      title: 'True Label',
+      tickvals: [0, 1],
+      ticktext: categories,
+      autorange: 'reversed'
     },
-    title: {
-      text: "Confusion Matrix",
-      align: "center",
+    annotations: annotations,
+    margin: {
+      l: 80,
+      r: 30,
+      b: 80,
+      t: 80
     },
-    colors: ["#ea580c"],
+    plot_bgcolor: 'white',
+    paper_bgcolor: 'white'
+  };
+
+  const config = {
+    responsive: true,
+    displayModeBar: false
   };
 
   return (
@@ -119,11 +121,11 @@ const ConfusionMatrix: React.FC<ConfusionMatrixProps> = ({
         </p>
       </div>
       <div className="p-3">
-        <ReactApexChart
-          options={options}
-          series={series}
-          type="heatmap"
-          height={500}
+        <Plot
+          data={data}
+          layout={layout}
+          config={config}
+          style={{ width: '100%', height: 500 }}
         />
       </div>
     </div>

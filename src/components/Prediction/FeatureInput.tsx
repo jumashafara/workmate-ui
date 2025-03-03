@@ -1,7 +1,20 @@
 import React from "react";
 import CheckboxTwo from "../Checkboxes/CheckboxTwo";
 import { Features } from "../../types/features";
-// import { PuffLoader } from "react-spinners";
+import { 
+  Card, 
+  CardHeader, 
+  CardContent, 
+  Grid, 
+  FormControl, 
+  FormLabel, 
+  Slider, 
+  Box, 
+  Typography,
+  Checkbox,
+  FormControlLabel,
+  FormGroup
+} from "@mui/material";
 
 interface FeatureInputProps {
   formData: Features;
@@ -67,420 +80,427 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
     // setOrganicsProduction,
   },
 }) => {
+  // Custom MUI checkbox component to replace CheckboxTwo
+  const FeatureCheckbox = ({ label, checked, onChange }: { label: string, checked: boolean, onChange: (checked: boolean) => void }) => (
+    <FormControlLabel
+      control={
+        <Checkbox 
+          checked={checked} 
+          onChange={(e) => onChange(e.target.checked)}
+          color="primary"
+        />
+      }
+      label={label}
+    />
+  );
+
   return (
-    <div className="flex flex-col md:flex-row mt-6 md:justify-between md:space-x-6">
-      <div className="border border-gray-300 rounded-sm shadow-lg w-full bg-white mb-6 md:mb-0 dark:border-gray-600 dark:bg-gray-800  ">
-        <div className="bg-gradient-to-r from-gray-200 to-gray-300 p-4 rounded-sm  dark:from-gray-800 dark:to-gray-900 dark:text-gray-200">
-          <h2 className="text-xl font-bold mb-2 w-full">Feature Input</h2>
-          <p className="">Adjust features to update the prediction</p>
-          {/* {loading && (
-            <PuffLoader className="mx-auto mt-2" color="#ffffff" size={20} />
-          )} */}
-        </div>
-        <form className="p-6 dark:bg-gray-800 ">
-          <div className="flex flex-col space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              <div>
-                <CheckboxTwo
-                  label="Food Banana"
-                  initialChecked={formData.perennial_crops_grown_food_banana[0]}
-                  onChange={(checked) =>
-                    setFormData({
-                      ...formData,
-                      perennial_crops_grown_food_banana: [checked],
-                    })
-                  }
-                />
-              </div>
-              <div>
-                <CheckboxTwo
-                  label="Ground Nuts"
-                  initialChecked={formData.ground_nuts[0]}
-                  onChange={(checked) =>
-                    setFormData({ ...formData, ground_nuts: [checked] })
-                  }
-                />
-              </div>
-              <div>
-                <CheckboxTwo
-                  label="Sweet Potatoes"
-                  initialChecked={formData.sweet_potatoes[0]}
-                  onChange={(checked) =>
-                    setFormData({ ...formData, sweet_potatoes: [checked] })
-                  }
-                />
-              </div>
-              <div>
-                <CheckboxTwo
-                  label="Cassava"
-                  initialChecked={formData.cassava[0]}
-                  onChange={(checked) =>
-                    setFormData({ ...formData, cassava: [checked] })
-                  }
-                />
-              </div>
-              <div>
-                <CheckboxTwo
-                  label="Business Participation"
-                  initialChecked={formData.business_participation[0]}
-                  onChange={(checked) =>
-                    setFormData({
-                      ...formData,
-                      business_participation: [checked],
-                    })
-                  }
-                />
-              </div>
-              <div>
-                <CheckboxTwo
-                  label="Coffee"
-                  initialChecked={formData.perennial_crops_grown_coffee[0]}
-                  onChange={(checked) =>
-                    setFormData({
-                      ...formData,
-                      perennial_crops_grown_coffee: [checked],
-                    })
-                  }
-                />
-              </div>
-              <div>
-                <CheckboxTwo
-                  label="Sorghum"
-                  initialChecked={formData.sorghum[0]}
-                  onChange={(checked) =>
-                    setFormData({ ...formData, sorghum: [checked] })
-                  }
-                />
-              </div>
-              <div>
-                <CheckboxTwo
-                  label="Tippy Tap"
-                  initialChecked={formData.tippy_tap_present[0]}
-                  onChange={(checked) =>
-                    setFormData({ ...formData, tippy_tap_present: [checked] })
-                  }
-                />
-              </div>
-              <div>
-                <CheckboxTwo
-                  label="Waste Mgt"
-                  initialChecked={formData.non_bio_waste_mgt_present[0]}
-                  onChange={(checked) =>
-                    setFormData({
-                      ...formData,
-                      non_bio_waste_mgt_present: [checked],
-                    })
-                  }
-                />
-              </div>
-              <div>
-                <CheckboxTwo
-                  label="Organics Production"
-                  initialChecked={formData.hh_produce_organics[0]}
-                  onChange={(checked) =>
-                    setFormData({
-                      ...formData,
-                      hh_produce_organics: [checked],
-                    })
-                  }
-                />
-              </div>
-            </div>
+    <Card sx={{ width: '100%', boxShadow: 2, mt: 3 }}>
+      <CardHeader 
+        title="Feature Input" 
+        subheader="Adjust features to update the prediction"
+        sx={{ 
+          backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'grey.800' : 'grey.100',
+          backgroundImage: 'linear-gradient(to right, #e5e7eb, #d1d5db)',
+          padding: 3
+        }}
+      />
+      <CardContent>
+        <Box component="form" sx={{ mt: 2 }}>
+          <Grid container spacing={3}>
+            {/* Checkboxes */}
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom>Crop & Business Features</Typography>
+              <FormGroup>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6} md={4} lg={2.4}>
+                    <FeatureCheckbox
+                      label="Food Banana"
+                      checked={formData.perennial_crops_grown_food_banana[0]}
+                      onChange={(checked) =>
+                        setFormData({
+                          ...formData,
+                          perennial_crops_grown_food_banana: [checked],
+                        })
+                      }
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4} lg={2.4}>
+                    <FeatureCheckbox
+                      label="Ground Nuts"
+                      checked={formData.ground_nuts[0]}
+                      onChange={(checked) =>
+                        setFormData({ ...formData, ground_nuts: [checked] })
+                      }
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4} lg={2.4}>
+                    <FeatureCheckbox
+                      label="Sweet Potatoes"
+                      checked={formData.sweet_potatoes[0]}
+                      onChange={(checked) =>
+                        setFormData({ ...formData, sweet_potatoes: [checked] })
+                      }
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4} lg={2.4}>
+                    <FeatureCheckbox
+                      label="Cassava"
+                      checked={formData.cassava[0]}
+                      onChange={(checked) =>
+                        setFormData({ ...formData, cassava: [checked] })
+                      }
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4} lg={2.4}>
+                    <FeatureCheckbox
+                      label="Business Participation"
+                      checked={formData.business_participation[0]}
+                      onChange={(checked) =>
+                        setFormData({
+                          ...formData,
+                          business_participation: [checked],
+                        })
+                      }
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4} lg={2.4}>
+                    <FeatureCheckbox
+                      label="Coffee"
+                      checked={formData.perennial_crops_grown_coffee[0]}
+                      onChange={(checked) =>
+                        setFormData({
+                          ...formData,
+                          perennial_crops_grown_coffee: [checked],
+                        })
+                      }
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4} lg={2.4}>
+                    <FeatureCheckbox
+                      label="Sorghum"
+                      checked={formData.sorghum[0]}
+                      onChange={(checked) =>
+                        setFormData({ ...formData, sorghum: [checked] })
+                      }
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4} lg={2.4}>
+                    <FeatureCheckbox
+                      label="Tippy Tap"
+                      checked={formData.tippy_tap_present[0]}
+                      onChange={(checked) =>
+                        setFormData({ ...formData, tippy_tap_present: [checked] })
+                      }
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4} lg={2.4}>
+                    <FeatureCheckbox
+                      label="Waste Mgt"
+                      checked={formData.non_bio_waste_mgt_present[0]}
+                      onChange={(checked) =>
+                        setFormData({
+                          ...formData,
+                          non_bio_waste_mgt_present: [checked],
+                        })
+                      }
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4} lg={2.4}>
+                    <FeatureCheckbox
+                      label="Organics Production"
+                      checked={formData.hh_produce_organics[0]}
+                      onChange={(checked) =>
+                        setFormData({
+                          ...formData,
+                          hh_produce_organics: [checked],
+                        })
+                      }
+                    />
+                  </Grid>
+                </Grid>
+              </FormGroup>
+            </Grid>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div className="flex flex-col">
-                  <label className="  mb-1 dark:text-gray-200">
-                    Agriculture Land (
-                    {formData.Land_size_for_Crop_Agriculture_Acres[0]} acres)
-                  </label>
-                  <input
-                    type="range"
-                    min="0.1"
-                    max="10"
-                    step="0.1"
-                    value={formData.Land_size_for_Crop_Agriculture_Acres[0]}
-                    onChange={(e) => {
-                      const value = parseFloat(e.target.value);
-                      setLand(value);
-                      setFormData({
-                        ...formData,
-                        Land_size_for_Crop_Agriculture_Acres: [value],
-                      });
-                    }}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 
-                        [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
-                        [&::-webkit-slider-thumb]:bg-orange-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
-                        [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-orange-500 
-                        [&::-moz-range-thumb]:border-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <label className="  mb-1 dark:text-gray-200">
-                    Household Members ({formData.tot_hhmembers[0]})
-                  </label>
-                  <input
-                    type="range"
-                    min="1"
-                    max="15"
-                    step="1"
-                    value={formData.tot_hhmembers[0]}
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value);
-                      setMember(value);
-                      setFormData({
-                        ...formData,
-                        tot_hhmembers: [value],
-                      });
-                    }}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 
-[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
-[&::-webkit-slider-thumb]:bg-orange-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
-[&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-orange-500 
-[&::-moz-range-thumb]:border-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer"
-                  />
-                </div>
-              </div>
+            {/* Sliders */}
+            <Grid item xs={12} container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <Typography variant="h6" gutterBottom>Land & Household</Typography>
+                <Box sx={{ mb: 4 }}>
+                  <FormControl fullWidth sx={{ mb: 3 }}>
+                    <FormLabel id="agriculture-land-slider-label">
+                      Agriculture Land ({formData.Land_size_for_Crop_Agriculture_Acres[0]} acres)
+                    </FormLabel>
+                    <Slider
+                      aria-labelledby="agriculture-land-slider-label"
+                      min={0.1}
+                      max={10}
+                      step={0.1}
+                      value={formData.Land_size_for_Crop_Agriculture_Acres[0]}
+                      onChange={(e, value) => {
+                        const newValue = typeof value === 'number' ? value : value[0];
+                        setLand(newValue);
+                        setFormData({
+                          ...formData,
+                          Land_size_for_Crop_Agriculture_Acres: [newValue],
+                        });
+                      }}
+                      valueLabelDisplay="auto"
+                    />
+                  </FormControl>
 
-              <div className="space-y-4">
-                <div className="flex flex-col">
-                  <label className="  mb-1 dark:text-gray-200">
-                    Farm Implements ({formData.farm_implements_owned[0]})
-                  </label>
-                  <input
-                    type="range"
-                    min="1"
-                    max="20"
-                    step="1"
-                    value={formData.farm_implements_owned[0]}
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value);
-                      setFarmImplements(value);
-                      setFormData({
-                        ...formData,
-                        farm_implements_owned: [value],
-                      });
-                    }}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 
-[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
-[&::-webkit-slider-thumb]:bg-orange-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
-[&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-orange-500 
-[&::-moz-range-thumb]:border-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <label className="  mb-1 dark:text-gray-200">
-                    Daily Consumed Water (
-                    {formData.Average_Water_Consumed_Per_Day[0]} L)
-                  </label>
-                  <input
-                    type="range"
-                    min="0.1"
-                    max="20"
-                    step="0.1"
-                    value={formData.Average_Water_Consumed_Per_Day[0]}
-                    onChange={(e) => {
-                      const value = parseFloat(e.target.value);
-                      setWater(value);
-                      setFormData({
-                        ...formData,
-                        Average_Water_Consumed_Per_Day: [value],
-                      });
-                    }}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 
-[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
-[&::-webkit-slider-thumb]:bg-orange-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
-[&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-orange-500 
-[&::-moz-range-thumb]:border-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer"
-                  />
-                </div>
-              </div>
-            </div>
+                  <FormControl fullWidth sx={{ mb: 3 }}>
+                    <FormLabel id="household-members-slider-label">
+                      Household Members ({formData.tot_hhmembers[0]})
+                    </FormLabel>
+                    <Slider
+                      aria-labelledby="household-members-slider-label"
+                      min={1}
+                      max={15}
+                      step={1}
+                      value={formData.tot_hhmembers[0]}
+                      onChange={(e, value) => {
+                        const newValue = typeof value === 'number' ? value : value[0];
+                        setMember(newValue);
+                        setFormData({
+                          ...formData,
+                          tot_hhmembers: [newValue],
+                        });
+                      }}
+                      valueLabelDisplay="auto"
+                    />
+                  </FormControl>
+                </Box>
+              </Grid>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div className="flex flex-col">
-                  <label className="  mb-1 dark:text-gray-200">
-                    Distance to OPD (
-                    {formData.Distance_travelled_one_way_OPD_treatment[0]} km)
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="50"
-                    step="0.1"
-                    value={formData.Distance_travelled_one_way_OPD_treatment[0]}
-                    onChange={(e) => {
-                      const value = parseFloat(e.target.value);
-                      setDistanceToOPD(value);
-                      setFormData({
-                        ...formData,
-                        Distance_travelled_one_way_OPD_treatment: [value],
-                      });
-                    }}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 
-[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
-[&::-webkit-slider-thumb]:bg-orange-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
-[&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-orange-500 
-[&::-moz-range-thumb]:border-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <label className="  mb-1 dark:text-gray-200">
-                    Water Collection Time (
-                    {formData.hh_water_collection_Minutes[0]} minutes)
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="180"
-                    step="1"
-                    value={formData.hh_water_collection_Minutes[0]}
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value);
-                      setWaterCollectionTime(value);
-                      setFormData({
-                        ...formData,
-                        hh_water_collection_Minutes: [value],
-                      });
-                    }}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 
-[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
-[&::-webkit-slider-thumb]:bg-orange-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
-[&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-orange-500 
-[&::-moz-range-thumb]:border-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer"
-                  />
-                </div>
-              </div>
+              <Grid item xs={12} md={6}>
+                <Typography variant="h6" gutterBottom>Farm & Water</Typography>
+                <Box sx={{ mb: 4 }}>
+                  <FormControl fullWidth sx={{ mb: 3 }}>
+                    <FormLabel id="farm-implements-slider-label">
+                      Farm Implements ({formData.farm_implements_owned[0]})
+                    </FormLabel>
+                    <Slider
+                      aria-labelledby="farm-implements-slider-label"
+                      min={0}
+                      max={10}
+                      step={1}
+                      value={formData.farm_implements_owned[0]}
+                      onChange={(e, value) => {
+                        const newValue = typeof value === 'number' ? value : value[0];
+                        setFarmImplements(newValue);
+                        setFormData({
+                          ...formData,
+                          farm_implements_owned: [newValue],
+                        });
+                      }}
+                      valueLabelDisplay="auto"
+                    />
+                  </FormControl>
 
-              <div className="space-y-4">
-                <div className="flex flex-col">
-                  <label className="  mb-1 dark:text-gray-200">
-                    Composts Number ({formData.composts_num[0]})
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="10"
-                    step="1"
-                    value={formData.composts_num[0]}
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value);
-                      setCompostsNum(value);
-                      setFormData({
-                        ...formData,
-                        composts_num: [value],
-                      });
-                    }}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 
-[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
-[&::-webkit-slider-thumb]:bg-orange-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
-[&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-orange-500 
-[&::-moz-range-thumb]:border-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <label className="  mb-1 dark:text-gray-200">
-                    Education Level ({formData.education_level_encoded[0]})
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="3"
-                    step="1"
-                    value={formData.education_level_encoded[0]}
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value);
-                      setEducationLevel(value);
-                      setFormData({
-                        ...formData,
-                        education_level_encoded: [value],
-                      });
-                    }}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 
-[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
-[&::-webkit-slider-thumb]:bg-orange-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
-[&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-orange-500 
-[&::-moz-range-thumb]:border-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer"
-                  />
-                </div>
-              </div>
-            </div>
+                  <FormControl fullWidth sx={{ mb: 3 }}>
+                    <FormLabel id="water-consumption-slider-label">
+                      Water Consumption ({formData.Average_Water_Consumed_Per_Day[0]} liters)
+                    </FormLabel>
+                    <Slider
+                      aria-labelledby="water-consumption-slider-label"
+                      min={0}
+                      max={100}
+                      step={1}
+                      value={formData.Average_Water_Consumed_Per_Day[0]}
+                      onChange={(e, value) => {
+                        const newValue = typeof value === 'number' ? value : value[0];
+                        setWater(newValue);
+                        setFormData({
+                          ...formData,
+                          Average_Water_Consumed_Per_Day: [newValue],
+                        });
+                      }}
+                      valueLabelDisplay="auto"
+                    />
+                  </FormControl>
+                </Box>
+              </Grid>
+            </Grid>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div className="flex flex-col">
-                  <label className="  mb-1 dark:text-gray-200 ">District</label>
-                  <input
-                    placeholder="eg Kaliro"
-                    onChange={(e) => {
-                      setDistrict(e.target.value);
-                      setFormData({
-                        ...formData,
-                        district: e.target.value,
-                      });
-                    }}
-                    className="p-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all dark:bg-gray-800 dark:text-gray-200"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <label className="  mb-1 dark:text-gray-200   ">
-                    Village
-                  </label>
-                  <input
-                    placeholder="eg Buyunga"
-                    onChange={(e) => {
-                      setVillage(e.target.value);
-                      setFormData({
-                        ...formData,
-                        village: e.target.value,
-                      });
-                    }}
-                    className="p-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all dark:bg-gray-800 dark:text-gray-200"
-                  />
-                </div>
-              </div>
+            <Grid item xs={12} container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <Typography variant="h6" gutterBottom>Distance & Time</Typography>
+                <Box sx={{ mb: 4 }}>
+                  <FormControl fullWidth sx={{ mb: 3 }}>
+                    <FormLabel id="distance-to-opd-slider-label">
+                      Distance to OPD ({formData.Distance_travelled_one_way_OPD_treatment[0]} km)
+                    </FormLabel>
+                    <Slider
+                      aria-labelledby="distance-to-opd-slider-label"
+                      min={0}
+                      max={50}
+                      step={0.1}
+                      value={formData.Distance_travelled_one_way_OPD_treatment[0]}
+                      onChange={(e, value) => {
+                        const newValue = typeof value === 'number' ? value : value[0];
+                        setDistanceToOPD(newValue);
+                        setFormData({
+                          ...formData,
+                          Distance_travelled_one_way_OPD_treatment: [newValue],
+                        });
+                      }}
+                      valueLabelDisplay="auto"
+                    />
+                  </FormControl>
 
-              <div className="space-y-4">
-                <div className="flex flex-col">
-                  <label className="  mb-1 dark:text-gray-200">Cluster</label>
-                  <input
-                    placeholder="eg Mitooma"
-                    onChange={(e) => {
-                      setCluster(e.target.value);
-                      setFormData({
-                        ...formData,
-                        cluster: e.target.value,
-                      });
-                    }}
-                    className="p-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all dark:bg-gray-800 dark:text-gray-200"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <label className="  mb-1 dark:text-gray-200">
-                    Evaluation Month
-                  </label>
-                  <input
-                    type="number"
-                    min={1}
-                    max={12}
-                    onChange={(e) => {
-                      const value = Number(e.target.value);
-                      setEvaluationMonth(value);
-                      setFormData({
-                        ...formData,
-                        evaluation_month: value,
-                      });
-                    }}
-                    className="p-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all dark:bg-gray-800 dark:text-gray-200"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
+                  <FormControl fullWidth sx={{ mb: 3 }}>
+                    <FormLabel id="water-collection-time-slider-label">
+                      Water Collection Time ({formData.hh_water_collection_Minutes[0]} minutes)
+                    </FormLabel>
+                    <Slider
+                      aria-labelledby="water-collection-time-slider-label"
+                      min={0}
+                      max={180}
+                      step={1}
+                      value={formData.hh_water_collection_Minutes[0]}
+                      onChange={(e, value) => {
+                        const newValue = typeof value === 'number' ? value : value[0];
+                        setWaterCollectionTime(newValue);
+                        setFormData({
+                          ...formData,
+                          hh_water_collection_Minutes: [newValue],
+                        });
+                      }}
+                      valueLabelDisplay="auto"
+                    />
+                  </FormControl>
+                </Box>
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <Typography variant="h6" gutterBottom>Compost & Education</Typography>
+                <Box sx={{ mb: 4 }}>
+                  <FormControl fullWidth sx={{ mb: 3 }}>
+                    <FormLabel id="composts-number-slider-label">
+                      Composts Number ({formData.composts_num[0]})
+                    </FormLabel>
+                    <Slider
+                      aria-labelledby="composts-number-slider-label"
+                      min={0}
+                      max={10}
+                      step={1}
+                      value={formData.composts_num[0]}
+                      onChange={(e, value) => {
+                        const newValue = typeof value === 'number' ? value : value[0];
+                        setCompostsNum(newValue);
+                        setFormData({
+                          ...formData,
+                          composts_num: [newValue],
+                        });
+                      }}
+                      valueLabelDisplay="auto"
+                    />
+                  </FormControl>
+
+                  <FormControl fullWidth sx={{ mb: 3 }}>
+                    <FormLabel id="education-level-slider-label">
+                      Education Level ({formData.education_level_encoded[0]})
+                    </FormLabel>
+                    <Slider
+                      aria-labelledby="education-level-slider-label"
+                      min={0}
+                      max={3}
+                      step={1}
+                      value={formData.education_level_encoded[0]}
+                      onChange={(e, value) => {
+                        const newValue = typeof value === 'number' ? value : value[0];
+                        setEducationLevel(newValue);
+                        setFormData({
+                          ...formData,
+                          education_level_encoded: [newValue],
+                        });
+                      }}
+                      valueLabelDisplay="auto"
+                    />
+                  </FormControl>
+                </Box>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12} container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <Typography variant="h6" gutterBottom>Location</Typography>
+                <Box sx={{ mb: 4 }}>
+                  <FormControl fullWidth sx={{ mb: 3 }}>
+                    <FormLabel id="district-input-label">District</FormLabel>
+                    <input
+                      placeholder="eg Kaliro"
+                      onChange={(e) => {
+                        setDistrict(e.target.value);
+                        setFormData({
+                          ...formData,
+                          district: e.target.value,
+                        });
+                      }}
+                      className="p-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all dark:bg-gray-800 dark:text-gray-200"
+                    />
+                  </FormControl>
+
+                  <FormControl fullWidth sx={{ mb: 3 }}>
+                    <FormLabel id="village-input-label">Village</FormLabel>
+                    <input
+                      placeholder="eg Buyunga"
+                      onChange={(e) => {
+                        setVillage(e.target.value);
+                        setFormData({
+                          ...formData,
+                          village: e.target.value,
+                        });
+                      }}
+                      className="p-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all dark:bg-gray-800 dark:text-gray-200"
+                    />
+                  </FormControl>
+                </Box>
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <Typography variant="h6" gutterBottom>Cluster & Evaluation</Typography>
+                <Box sx={{ mb: 4 }}>
+                  <FormControl fullWidth sx={{ mb: 3 }}>
+                    <FormLabel id="cluster-input-label">Cluster</FormLabel>
+                    <input
+                      placeholder="eg Mitooma"
+                      onChange={(e) => {
+                        setCluster(e.target.value);
+                        setFormData({
+                          ...formData,
+                          cluster: e.target.value,
+                        });
+                      }}
+                      className="p-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all dark:bg-gray-800 dark:text-gray-200"
+                    />
+                  </FormControl>
+
+                  <FormControl fullWidth sx={{ mb: 3 }}>
+                    <FormLabel id="evaluation-month-input-label">Evaluation Month</FormLabel>
+                    <input
+                      type="number"
+                      min={1}
+                      max={12}
+                      onChange={(e) => {
+                        const value = Number(e.target.value);
+                        setEvaluationMonth(value);
+                        setFormData({
+                          ...formData,
+                          evaluation_month: value,
+                        });
+                      }}
+                      className="p-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all dark:bg-gray-800 dark:text-gray-200"
+                    />
+                  </FormControl>
+                </Box>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Box>
+      </CardContent>
+    </Card>
   );
 };
 

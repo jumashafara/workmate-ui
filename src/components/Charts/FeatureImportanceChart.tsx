@@ -1,121 +1,176 @@
 import React, { useEffect, useState } from "react";
-import ReactApexChart from "react-apexcharts";
+import Plot from "react-plotly.js";
+import { Card, CardHeader, CardContent, Box, Typography, Select, MenuItem, FormControl, InputLabel, CircularProgress, Alert } from "@mui/material";
 
-const FeatureImportanceChart: React.FC = () => {
-  const [featureNames, setFeatureName] = useState(["foo", "bar"]);
-  const [importances, setImportances] = useState<number[]>([]);
-  const [model, setModel] = useState<string | undefined>(
-    "year1_classification"
-  );
+interface FeatureImportanceChartProps {
+  featureNames?: string[];
+  importances?: number[];
+}
 
-  const getFeatureImportances = async (model: string | undefined) => {
-    const response = await fetch(
-      `/api/models/feature-importances/?model=${model}`
-    );
-    const data = await response.json();
-    console.log(data);
-    return data;
+const FeatureImportanceChart: React.FC<FeatureImportanceChartProps> = ({ featureNames: propFeatureNames, importances: propImportances }) => {
+  const [featureNames, setFeatureName] = useState<string[]>(propFeatureNames || []);
+  const [importances, setImportances] = useState<number[]>(propImportances || []);
+  const [model, setModel] = useState<string>("year1_classification");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const getFeatureImportances = async (model: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch(
+        `/api/models/feature-importances/?model=${model}`
+      );
+      
+      if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log("Feature importances data:", data);
+      
+      if (!data.feature_importances) {
+        throw new Error("No feature importances data returned from API");
+      }
+      
+      return data;
+    } catch (error) {
+      console.error("Error fetching feature importances:", error);
+      setError(error instanceof Error ? error.message : "Failed to load feature importances");
+      return { feature_importances: {} };
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    getFeatureImportances(model).then((data) => {
-      const features = Object.keys(data.feature_importances);
-      const importances = Object.values(data.feature_importances) as number[];
-      setFeatureName(features);
-      setImportances(importances);
-    });
-  }, [model]);
+    if (!propFeatureNames || !propImportances || propFeatureNames.length === 0 || propImportances.length === 0) {
+      getFeatureImportances(model).then((data) => {
+        if (data && data.feature_importances) {
+          const features = Object.keys(data.feature_importances);
+          const importances = Object.values(data.feature_importances) as number[];
+          setFeatureName(features);
+          setImportances(importances);
+        }
+      });
+    } else {
+      setFeatureName(propFeatureNames);
+      setImportances(propImportances);
+      setLoading(false);
+    }
+  }, [model, propFeatureNames, propImportances]);
 
-  const options = {
-    chart: {
-      type: "bar" as const,
-      toolbar: { show: true },
-    },
-    legend: {
-      show: false,
-    },
-    plotOptions: {
-      bar: {
-        horizontal: true,
-        distributed: true,
-      },
-    },
+  // Sort features by importance
+  const sortedData = featureNames.map((name, index) => ({
+    name,
+    importance: importances[index] || 0
+  })).sort((a, b) => b.importance - a.importance);
 
-    xaxis: {
-      title: {
-        text: "Importance",
-      },
-      categories: featureNames,
-      min: 0,
-      max: Math.max(...importances) * 1.1,
-      labels: {
-        formatter: (value: number) => value.toFixed(3), // Show three decimal places
-      },
-    },
-    yaxis: {
-      title: {
-        text: "Features",
-        align: "left",
-      },
-      labels: {
-        show: true,
-      },
-    },
-    fill: {
-      colors: ["#ea580c"],
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    grid: {
-      show: false,
-      borderColor: "#e0e0e0",
-    },
-    tooltip: {
-      shared: true,
-      intersect: false,
-    },
+  const sortedFeatureNames = sortedData.map(item => item.name);
+  const sortedImportances = sortedData.map(item => item.importance);
+
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 400 }}>
+          <CircularProgress />
+        </Box>
+      );
+    }
+
+    if (error) {
+      return (
+        <Box sx={{ p: 2 }}>
+          <Alert severity="error">{error}</Alert>
+        </Box>
+      );
+    }
+
+    if (sortedFeatureNames.length === 0 || sortedImportances.length === 0) {
+      return (
+        <Box sx={{ p: 2 }}>
+          <Alert severity="info">No feature importance data available for this model.</Alert>
+        </Box>
+      );
+    }
+
+    return (
+      <Plot
+        data={[
+          {
+            type: 'bar',
+            x: sortedImportances,
+            y: sortedFeatureNames,
+            orientation: 'h',
+            marker: {
+              color: '#ea580c'
+            }
+          }
+        ]}
+        layout={{
+          title: '',
+          autosize: true,
+          margin: {
+            l: 150, // Increased left margin for feature names
+            r: 30,
+            t: 10,
+            b: 50
+          },
+          xaxis: {
+            title: 'Importance',
+            automargin: true
+          },
+          yaxis: {
+            title: 'Features',
+            automargin: true
+          },
+          font: {
+            family: 'Arial, sans-serif'
+          }
+        }}
+        config={{
+          responsive: true,
+          displayModeBar: true,
+          displaylogo: false,
+          modeBarButtonsToRemove: ['lasso2d', 'select2d']
+        }}
+        style={{ width: '100%', height: '100%' }}
+      />
+    );
   };
 
-  const series = [
-    {
-      data: importances,
-    },
-  ];
-
   return (
-    <div className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-md">
-      <div className="flex flex-col space-y-3 md:flex-row md:justify-between bg-gray-200 dark:bg-gray-700 p-4 ">
-        <div>
-          <h2 className="text-lg font-semibold mb-4 w-full text-gray-900 dark:text-white">
-            Feature Importance Chart
-          </h2>
-          <p className="text-gray-900 dark:text-gray-100">
-            What were the most important features?
-          </p>
-        </div>
-        <div>
-          <select
-            name=""
-            id=""
-            className="w-full p-3 border bg-gray-100 border-gray-300 dark:border-gray-600 dark:bg-gray-800 outline-none"
-            onChange={(e) => setModel(e.target.value)}
-          >
-            <option value="year1_classification">Year 1 Classification</option>
-            <option value="year2_classification">Year 2 Classification</option>
-          </select>
-        </div>
-      </div>
-
-      <div className="p-4">
-        <ReactApexChart
-          options={options}
-          series={series}
-          type="bar"
-          height={350}
-        />
-      </div>
-    </div>
+    <Card sx={{ width: '100%', boxShadow: 2 }}>
+      <CardHeader 
+        title="Feature Importance Chart" 
+        subheader="What were the most important features?"
+        sx={{ 
+          backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'grey.800' : 'grey.100',
+          backgroundImage: 'linear-gradient(to right, #e5e7eb, #d1d5db)',
+          padding: 3
+        }}
+        action={
+          <FormControl sx={{ minWidth: 200, mt: 1 }}>
+            <InputLabel id="model-select-label">Model</InputLabel>
+            <Select
+              labelId="model-select-label"
+              id="model-select"
+              value={model}
+              label="Model"
+              onChange={(e) => setModel(e.target.value)}
+            >
+              <MenuItem value="year1_classification">Year 1 Classification</MenuItem>
+              <MenuItem value="year2_classification">Year 2 Classification</MenuItem>
+            </Select>
+          </FormControl>
+        }
+      />
+      <CardContent>
+        <Box sx={{ height: 400, width: '100%' }}>
+          {renderContent()}
+        </Box>
+      </CardContent>
+    </Card>
   );
 };
 

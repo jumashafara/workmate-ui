@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes, useLocation, Navigate } from "react-router-dom";
 
 import Loader from "./common/Loader";
 import PageTitle from "./components/PageTitle";
@@ -7,6 +7,7 @@ import SignIn from "./pages/Authentication/SignIn";
 import SignUp from "./pages/Authentication/SignUp";
 import ModelMetrics from "./pages/Dashboard/ModelMetricsPage";
 import FeatureImportance from "./pages/Dashboard/FeatureImportancePage";
+import StandardEvaluations from "./pages/Dashboard/StandardEvaluations";
 
 import DefaultLayout from "./layout/DefaultLayout";
 import IndividualPredictionPage from "./pages/Dashboard/IndividualPredictionPage";
@@ -14,10 +15,12 @@ import MultiplePredictionsPage from "./pages/Dashboard/MultiplePredictionsPage";
 import ChatPage from "./pages/ChatPage";
 import HomePage from "./pages/HomePage";
 import FloatingChat from "./components/FloatingChat";
+import Settings from "./pages/Settings";
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const { pathname } = useLocation();
+  const access_token = localStorage.getItem("access_token");
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -35,59 +38,94 @@ function App() {
         <Route
           index
           element={
-            <>
-              <PageTitle title="Model Metrics Dashboard | RTV" />
-              <HomePage />
-            </>
+            access_token ? (
+              <>
+                <PageTitle title="Standard Evaluations | RTV" />
+                <StandardEvaluations />
+              </>
+            ) : (
+              <Navigate to="/auth/signin" />
+            )
           }
         />
         <Route
           path="/model-metrics"
           element={
-            <>
-              <PageTitle title="Multiple Predictions | RTV" />
-              <ModelMetrics />
-            </>
+            access_token ? (
+              <>
+                <PageTitle title="Multiple Predictions | RTV" />
+                <ModelMetrics />
+              </>
+            ) : (
+              <Navigate to="/auth/signin" />
+            )
           }
         />
         <Route
           path="/feature-importance"
           element={
-            <>
-              <PageTitle title="Feature Importance | RTV" />
-              <FeatureImportance />
-            </>
+            access_token ? (
+              <>
+                <PageTitle title="Feature Importance | RTV" />
+                <FeatureImportance />
+              </>
+            ) : (
+              <Navigate to="/auth/signin" />
+            )
           }
         />
         <Route
           path="/individual-predictions"
           element={
-            <>
-              <PageTitle title="Individual Predictions | RTV" />
-              <IndividualPredictionPage />
-            </>
+            access_token ? (
+              <>
+                <PageTitle title="Individual Predictions | RTV" />
+                <IndividualPredictionPage />
+              </>
+            ) : (
+              <Navigate to="/auth/signin" />
+            )
           }
         />
         <Route
           path="/multiple-predictions"
           element={
-            <>
-              <PageTitle title="Multiple Predictions | RTV" />
-              <MultiplePredictionsPage />
-            </>
+            access_token ? (
+              <>
+                <PageTitle title="Multiple Predictions | RTV" />
+                <MultiplePredictionsPage />
+              </>
+            ) : (
+              <Navigate to="/auth/signin" />
+            )
           }
         />
-
+        <Route
+          path="/standard-evaluations"
+          element={
+            access_token ? (
+              <>
+                <PageTitle title="Model Metrics Dashboard | RTV" />
+                <HomePage />
+              </>
+            ) : (
+              <Navigate to="/auth/signin" />
+            )
+          }
+        />
         <Route
           path="/chat-bot"
           element={
-            <>
-              <PageTitle title="Chatbot | RTV" />
-              <ChatPage />
-            </>
+            access_token ? (
+              <>
+                <PageTitle title="Chatbot | RTV" />
+                <ChatPage />
+              </>
+            ) : (
+              <Navigate to="/auth/signin" />
+            )
           }
         />
-
         <Route
           path="/auth/signin"
           element={
@@ -104,6 +142,19 @@ function App() {
               <PageTitle title="Signup | RTV" />
               <SignUp />
             </>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            access_token ? (
+              <>
+                <PageTitle title="Multiple Predictions | RTV" />
+                <Settings />
+              </>
+            ) : (
+              <Navigate to="/auth/signin" />
+            )
           }
         />
       </Routes>

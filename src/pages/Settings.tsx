@@ -1,7 +1,37 @@
-import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
-import userThree from '../images/user/user-03.png';
+import Breadcrumb from "../components/Breadcrumbs/Breadcrumb";
+import userOne from "../images/user/user-01.png";
+import { updatePasswordAPI } from "../api/Auth";
 
 const Settings = () => {
+  const user_email = localStorage.getItem("email") || "";
+  const user_name = localStorage.getItem("username") || "";
+
+  const handlePasswordUpdate = (event: React.FormEvent) => {
+    event.preventDefault();
+    const currentPassword = (event.target as any).currentPassword.value;
+    const newPassword = (event.target as any).newPassword.value;
+    const confirmPassword = (event.target as any).confirmPassword.value;
+
+    if (newPassword !== confirmPassword) {
+      console.error("Passwords do not match");
+      return;
+    }
+
+    // Call your API to update the password here
+    console.log("Current Password:", currentPassword);
+    console.log("New Password:", newPassword);
+    updatePasswordAPI(currentPassword, newPassword).then((response) => {
+      // Handle response
+      if (response.status == 200) {
+        // alert(response.message)
+        console.log(response.message);
+      } else {
+        // alert(response.error)
+        console.log(response.error);
+      }
+    });
+  };
+
   return (
     <>
       <div className="mx-auto max-w-270">
@@ -18,7 +48,7 @@ const Settings = () => {
               <div className="p-7">
                 <form action="#">
                   <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
-                    <div className="w-full sm:w-1/2">
+                    {/* <div className="w-full sm:w-1/2">
                       <label
                         className="mb-3 block text-sm font-medium text-black dark:text-white"
                         htmlFor="fullName"
@@ -54,15 +84,16 @@ const Settings = () => {
                         <input
                           className="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
                           type="text"
+                          disabled
                           name="fullName"
                           id="fullName"
                           placeholder="Devid Jhon"
                           defaultValue="Devid Jhon"
                         />
                       </div>
-                    </div>
+                    </div> */}
 
-                    <div className="w-full sm:w-1/2">
+                    {/* <div className="w-full sm:w-1/2">
                       <label
                         className="mb-3 block text-sm font-medium text-black dark:text-white"
                         htmlFor="phoneNumber"
@@ -77,7 +108,7 @@ const Settings = () => {
                         placeholder="+990 3343 7865"
                         defaultValue="+990 3343 7865"
                       />
-                    </div>
+                    </div> */}
                   </div>
 
                   <div className="mb-5.5">
@@ -118,8 +149,9 @@ const Settings = () => {
                         type="email"
                         name="emailAddress"
                         id="emailAddress"
-                        placeholder="devidjond45@gmail.com"
-                        defaultValue="devidjond45@gmail.com"
+                        placeholder={user_email}
+                        defaultValue={user_email}
+                        disabled
                       />
                     </div>
                   </div>
@@ -136,8 +168,9 @@ const Settings = () => {
                       type="text"
                       name="Username"
                       id="Username"
-                      placeholder="devidjhon24"
-                      defaultValue="devidjhon24"
+                      placeholder={user_name}
+                      defaultValue={user_name}
+                      disabled
                     />
                   </div>
 
@@ -179,22 +212,13 @@ const Settings = () => {
                           </defs>
                         </svg>
                       </span>
-
-                      <textarea
-                        className="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
-                        name="bio"
-                        id="bio"
-                        rows={6}
-                        placeholder="Write your bio here"
-                        defaultValue="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque posuere fermentum urna, eu condimentum mauris tempus ut. Donec fermentum blandit aliquet."
-                      ></textarea>
                     </div>
                   </div>
 
-                  <div className="flex justify-end gap-4.5">
+                  <div className="flex justify-end gap-4.5 ">
                     <button
                       className="flex justify-center rounded border border-stroke py-2 px-6 font-medium text-black hover:shadow-1 dark:border-strokedark dark:text-white"
-                      type="submit"
+                      type="button"
                     >
                       Cancel
                     </button>
@@ -206,6 +230,84 @@ const Settings = () => {
                     </button>
                   </div>
                 </form>
+              </div>
+            </div>
+            <div className="mt-8">
+              <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+                <div className="border-b border-stroke py-4 px-7 dark:border-strokedark">
+                  <h3 className="font-medium text-black dark:text-white">
+                    Update Password
+                  </h3>
+                </div>
+                <div className="p-7">
+                  <form action="#" onSubmit={handlePasswordUpdate}>
+                    <div className="mb-5.5">
+                      <label
+                        className="mb-3 block text-sm font-medium text-black dark:text-white"
+                        htmlFor="currentPassword"
+                      >
+                        Current Password
+                      </label>
+                      <input
+                        className="w-full rounded border border-stroke bg-gray py-3 px-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                        type="password"
+                        name="currentPassword"
+                        id="currentPassword"
+                        placeholder="Enter your current password"
+                        required
+                      />
+                    </div>
+
+                    <div className="mb-5.5">
+                      <label
+                        className="mb-3 block text-sm font-medium text-black dark:text-white"
+                        htmlFor="newPassword"
+                      >
+                        New Password
+                      </label>
+                      <input
+                        className="w-full rounded border border-stroke bg-gray py-3 px-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                        type="password"
+                        name="newPassword"
+                        id="newPassword"
+                        placeholder="Enter your new password"
+                        required
+                      />
+                    </div>
+
+                    <div className="mb-5.5">
+                      <label
+                        className="mb-3 block text-sm font-medium text-black dark:text-white"
+                        htmlFor="confirmPassword"
+                      >
+                        Confirm New Password
+                      </label>
+                      <input
+                        className="w-full rounded border border-stroke bg-gray py-3 px-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                        type="password"
+                        name="confirmPassword"
+                        id="confirmPassword"
+                        placeholder="Confirm your new password"
+                        required
+                      />
+                    </div>
+
+                    <div className="flex justify-end gap-4.5">
+                      <button
+                        className="flex justify-center rounded border border-stroke py-2 px-6 font-medium text-black hover:shadow-1 dark:border-strokedark dark:text-white"
+                        type="button"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        className="flex justify-center rounded bg-primary py-2 px-6 font-medium text-gray hover:bg-opacity-90"
+                        type="submit"
+                      >
+                        Update Password
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
@@ -220,7 +322,7 @@ const Settings = () => {
                 <form action="#">
                   <div className="mb-4 flex items-center gap-3">
                     <div className="h-14 w-14 rounded-full">
-                      <img src={userThree} alt="User" />
+                      <img src={userOne} alt="User" />
                     </div>
                     <div>
                       <span className="mb-1.5 text-black dark:text-white">
@@ -245,6 +347,7 @@ const Settings = () => {
                       type="file"
                       accept="image/*"
                       className="absolute inset-0 z-50 m-0 h-full w-full cursor-pointer p-0 opacity-0 outline-none"
+                      disabled
                     />
                     <div className="flex flex-col items-center justify-center space-y-3">
                       <span className="flex h-10 w-10 items-center justify-center rounded-full border border-stroke bg-white dark:border-strokedark dark:bg-boxdark">
