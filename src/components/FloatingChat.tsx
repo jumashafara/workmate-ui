@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import ChatPage from "../pages/ChatPage";
+import ChatIcon from '@mui/icons-material/Chat';
+import CloseIcon from '@mui/icons-material/Close';
 
 const FloatingChat: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,25 +19,9 @@ const FloatingChat: React.FC = () => {
         aria-label="Toggle chat"
       >
         {isOpen ? (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            height="24"
-            width="24"
-            fill="currentColor"
-            viewBox="0 -960 960 960"
-          >
-            <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
-          </svg>
+          <CloseIcon />
         ) : (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            height="24"
-            width="24"
-            fill="currentColor"
-            viewBox="0 -960 960 960"
-          >
-            <path d="M240-400h480v-80H240v80Zm0 160h480v-80H240v80Zm0-320h480v-80H240v80ZM80-80v-800h800v800H80Z" />
-          </svg>
+          <ChatIcon />
         )}
       </button>
     </div>

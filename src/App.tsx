@@ -17,6 +17,8 @@ import HomePage from "./pages/Reports/HomePage";
 import FloatingChat from "./components/FloatingChat";
 import Settings from "./pages/Settings";
 
+import Checkins from "./pages/Reports/Checkins";
+
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const { pathname } = useLocation();
@@ -151,6 +153,19 @@ function App() {
               <>
                 <PageTitle title="Multiple Predictions | RTV" />
                 <Settings />
+              </>
+            ) : (
+              <Navigate to="/auth/signin" />
+            )
+          }
+        />
+        <Route
+          path="/checkin-evaluations"
+          element={
+            access_token ? (
+              <>
+                <PageTitle title="Check-ins | RTV" />
+                <Checkins />
               </>
             ) : (
               <Navigate to="/auth/signin" />

@@ -1,4 +1,5 @@
 import { ReactNode, useState } from 'react';
+import { ListItem } from '@mui/material';
 
 interface SidebarLinkGroupProps {
   children: (handleClick: () => void, open: boolean) => ReactNode;
@@ -15,7 +16,7 @@ const SidebarLinkGroup = ({
     setOpen(!open);
   };
 
-  return <li>{children(handleClick, open)}</li>;
+  return <ListItem disablePadding sx={{ display: 'block' }}>{children(handleClick, open)}</ListItem>;
 };
 
 export default SidebarLinkGroup;
