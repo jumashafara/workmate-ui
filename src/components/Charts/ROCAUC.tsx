@@ -44,13 +44,6 @@ const ROCCurve: React.FC<ROCCurveProps> = ({
   ];
 
   const layout = {
-    title: {
-      text: 'ROC Curve',
-      font: {
-        family: 'Arial, sans-serif',
-        size: 24
-      }
-    },
     xaxis: {
       title: 'False Positive Rate',
       range: [0, 1]

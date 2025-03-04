@@ -188,7 +188,7 @@ const SignIn: React.FC = () => {
                   </Box>
 
                   <OrangeButton
-                    type="submit"
+                      type="submit"
                     fullWidth
                     variant="contained"
                     disabled={loading}
@@ -207,11 +207,11 @@ const SignIn: React.FC = () => {
                     <Typography variant="body2" color="text.secondary">
                       Don't have an account?{" "}
                       <Link to="/auth/signup" style={{ color: "#ea580c", fontWeight: "bold", textDecoration: "none" }}>
-                        Sign Up
-                      </Link>
+                      Sign Up
+                    </Link>
                     </Typography>
                   </Box>
-                </form>
+              </form>
               </CardContent>
             </Grid>
           </Grid>

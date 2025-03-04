@@ -224,7 +224,7 @@ const SignUp: React.FC = () => {
                   </Box>
 
                   <OrangeButton
-                    type="submit"
+                      type="submit"
                     fullWidth
                     variant="contained"
                     disabled={loading}
@@ -241,13 +241,13 @@ const SignUp: React.FC = () => {
 
                   <Box sx={{ textAlign: "center" }}>
                     <Typography variant="body2" color="text.secondary">
-                      Already have an account?{" "}
+                    Already have an account?{" "}
                       <Link to="/auth/signin" style={{ color: "#ea580c", fontWeight: "bold", textDecoration: "none" }}>
                         Sign In
-                      </Link>
+                    </Link>
                     </Typography>
                   </Box>
-                </form>
+              </form>
               </CardContent>
             </Grid>
           </Grid>

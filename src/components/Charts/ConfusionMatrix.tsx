@@ -76,13 +76,6 @@ const ConfusionMatrix: React.FC<ConfusionMatrixProps> = ({
   ];
 
   const layout = {
-    title: {
-      text: 'Confusion Matrix',
-      font: {
-        family: 'Arial, sans-serif',
-        size: 24
-      }
-    },
     xaxis: {
       title: 'Predicted Label',
       tickvals: [0, 1],
