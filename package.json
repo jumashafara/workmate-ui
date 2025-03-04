@@ -19,6 +19,7 @@
     "@mui/icons-material": "^6.4.3",
     "@mui/material": "^6.4.3",
     "@shadcn/ui": "^0.0.4",
+    "@trubrics/trubrics": "^0.5.25",
     "@types/plotly.js": "^2.35.2",
     "apexcharts": "^3.41.0",
     "axios": "^1.7.9",

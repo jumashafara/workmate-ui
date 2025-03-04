@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import logToTrubrics from "../api/Trubrics";
 import { 
   Box, 
   Typography, 
@@ -214,6 +215,8 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
           conversation_id: conversationId,
         }),
       });
+
+      logToTrubrics(newMessage.text, receivedText, user);
     } catch (error) {
       console.error("Error:", error);
       setLoading(false);
