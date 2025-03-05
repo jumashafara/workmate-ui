@@ -1,5 +1,6 @@
-import React from "react";
-import Chart from "react-apexcharts";
+import React, { useEffect, useState } from "react";
+import Plot from 'react-plotly.js';
+import { Card, CardHeader, CardContent, Typography, Box, useTheme } from "@mui/material";
 
 interface FeatureContributionsChartProps {
   contributions: Record<string, number>;
@@ -35,85 +36,133 @@ const featureLabelMap: Record<string, string> = {
 const FeatureContributionsChart: React.FC<FeatureContributionsChartProps> = ({
   contributions,
 }) => {
-  const featureEntries = Object.entries(contributions)
-    .map(([key, value]) => [featureLabelMap[key] || key, Number(value)]) // Use mapped label or fallback to key, ensure value is a number
-    .sort((a, b) => Math.abs(Number(b[1])) - Math.abs(Number(a[1]))); // Ensure values are treated as numbers
+  const theme = useTheme();
+  const [plotData, setPlotData] = useState<any[]>([]);
+  const [layout, setLayout] = useState<any>({});
 
-  const featureNames = featureEntries.map(([key]) => key);
-  const featureValues = featureEntries.map(([, value]) => Number(value)); // Ensure values are numbers
+  useEffect(() => {
+    if (!contributions || Object.keys(contributions).length === 0) {
+      return;
+    }
 
-  const colors = featureValues.map((value) =>
-    value >= 0 ? "#EA580C" : "#374151"
-  );
+    const featureEntries = Object.entries(contributions)
+      .map(([key, value]) => [featureLabelMap[key] || key, Number(value)])
+      .sort((a, b) => Math.abs(Number(b[1])) - Math.abs(Number(a[1])));
 
-  const chartOptions = {
-    chart: {
-      type: "bar" as const,
-      toolbar: { show: false },
-      //   background: "#ffffff",
-      foreColor: "#333",
-      padding: "5px",
-      //   increase bar size
-    },
-    colors,
-    xaxis: {
-      categories: featureNames,
-      labels: { rotate: -45, style: { colors: "#333", fontSize: "14px" } },
-    },
-    yaxis: {
+    const featureNames = featureEntries.map(([key]) => key);
+    const featureValues = featureEntries.map(([, value]) => Number(value));
+
+    // Create colors array based on positive/negative values
+    const colors = featureValues.map((value) =>
+      value >= 0 ? '#EA580C' : '#374151'
+    );
+
+    // Set up the plot data
+    setPlotData([
+      {
+        type: 'bar',
+        orientation: 'h',
+        x: featureValues,
+        y: featureNames,
+        marker: {
+          color: colors
+        },
+        text: featureValues.map(val => val.toFixed(2)),
+        textposition: 'auto',
+        hoverinfo: 'x+y',
+        name: 'Feature Contribution'
+      }
+    ]);
+
+    // Set up the layout
+    setLayout({
       title: {
-        text: "Contribution Score",
-        style: { color: "#333", fontSize: "16px" },
+        text: '',
+        font: {
+          family: theme.typography.fontFamily,
+          size: 18
+        }
       },
-    },
-    tooltip: {
-      enabled: true,
-      y: {
-        formatter: (val: number) => `${val.toFixed(4)}`,
+      autosize: true,
+      height: 500,
+      margin: {
+        l: 150, // Increased left margin for feature names
+        r: 30,
+        t: 30,
+        b: 80
       },
-      style: { fontSize: "14px", background: "#fff", border: 0 },
-    },
-    plotOptions: {
-      bar: {
-        horizontal: true,
-        distributed: true,
-        barHeight: "90%",
+      xaxis: {
+        title: {
+          text: 'Contribution Score',
+          font: {
+            family: theme.typography.fontFamily,
+            size: 14
+          }
+        },
+        gridcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
       },
-    },
-    dataLabels: {
-      enabled: true,
-      formatter: (val: number) => val.toFixed(2),
-      style: { fontSize: "12px", colors: ["#fff"] },
-    },
-    legend: {
-      show: false, // Hide the legend
-    },
-  };
+      yaxis: {
+        automargin: true,
+        tickfont: {
+          family: theme.typography.fontFamily,
+          size: 12
+        }
+      },
+      plot_bgcolor: theme.palette.mode === 'dark' ? '#1C2434' : '#FFFFFF',
+      paper_bgcolor: theme.palette.mode === 'dark' ? '#1C2434' : '#FFFFFF',
+      font: {
+        family: theme.typography.fontFamily,
+        color: theme.palette.text.primary
+      }
+    });
+  }, [contributions, theme]);
 
-  const chartSeries = [
-    {
-      name: "Feature Contribution",
-      data: featureValues,
-    },
-  ];
+  // If no contributions data, show a message
+  if (!contributions || Object.keys(contributions).length === 0) {
+    return (
+      <Card sx={{ width: '100%', boxShadow: 2, mb: 3 }}>
+        <CardHeader
+          title="Feature Contributions"
+          subheader="How has each feature contributed to the prediction?"
+          sx={{ 
+            backgroundImage: 'linear-gradient(to right, #e5e7eb, #d1d5db)',
+            padding: 3
+          }}
+        />
+        <CardContent>
+          <Typography variant="body1" align="center" sx={{ py: 10 }}>
+            No feature contribution data available
+          </Typography>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <div className="bg-white rounded-sm shadow-md border border-gray-300 dark:border-gray-700">
-      <div className="bg-gradient-to-r from-gray-200 to-gray-300 p-4 rounded-sm  dark:from-gray-800 dark:to-gray-900 dark:text-gray-200">
-        <h2 className="text-lg font-semibold mb-3 text-gray-700 dark:text-gray-300">
-          Feature Contributions
-        </h2>
-        <p>How has each feature contributed to the prediction?</p>
-      </div>
-      <div className="dark:bg-gray-800">
-        <Chart
-          options={chartOptions}
-          series={chartSeries}
-          type="bar"
-          height={500}
-        />
-      </div>
-    </div>
+    <Card sx={{ width: '100%', boxShadow: 2, mb: 3 }}>
+      <CardHeader
+        title="Feature Contributions"
+        subheader="How has each feature contributed to the prediction?"
+        sx={{ 
+          backgroundImage: 'linear-gradient(to right, #e5e7eb, #d1d5db)',
+          padding: 3
+        }}
+      />
+      <CardContent>
+        <Box sx={{ height: 500, width: '100%' }}>
+          <Plot
+            data={plotData}
+            layout={layout}
+            config={{
+              displayModeBar: true,
+              responsive: true,
+              modeBarButtonsToRemove: ['lasso2d', 'select2d']
+            }}
+            style={{ width: '100%', height: '100%' }}
+          />
+        </Box>
+      </CardContent>
+    </Card>
   );
 };
 
