@@ -25,7 +25,7 @@ const MultiplePredictionsPage: React.FC = () => {
     setMessage("");
 
     try {
-      const response = await fetch("/api/many-predictions/", {
+      const response = await fetch("https://workmate.api.dataidea.org/api/many-predictions/", {
         method: "POST",
         body: formData,
       });

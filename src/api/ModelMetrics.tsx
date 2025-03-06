@@ -4,7 +4,7 @@ import {
 } from "../types/modelmetrics";
 
 const fetchClassificationModelMetrics = async (name: string) => {
-  const response = await fetch(`/api/models/classification/${name}`);
+  const response = await fetch(`https://workmate.api.dataidea.org/api/models/classification/${name}`);
   const data = await response.json();
   const model = data.model;
   const confusion_matrix = data.confusion_matrix;
@@ -18,7 +18,7 @@ const fetchClassificationModelMetrics = async (name: string) => {
 };
 
 const fetchRegressionModelMetrics = async (name: string) => {
-  const response = await fetch(`/api/models/regression/${name}`);
+  const response = await fetch(`https://workmate.api.dataidea.org/api/models/regression/${name}`);
   const data = await response.json();
   const metrics: RegressionMetricsProps = data.model;
   console.log(metrics);

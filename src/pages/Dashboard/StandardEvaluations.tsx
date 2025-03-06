@@ -67,7 +67,7 @@ const StandardEvaluations: React.FC = () => {
     const fetchPredictions = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/standard-evaluations/');
+        const response = await fetch('https://workmate.api.dataidea.org/api/standard-evaluations/');
         const data = await response.json();
         
         if (data.predictions) {
@@ -134,7 +134,7 @@ const StandardEvaluations: React.FC = () => {
         params.append('group_by', groupBy);
       }
       
-      const response = await fetch(`/api/standard-evaluations/?${params.toString()}`);
+      const response = await fetch(`https://workmate.api.dataidea.org/api/standard-evaluations/?${params.toString()}`);
       const data = await response.json();
       
       if (groupBy === 'none' && data.predictions) {
