@@ -1,10 +1,9 @@
-import { useState, useRef } from "react";
+import { useState} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import UserOne from "../../images/user/user-01.png";
 import {
   Avatar,
   Box,
-  Button,
   Divider,
   IconButton,
   ListItemIcon,
@@ -52,7 +51,7 @@ const DropdownUser = () => {
     return {
       username: localStorage.getItem("username"),
       email: localStorage.getItem("email"),
-      role: localStorage.getItem("role"),
+      role: localStorage.getItem("is_staff")? 'staff' : 'user',
       id: localStorage.getItem("id"),
     };
   };
@@ -75,7 +74,7 @@ const DropdownUser = () => {
             {userInfo.username ? userInfo.username : "Unknown User"}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            {userInfo.role ? userInfo.role : "Unknown Role"}
+              {userInfo.role ? userInfo.role : "Unknown Role"}
           </Typography>
         </Box>
 

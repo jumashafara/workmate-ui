@@ -11,11 +11,8 @@ import {
   MenuItem 
 } from "@mui/material";
 import { 
-  Timeline, 
   CheckCircle, 
   Cancel, 
-  QueryStats,
-  BarChart,
   TrendingUp,
   Assessment
 } from "@mui/icons-material";
@@ -35,8 +32,8 @@ const HomePage: React.FC = () => {
     total_predictions: 0,
     positive_predictions: 0,
     negative_predictions: 0,
-    average_income: 0,
-    accuracy: 0,
+    average_income: 0.0,
+    accuracy: 0.0,
   });
   const [loading, setLoading] = React.useState(true);
   const [groupBy, setGroupBy] = React.useState<string>("district");
@@ -102,21 +99,21 @@ const HomePage: React.FC = () => {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Achieved"
-            value={`${((stats.positive_predictions / stats.total_predictions) * 100).toFixed(1)}%`}
+              value={`${((stats.positive_predictions / stats.total_predictions) * 100)?.toFixed(1)}%`}
             icon={<CheckCircle sx={{ fontSize: 28, color: 'success.main' }} />}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Not achieved"
-            value={`${((stats.negative_predictions / stats.total_predictions) * 100).toFixed(1)}%`}
+              value={`${((stats.negative_predictions / stats.total_predictions) * 100)?.toFixed(1)}%`}
             icon={<Cancel sx={{ fontSize: 28, color: 'error.main' }} />}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Avg Income + Production"
-            value={`${(stats.average_income).toFixed(1)}%`}
+            value={`${(stats.average_income)?.toFixed(1)}%`}
             icon={<TrendingUp sx={{ fontSize: 28, color: 'info.main' }} />}
           />
         </Grid>

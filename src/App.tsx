@@ -5,6 +5,8 @@ import Loader from "./common/Loader";
 import PageTitle from "./components/PageTitle";
 import SignIn from "./pages/Authentication/SignIn";
 import SignUp from "./pages/Authentication/SignUp";
+import ForgotPassword from "./pages/Authentication/ForgotPassword";
+import ResetPassword from "./pages/Authentication/ResetPassword";
 import ModelMetrics from "./pages/Dashboard/ModelMetricsPage";
 import FeatureImportance from "./pages/Dashboard/FeatureImportancePage";
 import StandardEvaluations from "./pages/Dashboard/StandardEvaluations";
@@ -32,9 +34,68 @@ function App() {
     setTimeout(() => setLoading(false), 1000);
   }, []);
 
-  return loading ? (
-    <Loader />
-  ) : (
+  // Special routes that should be rendered outside the DefaultLayout
+  const isAuthRoute = pathname.includes('/auth/');
+  const isResetPasswordRoute = pathname.includes('/auth/reset-password/');
+
+  if (loading) {
+    return <Loader />;
+  }
+
+  // Render auth routes and reset password route outside DefaultLayout
+  if (isResetPasswordRoute) {
+    return (
+      <Routes>
+        <Route
+          path="/auth/reset-password/:uid/:token"
+          element={
+            <>
+              <PageTitle title="Reset Password | RTV" />
+              <ResetPassword />
+            </>
+          }
+        />
+      </Routes>
+    );
+  }
+
+  if (isAuthRoute) {
+    return (
+      <Routes>
+        <Route
+          path="/auth/signin"
+          element={
+            <>
+              <PageTitle title="Signin | RTV" />
+              <SignIn />
+            </>
+          }
+        />
+        <Route
+          path="/auth/signup"
+          element={
+            <>
+              <PageTitle title="Signup | RTV" />
+              <SignUp />
+            </>
+          }
+        />
+        <Route
+          path="/auth/forgot-password"
+          element={
+            <>
+              <PageTitle title="Forgot Password | RTV" />
+              <ForgotPassword />
+            </>
+          }
+        />
+        <Route path="*" element={<Navigate to="/auth/signin" />} />
+      </Routes>
+    );
+  }
+
+  // Render other routes inside DefaultLayout
+  return (
     <DefaultLayout>
       <Routes>
         <Route
@@ -126,24 +187,6 @@ function App() {
             ) : (
               <Navigate to="/auth/signin" />
             )
-          }
-        />
-        <Route
-          path="/auth/signin"
-          element={
-            <>
-              <PageTitle title="Signin | RTV" />
-              <SignIn />
-            </>
-          }
-        />
-        <Route
-          path="/auth/signup"
-          element={
-            <>
-              <PageTitle title="Signup | RTV" />
-              <SignUp />
-            </>
           }
         />
         <Route

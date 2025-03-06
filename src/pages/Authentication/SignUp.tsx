@@ -42,6 +42,7 @@ const OrangeButton = styled(Button)(({ theme }) => ({
 
 const SignUp: React.FC = () => {
   const [username, setUsername] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -69,7 +70,7 @@ const SignUp: React.FC = () => {
     
     try {
       setLoading(true);
-      await register({ username, password });
+      await register({ username, email, password });
       toast.success("Registration successful! Redirecting to login...");
       setTimeout(() => {
         navigate("/auth/signin");
@@ -144,12 +145,29 @@ const SignUp: React.FC = () => {
                 <form onSubmit={handleSignup}>
                   <TextField
                     fullWidth
+                    label="Username"
+                    variant="outlined"
+                    margin="normal"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <PersonIcon color="action" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+
+                  <TextField
+                    fullWidth
                     label="Email"
                     variant="outlined"
                     margin="normal"
                     required
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">

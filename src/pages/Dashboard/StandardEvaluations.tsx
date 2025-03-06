@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Grid, Card, CardContent, Typography, Box, Chip, FormControl, InputLabel, MenuItem, Select, OutlinedInput, SelectChangeEvent, Checkbox, ListItemText, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, Pagination, IconButton } from '@mui/material';
 import ClusterStats from '../../components/Tables/ClusterStats';
 import DistrictStats from '../../components/Tables/DistrictStats';
-import axios from 'axios';
-import { ArrowUpward, ArrowDownward, FilterList, QueryStats, PeopleAlt, Percent, AttachMoney, BarChart } from '@mui/icons-material';
+import { ArrowUpward, ArrowDownward, PeopleAlt, Percent, AttachMoney, BarChart } from '@mui/icons-material';
 
 // Define interfaces for our data
 interface FilterOption {
@@ -494,7 +493,7 @@ const StandardEvaluations: React.FC = () => {
                           <TableCell>{prediction.village}</TableCell>
                           <TableCell>{prediction.evaluation_month}</TableCell>
                           <TableCell>
-                            {prediction.prediction === 1 ? 'Achieved' : 'Not Achieved'}
+                            {prediction.prediction === 0 ? 'Achieved' : 'Not Achieved'}
                           </TableCell>
                           <TableCell>
                             ${prediction.predicted_income?.toFixed(2) || '0.00'}

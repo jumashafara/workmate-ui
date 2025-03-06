@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Breadcrumb from "../components/Breadcrumbs/Breadcrumb";
 import userOne from "../images/user/user-01.png";
 import { updatePasswordAPI } from "../api/Auth";
@@ -9,34 +10,71 @@ import {
   Button,
   Grid,
   Box,
+  Alert,
+  Snackbar,
+  CircularProgress,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 const Settings = () => {
   const user_email = localStorage.getItem("email") || "";
   const user_name = localStorage.getItem("username") || "";
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
 
-  const handlePasswordUpdate = (event: React.FormEvent) => {
+  const handlePasswordUpdate = async (event: React.FormEvent) => {
     event.preventDefault();
-    const currentPassword = (event.target as any).currentPassword.value;
-    const newPassword = (event.target as any).newPassword.value;
-    const confirmPassword = (event.target as any).confirmPassword.value;
+    setIsSubmitting(true);
+    setMessage(null);
+    setPasswordError("");
+    
+    const formData = new FormData(event.target as HTMLFormElement);
+    const currentPassword = formData.get("currentPassword") as string;
+    const newPassword = formData.get("newPassword") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
 
+    // Validate passwords
     if (newPassword !== confirmPassword) {
-      console.error("Passwords do not match");
+      setPasswordError("New passwords do not match");
+      setIsSubmitting(false);
+      return;
+    }
+    
+    if (newPassword.length < 8) {
+      setPasswordError("Password must be at least 8 characters long");
+      setIsSubmitting(false);
       return;
     }
 
-    // Call your API to update the password here
-    console.log("Current Password:", currentPassword);
-    console.log("New Password:", newPassword);
-    updatePasswordAPI(currentPassword, newPassword).then((response) => {
-      // Handle response
-      if (response.status === 200) {
-        console.log(response.message);
-      } else {
-        console.log(response.error);
-      }
-    });
+    try {
+      const response = await updatePasswordAPI(currentPassword, newPassword);
+      setMessage({ 
+        type: 'success', 
+        text: 'Password updated successfully!' 
+      });
+      
+      // Reset form
+      (event.target as HTMLFormElement).reset();
+    } catch (error: any) {
+      setMessage({ 
+        type: 'error', 
+        text: error.message || 'Failed to update password. Please try again.' 
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCloseMessage = () => {
+    setMessage(null);
   };
 
   return (
@@ -76,34 +114,85 @@ const Settings = () => {
             <Card sx={{ mt: 3 }}>
               <CardHeader title="Update Password" />
               <CardContent>
+                {passwordError && (
+                  <Alert severity="error" sx={{ mb: 2 }}>
+                    {passwordError}
+                  </Alert>
+                )}
+                
                 <form onSubmit={handlePasswordUpdate}>
                   <TextField
                     fullWidth
                     label="Current Password"
-                    type="password"
+                    type={showCurrentPassword ? "text" : "password"}
                     name="currentPassword"
                     required
                     margin="normal"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                            edge="end"
+                          >
+                            {showCurrentPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                   <TextField
                     fullWidth
                     label="New Password"
-                    type="password"
+                    type={showNewPassword ? "text" : "password"}
                     name="newPassword"
                     required
                     margin="normal"
+                    helperText="Password must be at least 8 characters long"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={() => setShowNewPassword(!showNewPassword)}
+                            edge="end"
+                          >
+                            {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                   <TextField
                     fullWidth
                     label="Confirm New Password"
-                    type="password"
+                    type={showConfirmPassword ? "text" : "password"}
                     name="confirmPassword"
                     required
                     margin="normal"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            edge="end"
+                          >
+                            {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                   <Box display="flex" justifyContent="flex-end" mt={2}>
-                    <Button variant="contained" color="warning" type="submit">
-                      Update Password
+                    <Button 
+                      variant="contained" 
+                      color="warning" 
+                      type="submit"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? <CircularProgress size={24} color="inherit" /> : "Update Password"}
                     </Button>
                   </Box>
                 </form>
@@ -133,6 +222,22 @@ const Settings = () => {
           </Grid>
         </Grid>
       </div>
+      
+      {/* Snackbar for success/error messages */}
+      <Snackbar 
+        open={message !== null} 
+        autoHideDuration={6000} 
+        onClose={handleCloseMessage}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={handleCloseMessage} 
+          severity={message?.type || 'info'} 
+          sx={{ width: '100%' }}
+        >
+          {message?.text || ''}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

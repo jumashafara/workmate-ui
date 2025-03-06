@@ -1,7 +1,6 @@
 interface RegisterData {
-  //   full_name: string;
-  username: string;
-  //   email: string;
+  username?: string;
+  email: string;
   password: string;
 }
 
@@ -17,7 +16,6 @@ interface AuthResponse {
     email: string;
     full_name: string;
     gender: string;
-    role: string;
     is_staff: boolean;
     is_superuser: boolean;
     username: string;
@@ -25,8 +23,10 @@ interface AuthResponse {
   };
 }
 
+const accounts_endpoint = "http://localhost:8000/accounts/";
+
 export const register = async (data: RegisterData) => {
-  const response = await fetch("http://localhost:8000/accounts/register/", {
+  const response = await fetch(accounts_endpoint + "register/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -39,12 +39,12 @@ export const register = async (data: RegisterData) => {
     return responseData;
   } else {
     const error = await response.json();
-    throw new Error(error.error_message || "Error registering user");
+    throw new Error(error.error || error.error_message || "Error registering user");
   }
 };
 
 export const login = async (data: LoginData): Promise<AuthResponse> => {
-  const response = await fetch("http://localhost:8000/accounts/login/", {
+  const response = await fetch(accounts_endpoint + "login/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -62,7 +62,7 @@ export const login = async (data: LoginData): Promise<AuthResponse> => {
 };
 
 export const logout = async () => {
-  const response = await fetch("http://localhost:8000/accounts/logout/", {
+  const response = await fetch(accounts_endpoint + "logout/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -83,16 +83,73 @@ export const updatePasswordAPI = async (
   newPassword: string
 ) => {
   // Implement the API call to update the password
-  const response = await fetch(
-    "http://localhost:8000/accounts/change-password/",
-    {
-      method: "POST",
-      headers: {
+  const response = await fetch(accounts_endpoint + "change-password/", {
+    method: "POST",
+    headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
-      body: JSON.stringify({ currentPassword, newPassword }),
+      body: JSON.stringify({ old_password: currentPassword, new_password: newPassword }),
     }
   );
   return response.json();
+};
+
+export const requestPasswordResetAPI = async (email: string) => {
+  const response = await fetch(accounts_endpoint + "request-password-reset/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }),
+  });
+  return response.json();
+};
+
+export const validateResetTokenAPI = async (uid: string, token: string) => {
+  console.log('validateResetTokenAPI called with:', { uid, token });
+  
+  try {
+    const response = await fetch(accounts_endpoint + "validate-reset-token/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ uid, token }),
+    });
+    
+    console.log('validateResetTokenAPI response status:', response.status);
+    
+    const data = await response.json();
+    console.log('validateResetTokenAPI response data:', data);
+    
+    return data;
+  } catch (error) {
+    console.error('Error in validateResetTokenAPI:', error);
+    throw error;
+  }
+};
+
+export const resetPasswordAPI = async (uid: string, token: string, newPassword: string) => {
+  const response = await fetch(accounts_endpoint + "reset-password/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ uid, token, new_password: newPassword }),
+  });
+  return response.json();
+};
+
+export const getUser = async () => {
+  const response = await fetch(accounts_endpoint + "user/", {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.detail || "Error getting user");
+  }
 };
