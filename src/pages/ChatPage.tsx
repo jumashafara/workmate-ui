@@ -76,6 +76,8 @@ interface ChatPageProps {
 }
 
 const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
+
+  const API_URL = 'http://localhost:8000';
   const [messages, setMessages] = useState<Message[]>([]);
   const [displayedMessages, setDisplayedMessages] = useState<Message[]>([]);
   const [messageLimit, setMessageLimit] = useState(6);
@@ -112,7 +114,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
 
       try {
         const response = await fetch(
-          `http://localhost:8000/chat/history/${user}/`
+          `${API_URL}/chat/history/${user}/`
         );
         const history = await response.json();
 
@@ -201,7 +203,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
       }
 
       // After receiving complete response, store the chat
-      await fetch("http://localhost:8000/chat/store/", {
+      await fetch(`${API_URL}/chat/store/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
