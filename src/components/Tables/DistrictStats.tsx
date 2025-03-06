@@ -26,7 +26,7 @@ interface DistrictStatsProps {
   queryParams?: URLSearchParams;
 }
 
-const DistrictStats: React.FC<DistrictStatsProps> = ({ apiUrl = "/api/district-stats/", queryParams }) => {
+const DistrictStats: React.FC<DistrictStatsProps> = ({ apiUrl = "https://workmate.api.dataidea.org/api/district-stats/", queryParams }) => {
   const [districtStats, setDistrictStats] = useState<DistrictStat[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState<keyof DistrictStat>("district");
@@ -49,7 +49,7 @@ const DistrictStats: React.FC<DistrictStatsProps> = ({ apiUrl = "/api/district-s
         // Add group_by=district to the query params
         const params = new URLSearchParams(queryParams);
         params.set('group_by', 'district');
-        url = `/api/standard-evaluations/?${params.toString()}`;
+        url = `https://workmate.api.dataidea.org/api/standard-evaluations/?${params.toString()}`;
       }
       
       const response = await fetch(url);
