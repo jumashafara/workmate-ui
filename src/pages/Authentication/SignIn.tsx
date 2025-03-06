@@ -76,7 +76,7 @@ const SignIn: React.FC = () => {
     <>
       {/* <Breadcrumb pageName="Sign In" /> */}
 
-      <Container maxWidth="lg" sx={{ mt: 2 }}>
+      <Container maxWidth="lg" sx={{ mt: 6 }}>
         <Card elevation={3} sx={{ overflow: "hidden" }}>
           <Grid container>
             {/* Left side with image - hidden on small screens */}
