@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Breadcrumb from "../../components/Breadcrumbs/Breadcrumb";
 import LogoDark from "../../images/logo/RTV_Logo.png";
 import { login } from "../../api/Auth";
 import { toast } from "react-toastify";
@@ -75,7 +74,7 @@ const SignIn: React.FC = () => {
 
   return (
     <>
-      <Breadcrumb pageName="Sign In" />
+      {/* <Breadcrumb pageName="Sign In" /> */}
 
       <Container maxWidth="lg" sx={{ mt: 2 }}>
         <Card elevation={3} sx={{ overflow: "hidden" }}>
