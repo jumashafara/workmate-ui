@@ -173,7 +173,7 @@ const DropdownMessage = () => {
           <ListItem 
             button 
             component={Link} 
-            to="/messages"
+                  to="/messages"
             sx={{ 
               py: 1.5, 
               '&:hover': { 
@@ -208,7 +208,7 @@ const DropdownMessage = () => {
           <ListItem 
             button 
             component={Link} 
-            to="/messages"
+                  to="/messages"
             sx={{ 
               py: 1.5, 
               '&:hover': { 
@@ -222,7 +222,7 @@ const DropdownMessage = () => {
             <ListItemText 
               primary={
                 <Typography variant="body2" fontWeight="medium">
-                  Cody Fisher
+                      Cody Fisher
                 </Typography>
               }
               secondary={

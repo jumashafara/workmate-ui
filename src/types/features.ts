@@ -1,8 +1,14 @@
 export interface Features {
   household_id: string;
+  checkin_evaluation: Array<boolean>;
+  standard_evaluation: Array<boolean>;
+  
+  cohort: string;
+  cycle: string;
+  region: string;
   district: string;
-  village: string;
   cluster: string;
+  village: string;
   evaluation_month: number;
 
   // Numeric fields

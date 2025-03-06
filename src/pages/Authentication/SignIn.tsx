@@ -141,7 +141,7 @@ const SignIn: React.FC = () => {
                     variant="outlined"
                     margin="normal"
                     required
-                    type="email"
+                      type="email"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     InputProps={{

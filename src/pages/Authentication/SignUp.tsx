@@ -185,7 +185,7 @@ const SignUp: React.FC = () => {
                     required
                     type={showPassword ? "text" : "password"}
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                      onChange={(e) => setPassword(e.target.value)}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">

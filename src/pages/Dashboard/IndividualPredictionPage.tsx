@@ -26,6 +26,13 @@ const IndividualPredictionPage: React.FC = () => {
   const [village, setVillage] = useState<string>("");
   const [cluster, setCluster] = useState<string>("");
   const [evaluationMonth, setEvaluationMonth] = useState<number>(1);
+  
+  // Add new state variables for the missing fields
+  const [cohort, setCohort] = useState<string>("2024");
+  const [cycle, setCycle] = useState<string>("A");
+  const [region, setRegion] = useState<string>("Central");
+  const [standardEvaluation, setStandardEvaluation] = useState<boolean>(true);
+  const [checkinEvaluation, setCheckinEvaluation] = useState<boolean>(false);
 
   // Add new state variables
   const [distanceToOPD, setDistanceToOPD] = useState<number>(1);
@@ -51,45 +58,82 @@ const IndividualPredictionPage: React.FC = () => {
     district: "",
     village: "",
     cluster: "",
-    evaluation_month: 0,
-    cassava: [false], //done
-    maize: [false], //
-    ground_nuts: [false], //done
-    irish_potatoes: [false], //
-    sweet_potatoes: [false], //done
-    perennial_crops_grown_food_banana: [false], //done
-    vsla_participation: [true],
-    business_participation: [false],
-    tot_hhmembers: [1], // done
-    Land_size_for_Crop_Agriculture_Acres: [0.1], //done
-    hh_water_collection_Minutes: [1],
+    evaluation_month: 1,
+    
+    // Add missing fields
+    cohort: "2024",
+    cycle: "A",
+    region: "Central",
+    standard_evaluation: [true],
+    checkin_evaluation: [false],
+    
+    // Numeric fields with proper defaults
+    Land_size_for_Crop_Agriculture_Acres: [1.0],
     farm_implements_owned: [1],
-    Average_Water_Consumed_Per_Day: [0],
-    Distance_travelled_one_way_OPD_treatment: [0],
+    tot_hhmembers: [5],
+    Distance_travelled_one_way_OPD_treatment: [1],
+    Average_Water_Consumed_Per_Day: [20],
+    hh_water_collection_Minutes: [30],
     composts_num: [0],
+    education_level_encoded: [0],
+    
+    // Categorical fields (all initialized to false)
+    vsla_participation: [true],  // This seems to be a default in the original code
+    ground_nuts: [false],
+    perennial_crops_grown_food_banana: [false],
+    sweet_potatoes: [false],
     perennial_crops_grown_coffee: [false],
-    sorghum: [false],
+    irish_potatoes: [false],
+    business_participation: [false],
+    cassava: [false],
     hh_produce_lq_manure: [false],
     hh_produce_organics: [false],
+    maize: [false],
+    sorghum: [false],
     non_bio_waste_mgt_present: [false],
     soap_ash_present: [false],
-    education_level_encoded: [0],
     tippy_tap_present: [false],
-    hhh_sex: [false],
+    hhh_sex: [false],  
+
   });
 
   const handleGetPrediction = async (data: Features) => {
     setLoading(true);
     setPredictionMade(false);
+    
+    // Ensure all boolean values are properly formatted as arrays
+    const formattedData = {
+      ...data,
+      // Convert any single boolean values to arrays if needed
+      checkin_evaluation: Array.isArray(data.checkin_evaluation) ? data.checkin_evaluation : [data.checkin_evaluation],
+      standard_evaluation: Array.isArray(data.standard_evaluation) ? data.standard_evaluation : [data.standard_evaluation],
+      vsla_participation: Array.isArray(data.vsla_participation) ? data.vsla_participation : [data.vsla_participation],
+      ground_nuts: Array.isArray(data.ground_nuts) ? data.ground_nuts : [data.ground_nuts],
+      perennial_crops_grown_food_banana: Array.isArray(data.perennial_crops_grown_food_banana) ? data.perennial_crops_grown_food_banana : [data.perennial_crops_grown_food_banana],
+      sweet_potatoes: Array.isArray(data.sweet_potatoes) ? data.sweet_potatoes : [data.sweet_potatoes],
+      perennial_crops_grown_coffee: Array.isArray(data.perennial_crops_grown_coffee) ? data.perennial_crops_grown_coffee : [data.perennial_crops_grown_coffee],
+      irish_potatoes: Array.isArray(data.irish_potatoes) ? data.irish_potatoes : [data.irish_potatoes],
+      business_participation: Array.isArray(data.business_participation) ? data.business_participation : [data.business_participation],
+      cassava: Array.isArray(data.cassava) ? data.cassava : [data.cassava],
+      hh_produce_lq_manure: Array.isArray(data.hh_produce_lq_manure) ? data.hh_produce_lq_manure : [data.hh_produce_lq_manure],
+      hh_produce_organics: Array.isArray(data.hh_produce_organics) ? data.hh_produce_organics : [data.hh_produce_organics],
+      maize: Array.isArray(data.maize) ? data.maize : [data.maize],
+      sorghum: Array.isArray(data.sorghum) ? data.sorghum : [data.sorghum],
+      non_bio_waste_mgt_present: Array.isArray(data.non_bio_waste_mgt_present) ? data.non_bio_waste_mgt_present : [data.non_bio_waste_mgt_present],
+      soap_ash_present: Array.isArray(data.soap_ash_present) ? data.soap_ash_present : [data.soap_ash_present],
+      tippy_tap_present: Array.isArray(data.tippy_tap_present) ? data.tippy_tap_present : [data.tippy_tap_present],
+      hhh_sex: Array.isArray(data.hhh_sex) ? data.hhh_sex : [data.hhh_sex],
+    };
+    
     try {
-      const response = await getPrediction(data);
+      console.log("Sending prediction data:", formattedData);
+      const response = await getPrediction(formattedData);
       const prediction = response.prediction;
       const probability = response.probability;
       setPrediction(prediction);
       setContributions(response.contributions);
 
-      setPredictedIncomeProduction(response.predicted_income_production); // Set as a number
-
+      setPredictedIncomeProduction(response.predicted_income_production);
       setProbabilities([probability, 1 - probability]);
       setPredictionMade(true);
     } catch (error) {
@@ -107,12 +151,6 @@ const IndividualPredictionPage: React.FC = () => {
   return (
     <div className="">
       <div className="flex flex-col space-y-6">
-        {/* <div className="w-full h-full md:w-1/2">
-          <SelectHousehold
-            cutoffValue={cutoffValue}
-            onCutoffChange={setCutoffValue}
-          />
-        </div> */}
         <div className="">
           <FeatureInput
             formData={formData}
@@ -137,6 +175,12 @@ const IndividualPredictionPage: React.FC = () => {
               tippyTapPresent,
               nonBioWasteManagement,
               organicsProduction,
+              // Add missing values
+              cohort,
+              cycle,
+              region,
+              standardEvaluation,
+              checkinEvaluation,
             }}
             setValues={{
               setLand: setLandValue,
@@ -154,6 +198,12 @@ const IndividualPredictionPage: React.FC = () => {
               setTippyTapPresent,
               setNonBioWasteManagement,
               setOrganicsProduction,
+              // Add missing setters
+              setCohort,
+              setCycle,
+              setRegion,
+              setStandardEvaluation,
+              setCheckinEvaluation,
             }}
           />
           

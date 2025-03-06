@@ -132,14 +132,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         <Box sx={{ overflow: 'auto', height: '100%' }}>
           <List component="nav" sx={{ px: 1 }}>
             {/* Dashboard */}
-            <SidebarLinkGroup
-              activeCondition={
+              <SidebarLinkGroup
+                activeCondition={
                 pathname === '/' || pathname.includes('dashboard')
-              }
-            >
-              {(handleClick, open) => {
-                return (
-                  <React.Fragment>
+                }
+              >
+                {(handleClick, open) => {
+                  return (
+                    <React.Fragment>
                     <ListItem disablePadding>
                       <ListItemButton
                         onClick={(e) => {
@@ -269,7 +269,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     <Collapse in={open} timeout="auto" unmountOnExit>
                       <List component="div" disablePadding>
                         <StyledNavLink 
-                          to="/model-metrics"
+                              to="/model-metrics"
                           onClick={(e) => e.stopPropagation()}
                         >
                           <ListItemButton sx={{ 
@@ -285,7 +285,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         </StyledNavLink>
                         
                         <StyledNavLink 
-                          to="/feature-importance"
+                              to="/feature-importance"
                           onClick={(e) => e.stopPropagation()}
                         >
                           <ListItemButton sx={{ 
@@ -313,16 +313,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         </StyledNavLink>
                       </List>
                     </Collapse>
-                  </React.Fragment>
-                );
-              }}
-            </SidebarLinkGroup>
+                    </React.Fragment>
+                  );
+                }}
+              </SidebarLinkGroup>
 
             {/* Chat */}
             <ListItem disablePadding>
               <ListItemButton
                 component={NavLink}
-                to="/chat-bot"
+                  to="/chat-bot"
                 sx={{
                   borderRadius: 1,
                   mb: 0.5,
@@ -346,7 +346,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             <ListItem disablePadding>
               <ListItemButton
                 component={NavLink}
-                to="/settings"
+                  to="/settings"
                 sx={{
                   borderRadius: 1,
                   mb: 0.5,
@@ -369,14 +369,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             <Divider sx={{ my: 2 }} />
 
             {/* Authentication */}
-            <SidebarLinkGroup
-              activeCondition={
+              <SidebarLinkGroup
+                activeCondition={
                 pathname === '/auth' || pathname.includes('auth')
-              }
-            >
-              {(handleClick, open) => {
-                return (
-                  <React.Fragment>
+                }
+              >
+                {(handleClick, open) => {
+                  return (
+                    <React.Fragment>
                     <ListItem disablePadding>
                       <ListItemButton
                         onClick={(e) => {
@@ -443,10 +443,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         </StyledNavLink>
                       </List>
                     </Collapse>
-                  </React.Fragment>
-                );
-              }}
-            </SidebarLinkGroup>
+                    </React.Fragment>
+                  );
+                }}
+              </SidebarLinkGroup>
           </List>
         </Box>
       </StyledDrawer>
