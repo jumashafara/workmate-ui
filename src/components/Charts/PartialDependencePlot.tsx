@@ -44,7 +44,7 @@ const PartialDependencePlot: React.FC = () => {
         console.log(`Fetching PDP data for model: ${model}, feature: ${feature}`);
         
         const response = await fetch(
-          `/api/get-pdp/?model=${model}&feature=${feature}`
+          `https://workmate.api.dataidea.org/api/get-pdp/?model=${model}&feature=${feature}`
         );
         
         if (!response.ok) {
