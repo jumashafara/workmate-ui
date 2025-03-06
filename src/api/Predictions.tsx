@@ -42,7 +42,7 @@ const getPrediction = async (features: Features): Promise<PredictionResult> => {
     console.log("Formatted features for prediction:", formattedFeatures);
     
     const response = await fetch(
-        "http://localhost:8000/api/single-prediction/",
+        "https://workmate.api.dataidea.org/api/single-prediction/",
         {
             method: "POST",
             headers: {

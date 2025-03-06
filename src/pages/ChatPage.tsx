@@ -77,7 +77,7 @@ interface ChatPageProps {
 
 const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
 
-  const API_URL = 'http://localhost:8000';
+  const API_URL = 'https://workmate.api.dataidea.org';
   const [messages, setMessages] = useState<Message[]>([]);
   const [displayedMessages, setDisplayedMessages] = useState<Message[]>([]);
   const [messageLimit, setMessageLimit] = useState(6);
@@ -95,7 +95,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
   const [user, setUser] = useState<string>("");
 
   useEffect(() => {
-    setUser(localStorage.getItem("user") || "demo@raisingthevillage.org");
+    setUser(localStorage.getItem("email") || "demo@raisingthevillage.org");
     console.log(user);
     
     // Focus input on component mount
