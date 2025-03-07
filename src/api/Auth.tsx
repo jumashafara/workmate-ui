@@ -23,7 +23,7 @@ interface AuthResponse {
   };
 }
 
-const accounts_endpoint = "https://workmate.api.dataidea.org/accounts/";
+const accounts_endpoint = "http://localhost:8000/accounts/";
 
 export const register = async (data: RegisterData) => {
   const response = await fetch(accounts_endpoint + "register/", {

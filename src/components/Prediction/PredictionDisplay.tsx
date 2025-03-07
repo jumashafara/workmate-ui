@@ -58,7 +58,7 @@ const PredictionDisplay: React.FC<PredictionDisplayProps> = ({
                   </TableRow>
                   <TableRow>
                     <TableCell>Predicted</TableCell>
-                    <TableCell>{prediction === 1 ? "Achieved" : "Not Achieved"}</TableCell>
+                    <TableCell>{prediction === 1 ? "Not Achieved" : "Achieved"}</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell>Predicted Income Production</TableCell>

@@ -5,7 +5,7 @@ type TrubricsConfig = {
 }
 
 const config: TrubricsConfig = {
-    apiKey: "TCBrEXtYK2V08gxMYPNqemwI7sNVWLWdSHXBykz61zWnL6iU5j-tFviJdf-Cw7Yx",
+    apiKey: import.meta.env.VITE_TRUBRICS_API_KEY,
 }
 
 const trubrics = new Trubrics(config);

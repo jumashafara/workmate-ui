@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Breadcrumb from "../../components/Breadcrumbs/Breadcrumb";
 import LogoDark from "../../images/logo/RTV_Logo.png";
+import Logo from "../../images/logo/RTV_Logo.png";
 import { login } from "../../api/Auth";
 import { toast } from "react-toastify";
 
@@ -19,6 +21,7 @@ import {
   IconButton,
   Alert,
   CircularProgress,
+  Paper,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import EmailIcon from "@mui/icons-material/Email";
@@ -74,9 +77,9 @@ const SignIn: React.FC = () => {
 
   return (
     <>
-      {/* <Breadcrumb pageName="Sign In" /> */}
+      <Breadcrumb pageName="Sign In" />
 
-      <Container maxWidth="lg" sx={{ mt: 6 }}>
+      <Container maxWidth="lg" sx={{ mt: 2 }}>
         <Card elevation={3} sx={{ overflow: "hidden" }}>
           <Grid container>
             {/* Left side with image - hidden on small screens */}

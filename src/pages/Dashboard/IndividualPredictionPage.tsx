@@ -151,6 +151,12 @@ const IndividualPredictionPage: React.FC = () => {
   return (
     <div className="">
       <div className="flex flex-col space-y-6">
+        {/* <div className="w-full h-full md:w-1/2">
+          <SelectHousehold
+            cutoffValue={cutoffValue}
+            onCutoffChange={setCutoffValue}
+          />
+        </div> */}
         <div className="">
           <FeatureInput
             formData={formData}

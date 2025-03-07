@@ -76,8 +76,6 @@ interface ChatPageProps {
 }
 
 const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
-
-  const API_URL = 'https://workmate.api.dataidea.org';
   const [messages, setMessages] = useState<Message[]>([]);
   const [displayedMessages, setDisplayedMessages] = useState<Message[]>([]);
   const [messageLimit, setMessageLimit] = useState(6);
@@ -95,7 +93,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
   const [user, setUser] = useState<string>("");
 
   useEffect(() => {
-    setUser(localStorage.getItem("email") || "demo@raisingthevillage.org");
+    setUser(localStorage.getItem("user") || "demo@raisingthevillage.org");
     console.log(user);
     
     // Focus input on component mount
@@ -114,7 +112,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
 
       try {
         const response = await fetch(
-          `${API_URL}/chat/history/${user}/`
+          `http://localhost:8000/chat/history/${user}/`
         );
         const history = await response.json();
 
@@ -203,7 +201,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
       }
 
       // After receiving complete response, store the chat
-      await fetch(`${API_URL}/chat/store/`, {
+      await fetch("http://localhost:8000/chat/store/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

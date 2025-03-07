@@ -27,7 +27,7 @@ interface ClusterStatsProps {
   queryParams?: URLSearchParams;
 }
 
-const ClusterStats: React.FC<ClusterStatsProps> = ({ apiUrl = "https://workmate.api.dataidea.org/api/cluster-stats/", queryParams }) => {
+const ClusterStats: React.FC<ClusterStatsProps> = ({ apiUrl = "/api/cluster-stats/", queryParams }) => {
   const [clusterStats, setClusterStats] = useState<ClusterStat[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState<keyof ClusterStat>("district");
@@ -50,7 +50,7 @@ const ClusterStats: React.FC<ClusterStatsProps> = ({ apiUrl = "https://workmate.
         // Add group_by=cluster to the query params
         const params = new URLSearchParams(queryParams);
         params.set('group_by', 'cluster');
-        url = `https://workmate.api.dataidea.org/api/standard-evaluations/?${params.toString()}`;
+        url = `/api/standard-evaluations/?${params.toString()}`;
       }
       
       const response = await fetch(url);
