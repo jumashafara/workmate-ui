@@ -493,7 +493,7 @@ const StandardEvaluations: React.FC = () => {
                           <TableCell>{prediction.village}</TableCell>
                           <TableCell>{prediction.evaluation_month}</TableCell>
                           <TableCell>
-                            {prediction.prediction === 0 ? 'Achieved' : 'Not Achieved'}
+                            {prediction.prediction === 1 ? 'Achieved' : 'Not Achieved'}
                           </TableCell>
                           <TableCell>
                             ${prediction.predicted_income?.toFixed(2) || '0.00'}
