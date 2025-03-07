@@ -47,7 +47,7 @@ function App() {
     return (
       <Routes>
         <Route
-          path="/auth/reset-password/:uid/:token"
+          path="auth/reset-password/:uid/:token"
           element={
             <>
               <PageTitle title="Reset Password | RTV" />
