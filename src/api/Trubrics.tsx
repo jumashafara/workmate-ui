@@ -10,18 +10,24 @@ const config: TrubricsConfig = {
 
 const trubrics = new Trubrics(config);
 
-const logToTrubrics = async (prompt: string, response: any, email: string) => {
+const logToTrubrics = async (prompt: string, response: any, email: string, thread_id: string) => {
     console.log(prompt, response, email);
-    trubrics.track(
-        {
-            event: "Generation",
-            user_id: email,
-            properties: {
-            prompt: prompt,
-            response: response,
-            source: "Workmate"
-        }
-    });
+    try {
+        trubrics.track(
+            {
+                event: "Generation",
+                user_id: email,
+                properties: {
+                    $thread_id: thread_id,
+                    prompt: prompt,
+                    response: response,
+                    source: "Workmate"
+                }
+            }
+        );
+    } catch (error) {
+        console.error("Error logging to Trubrics:", error);
+    }
 }
 
 export default logToTrubrics;

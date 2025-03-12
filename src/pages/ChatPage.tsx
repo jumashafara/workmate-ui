@@ -26,7 +26,6 @@ import {
   Send as SendIcon, 
   Close as CloseIcon,
   ExpandMore as ExpandMoreIcon,
-  Chat as ChatIcon,
   DeleteOutline as DeleteIcon
 } from "@mui/icons-material";
 
@@ -200,23 +199,23 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
         );
       }
 
-      // After receiving complete response, store the chat
-      await fetch("https://workmate.api.dataidea.org/chat/store/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // Add your authentication headers here
-        },
-        body: JSON.stringify({
-          // add user
-          user: user,
-          sent: newMessage.text,
-          received: receivedText,
-          conversation_id: conversationId,
-        }),
-      });
+      // // After receiving complete response, store the chat
+      // await fetch("https://workmate.api.dataidea.org/chat/store/", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     // Add your authentication headers here
+      //   },
+      //   body: JSON.stringify({
+      //     // add user
+      //     user: user,
+      //     sent: newMessage.text,
+      //     received: receivedText,
+      //     conversation_id: conversationId,
+      //   }),
+      // });
 
-      logToTrubrics(newMessage.text, receivedText, user);
+      logToTrubrics(newMessage.text, receivedText, user, conversationId);
     } catch (error) {
       console.error("Error:", error);
       setLoading(false);
