@@ -134,7 +134,7 @@ interface PredictionData {
         params.append('group_by', groupBy);
       }
       
-      const response = await fetch(`https://workmate.api.dataidea.org/api/standard-evaluations/?${params.toString()}`);
+      const response = await fetch(`http://localhost:8000/api/standard-evaluations/?${params.toString()}`);
       const data = await response.json();
       
       if (groupBy === 'none' && data.predictions) {

@@ -111,7 +111,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
 
       try {
         const response = await fetch(
-          `https://workmate.api.dataidea.org/chat/history/${user}/`
+          `http://localhost:8000/chat/history/${user}/`
         );
         const history = await response.json();
 
@@ -200,7 +200,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
       }
 
       // // After receiving complete response, store the chat
-      // await fetch("https://workmate.api.dataidea.org/chat/store/", {
+      // await fetch("http://localhost:8000/chat/store/", {
       //   method: "POST",
       //   headers: {
       //     "Content-Type": "application/json",

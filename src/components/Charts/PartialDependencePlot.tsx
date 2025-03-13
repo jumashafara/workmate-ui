@@ -21,8 +21,8 @@ const PartialDependencePlot: React.FC = () => {
   const [averages, setAverages] = useState<number[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  const featureList = [
+  const [isCategorical, setIsCategorical] = useState<boolean>(false);
+  const categoricalFeatureList = [
     ["Land_size_for_Crop_Agriculture_Acres", "Agriculture land size (acres)"],
     ["farm_implements_owned", "Farm implements owned"],
     ["tot_hhmembers", "Household members"],
@@ -36,6 +36,25 @@ const PartialDependencePlot: React.FC = () => {
     ["education_level_encoded", "Education level"],
   ];
 
+  const numericalFeatureList = [
+    ["vsla_participation", "VSLA participation"],
+    ["ground_nuts", "Groundnuts"],
+    ["perennial_crops_grown_food_banana", "Food banana"],
+    ["sweet_potatoes", "Sweet potatoes"],
+    ["perennial_crops_grown_coffee", "Coffee"],
+    ["irish_potatoes", "Irish potatoes"],
+    ["business_participation", "Business participation"],
+    ["cassava", "Cassava"],
+    ["hh_produce_lq_manure", "Manure"],
+    ["hh_produce_organics", "Organics"],
+    ["maize", "Maize"],
+    ["sorghum", "Sorghum"],
+  ]
+
+
+  // sortted combined list  
+  const featureList = [...categoricalFeatureList, ...numericalFeatureList].sort((a, b) => a[0].localeCompare(b[0]));
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -43,8 +62,10 @@ const PartialDependencePlot: React.FC = () => {
         setError(null);
         console.log(`Fetching PDP data for model: ${model}, feature: ${feature}`);
         
+        const isCategorical_ = categoricalFeatureList.some(item => item[0] === feature);
+        setIsCategorical(isCategorical_);
         const response = await fetch(
-          `/api/get-pdp/?model=${model}&feature=${feature}`
+          `/api/get-pdp/?model=${model}&feature=${feature}&type=${isCategorical ? "categorical" : "numerical"}`
         );
         
         if (!response.ok) {
@@ -73,7 +94,7 @@ const PartialDependencePlot: React.FC = () => {
     fetchData();
   }, [model, feature]);
 
-  const renderContent = () => {
+  const renderContent = (isCategorical: boolean) => {
     if (loading) {
       return (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 400 }}>
@@ -99,7 +120,8 @@ const PartialDependencePlot: React.FC = () => {
     }
 
     return (
-      <Plot
+      isCategorical ? (
+        <Plot
         data={[
           {
             type: 'scatter',
@@ -145,6 +167,54 @@ const PartialDependencePlot: React.FC = () => {
         }}
         style={{ width: '100%', height: '100%' }}
       />
+      ) : (
+        <Plot
+        data={[
+          {
+            type: 'bar',
+            mode: 'lines+markers',
+            x: gridValues,
+            y: averages,
+            line: {
+              color: '#ea580c',
+              width: 2
+            },
+            marker: {
+              color: '#ea580c',
+              size: 6
+            }
+          }
+        ]}
+        layout={{
+          title: '',
+          autosize: true,
+          margin: {
+            l: 50,
+            r: 30,
+            t: 10,
+            b: 50
+          },
+          xaxis: {
+            title: featureList.find(item => item[0] === feature)?.[1] || feature,
+            automargin: true
+          },
+          yaxis: {
+            title: 'Average Probability',
+            automargin: true
+          },
+          font: {
+            family: 'Arial, sans-serif'
+          }
+        }}
+        config={{
+          responsive: true,
+          displayModeBar: true,
+          displaylogo: false,
+          modeBarButtonsToRemove: ['lasso2d', 'select2d']
+        }}
+        style={{ width: '100%', height: '100%' }}
+      />
+      )
     );
   };
 
@@ -197,7 +267,7 @@ const PartialDependencePlot: React.FC = () => {
         </Grid>
         
         <Box sx={{ height: 400, width: '100%' }}>
-          {renderContent()}
+          {renderContent(isCategorical)}
         </Box>
       </CardContent>
     </Card>
