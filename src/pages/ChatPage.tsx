@@ -89,11 +89,12 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
       : Math.random().toString(36).substring(2, 15) +
           Math.random().toString(36).substring(2, 15)
   );
-  const [user, setUser] = useState<string>("");
+  const [fullname, setFullname] = useState<string>("");
+  const [hasStartedConversation, setHasStartedConversation] = useState(false);
 
   useEffect(() => {
-    setUser(localStorage.getItem("user") || "demo@raisingthevillage.org");
-    console.log(user);
+    setFullname(localStorage.getItem("fullname") || "Unknown User");
+    console.log(fullname);
     
     // Focus input on component mount
     inputRef.current?.focus();
@@ -107,11 +108,11 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
   // Load chat history on component mount
   useEffect(() => {
     const loadChatHistory = async () => {
-      if (!user) return;
+      if (!fullname) return;
 
       try {
         const response = await fetch(
-          `http://localhost:8000/chat/history/${user}/`
+          `http://localhost:8000/chat/history/${fullname}/`
         );
         const history = await response.json();
 
@@ -139,7 +140,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
     };
 
     loadChatHistory();
-  }, [user]);
+  }, [fullname]);
 
   // Update displayed messages when messages or limit changes
   useEffect(() => {
@@ -160,6 +161,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
     setMessages((prevMessages) => [...prevMessages, newMessage]);
     setInput("");
     setLoading(true);
+    setHasStartedConversation(true);
 
     // Initialize an empty bot message
     const botMessage: Message = {
@@ -173,7 +175,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
     try {
       const url = `https://iankagera-prod--askfsdl-backend-stream-qa.modal.run/?query=${encodeURIComponent(
         newMessage.text
-      )}&request_id=${encodeURIComponent(`${user}`)}`;
+      )}&request_id=${encodeURIComponent(`${conversationId}`)}`;
 
       const response = await fetch(url);
 
@@ -215,7 +217,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
       //   }),
       // });
 
-      logToTrubrics(newMessage.text, receivedText, user, conversationId);
+      logToTrubrics(newMessage.text, receivedText, fullname, conversationId);
     } catch (error) {
       console.error("Error:", error);
       setLoading(false);
@@ -276,8 +278,8 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
             boxShadow: 3,
             bgcolor: 'background.paper'
           }}
-    >
-      {/* Header */}
+        >
+          {/* Header */}
           <CardHeader
             title={
               <Typography variant="h6" component="div">
@@ -287,7 +289,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
             action={
               isFloating && onClose && (
                 <IconButton 
-              onClick={onClose}
+                  onClick={onClose}
                   color="inherit" 
                   aria-label="close"
                 >
@@ -303,7 +305,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
           />
 
           {/* Sample Questions */}
-      {!isFloating && (
+          {!isFloating && !hasStartedConversation && (
             <Paper 
               variant="outlined" 
               sx={{ 
@@ -354,18 +356,18 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
                 <Button 
                   variant="outlined" 
                   size="small" 
-              onClick={handleLoadMore}
+                  onClick={handleLoadMore}
                   startIcon={<ExpandMoreIcon />}
                   color="primary"
-            >
-              Load More
+                >
+                  Load More
                 </Button>
               </Box>
-        )}
+            )}
 
-        {displayedMessages.map((msg) => (
+            {displayedMessages.map((msg) => (
               <Box
-            key={msg.id}
+                key={msg.id}
                 sx={{
                   display: 'flex',
                   justifyContent: msg.sender === "user" ? 'flex-end' : 'flex-start',
@@ -392,7 +394,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
                   }}
                 >
                   <Typography variant="body1">
-                  {renderMessageText(msg.text)}
+                    {renderMessageText(msg.text)}
                   </Typography>
                   <Typography 
                     variant="caption" 
@@ -409,7 +411,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
               </Box>
             ))}
 
-        {loading && (
+            {loading && (
               <Box
                 sx={{
                   display: 'flex',
@@ -427,14 +429,14 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
 
           <Divider />
 
-      {/* Input Area */}
+          {/* Input Area */}
           <Box sx={{ p: 2, bgcolor: 'background.paper' }}>
             <TextField
               fullWidth
               placeholder="Type your message..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={handleKeyPress}
               variant="outlined"
               size="small"
               inputRef={inputRef}
@@ -468,16 +470,16 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
               }}
             />
 
-      {/* Clear Chat Button */}
+            {/* Clear Chat Button */}
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
               <Button
                 startIcon={<DeleteIcon />}
-          onClick={() => setMessages([])}
+                onClick={() => setMessages([])}
                 color="primary"
                 size="small"
                 variant="text"
               >
-          Clear chat
+                Clear chat
               </Button>
             </Box>
           </Box>

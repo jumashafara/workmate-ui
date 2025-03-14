@@ -37,6 +37,7 @@ function App() {
   // Special routes that should be rendered outside the DefaultLayout
   const isAuthRoute = pathname.includes('/auth/');
   const isResetPasswordRoute = pathname.includes('/auth/reset-password/');
+  const isSuperuser = localStorage.getItem("superuser") === "true";
 
   if (loading) {
     return <Loader />;
@@ -101,20 +102,20 @@ function App() {
         <Route
           index
           element={
-            access_token ? (
+            access_token && isSuperuser ? (
               <>
                 <PageTitle title="Standard Evaluations | RTV" />
                 <StandardEvaluations />
               </>
             ) : (
-              <Navigate to="/auth/signin" />
+              <Navigate to="/chat-bot" />
             )
           }
         />
         <Route
           path="/model-metrics"
           element={
-            access_token ? (
+            access_token && isSuperuser ? (
               <>
                 <PageTitle title="Multiple Predictions | RTV" />
                 <ModelMetrics />
@@ -127,7 +128,7 @@ function App() {
         <Route
           path="/feature-importance"
           element={
-            access_token ? (
+            access_token && isSuperuser ? (
               <>
                 <PageTitle title="Feature Importance | RTV" />
                 <FeatureImportance />
@@ -140,7 +141,7 @@ function App() {
         <Route
           path="/individual-predictions"
           element={
-            access_token ? (
+            access_token && isSuperuser ? (
               <>
                 <PageTitle title="Individual Predictions | RTV" />
                 <IndividualPredictionPage />
@@ -153,7 +154,7 @@ function App() {
         <Route
           path="/multiple-predictions"
           element={
-            access_token ? (
+           access_token && isSuperuser ? (
               <>
                 <PageTitle title="Multiple Predictions | RTV" />
                 <MultiplePredictionsPage />
@@ -166,7 +167,7 @@ function App() {
         <Route
           path="/standard-evaluations"
           element={
-            access_token ? (
+            access_token && isSuperuser ? (
               <>
                 <PageTitle title="Model Metrics Dashboard | RTV" />
                 <HomePage />
@@ -189,7 +190,7 @@ function App() {
             )
           }
         />
-        <Route
+        {access_token && isSuperuser && <Route
           path="/settings"
           element={
             access_token ? (
@@ -201,11 +202,11 @@ function App() {
               <Navigate to="/auth/signin" />
             )
           }
-        />
-        <Route
+        />}
+        {access_token && isSuperuser && <Route
           path="/checkin-evaluations"
           element={
-            access_token ? (
+            access_token && isSuperuser ? (
               <>
                 <PageTitle title="Check-ins | RTV" />
                 <Checkins />
@@ -214,7 +215,7 @@ function App() {
               <Navigate to="/auth/signin" />
             )
           }
-        />
+        />}
       </Routes>
       <FloatingChat />
     </DefaultLayout>

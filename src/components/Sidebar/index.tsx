@@ -82,6 +82,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [colorMode, setColorMode] = useColorMode();
 
+  const isSuperuser = localStorage.getItem("superuser") === "true";
+  const access_token = localStorage.getItem("access_token");
   // Close on click outside
   useEffect(() => {
     const clickHandler = ({ target }: MouseEvent) => {
@@ -132,7 +134,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         <Box sx={{ overflow: 'auto', height: '100%' }}>
           <List component="nav" sx={{ px: 1 }}>
             {/* Dashboard */}
-              <SidebarLinkGroup
+              {isSuperuser && <SidebarLinkGroup
                 activeCondition={
                 pathname === '/' || pathname.includes('dashboard')
                 }
@@ -219,9 +221,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 );
               }}
             </SidebarLinkGroup>
+            }
 
             {/* Reports */}
-            <SidebarLinkGroup
+            {isSuperuser && <SidebarLinkGroup
               activeCondition={
                 pathname === '/model-metrics' ||
                 pathname === '/feature-importance' ||
@@ -317,6 +320,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   );
                 }}
               </SidebarLinkGroup>
+            }
 
             {/* Chat */}
             <ListItem disablePadding>
@@ -343,7 +347,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             </ListItem>
 
             {/* Settings */}
-            <ListItem disablePadding>
+            {/* <ListItem disablePadding>
               <ListItemButton
                 component={NavLink}
                   to="/settings"
@@ -364,12 +368,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 </ListItemIcon>
                 <ListItemText primary="Settings" />
               </ListItemButton>
-            </ListItem>
+            </ListItem> */}
 
             <Divider sx={{ my: 2 }} />
 
             {/* Authentication */}
-              <SidebarLinkGroup
+              {access_token? <></>:<SidebarLinkGroup
                 activeCondition={
                 pathname === '/auth' || pathname.includes('auth')
                 }
@@ -447,6 +451,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   );
                 }}
               </SidebarLinkGroup>
+            }
           </List>
         </Box>
       </StyledDrawer>
