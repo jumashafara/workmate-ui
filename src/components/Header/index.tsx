@@ -115,7 +115,7 @@ const Header = (props: {
         </Box>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2 } }}>
-          <DarkModeSwitcher />
+          {/* <DarkModeSwitcher /> */}
           {/* <!-- Notification Menu Area --> */}
           {/* <DropdownNotification /> */}
           {/* <!-- Notification Menu Area --> */}
