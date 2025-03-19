@@ -25,4 +25,22 @@ const fetchRegressionModelMetrics = async (name: string) => {
   return metrics;
 };
 
-export { fetchClassificationModelMetrics, fetchRegressionModelMetrics };
+const fetch2DPartialDependence = async (model: string, feature1: string, feature2: string) => {
+  try {
+    const response = await fetch(
+      `http://localhost:8000/api/get-2d-pdp/?model=${model}&feature1=${feature1}&feature2=${feature2}`
+    );
+    
+    if (!response.ok) {
+      throw new Error(`API request failed with status ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error fetching 2D PDP data:", error);
+    throw error;
+  }
+};
+
+export { fetchClassificationModelMetrics, fetchRegressionModelMetrics, fetch2DPartialDependence };

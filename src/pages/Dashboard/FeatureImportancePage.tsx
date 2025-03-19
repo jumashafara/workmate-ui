@@ -2,7 +2,7 @@ import FeatureImportanceChart from "../../components/Charts/FeatureImportanceCha
 import VariableDescriptions from "../../components/Tables/FeatureDescriptions";
 import PartialDependencePlot from "../../components/Charts/PartialDependencePlot";
 import { Grid, Box, Typography } from "@mui/material";
-
+import TwoWayPartialDependenceHeatMap from "../../components/Charts/TwoWayPartialDependenceHeatMap";
 const FeatureImportance: React.FC = () => {
   return (
     <Box sx={{ p: 2 }}>
@@ -21,6 +21,10 @@ const FeatureImportance: React.FC = () => {
         
         <Grid item xs={12}>
           <PartialDependencePlot />
+        </Grid>
+
+        <Grid item xs={12}>
+          <TwoWayPartialDependenceHeatMap />
         </Grid>
       </Grid>
     </Box>
