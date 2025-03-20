@@ -21,7 +21,7 @@ const PartialDependencePlot: React.FC = () => {
   const [averages, setAverages] = useState<number[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [isCategorical, setIsCategorical] = useState<boolean>(true);
+  const [isCategorical, setIsCategorical] = useState<boolean>(false);
   const categoricalFeatureList = [
     ["Land_size_for_Crop_Agriculture_Acres", "Agriculture land size (acres)"],
     ["farm_implements_owned", "Farm implements owned"],
@@ -190,7 +190,7 @@ const PartialDependencePlot: React.FC = () => {
           autosize: true,
           margin: {
             l: 50,
-            r: 30,
+            r: 50,
             t: 10,
             b: 50
           },

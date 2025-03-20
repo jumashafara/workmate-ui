@@ -43,19 +43,19 @@ const TwoWayPartialDependenceHeatMap: React.FC<TwoWayPartialDependenceHeatMapPro
     ["Average_Water_Consumed_Per_Day", "Average water consumed per day"],
     ["hh_water_collection_Minutes", "Water collection time (minutes)"],
     ["composts_num", "Number of composts"],
-    ["education_level_encoded", "Education level"],
-    ["vsla_participation", "VSLA participation"],
-    ["ground_nuts", "Groundnuts"],
-    ["perennial_crops_grown_food_banana", "Food banana"],
-    ["sweet_potatoes", "Sweet potatoes"],
-    ["perennial_crops_grown_coffee", "Coffee"],
-    ["irish_potatoes", "Irish potatoes"],
-    ["business_participation", "Business participation"],
-    ["cassava", "Cassava"],
-    ["hh_produce_lq_manure", "Manure"],
-    ["hh_produce_organics", "Organics"],
-    ["maize", "Maize"],
-    ["sorghum", "Sorghum"],
+    // ["education_level_encoded", "Education level"],
+    // ["vsla_participation", "VSLA participation"],
+    // ["ground_nuts", "Groundnuts"],
+    // ["perennial_crops_grown_food_banana", "Food banana"],
+    // ["sweet_potatoes", "Sweet potatoes"],
+    // ["perennial_crops_grown_coffee", "Coffee"],
+    // ["irish_potatoes", "Irish potatoes"],
+    // ["business_participation", "Business participation"],
+    // ["cassava", "Cassava"],
+    // ["hh_produce_lq_manure", "Manure"],
+    // ["hh_produce_organics", "Organics"],
+    // ["maize", "Maize"],
+    // ["sorghum", "Sorghum"],
   ].sort((a, b) => a[1].localeCompare(b[1]));
 
   useEffect(() => {
@@ -126,16 +126,16 @@ const TwoWayPartialDependenceHeatMap: React.FC<TwoWayPartialDependenceHeatMapPro
           autosize: true,
           margin: {
             l: 70,
-            r: 50,
+            r: 70,
             t: 30,
             b: 70
           },
           xaxis: {
-            title: pdpData.x_label,
+            title: feature1Display,
             automargin: true
           },
           yaxis: {
-            title: pdpData.y_label,
+            title: feature2Display,
             automargin: true
           },
           font: {
@@ -215,7 +215,9 @@ const TwoWayPartialDependenceHeatMap: React.FC<TwoWayPartialDependenceHeatMapPro
           </Grid>
         </Grid>
         
-        {renderContent()}
+        <div className="w-full h-[400px] pb-12">
+          {renderContent()}
+        </div>
       </CardContent>
     </Card>
   );
