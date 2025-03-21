@@ -22,7 +22,7 @@ const PartialDependencePlot: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isCategorical, setIsCategorical] = useState<boolean>(false);
-  const categoricalFeatureList = [
+  const numericalFeatureList = [
     ["Land_size_for_Crop_Agriculture_Acres", "Agriculture land size (acres)"],
     ["farm_implements_owned", "Farm implements owned"],
     ["tot_hhmembers", "Household members"],
@@ -36,7 +36,7 @@ const PartialDependencePlot: React.FC = () => {
     ["education_level_encoded", "Education level"],
   ];
 
-  const numericalFeatureList = [
+  const categoricalFeatureList = [
     ["vsla_participation", "VSLA participation"],
     ["ground_nuts", "Groundnuts"],
     ["perennial_crops_grown_food_banana", "Food banana"],
@@ -60,12 +60,15 @@ const PartialDependencePlot: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        console.log(`Fetching PDP data for model: ${model}, feature: ${feature}`);
         
-        const isCategorical_ = categoricalFeatureList.some(item => item[0] === feature);
-        setIsCategorical(isCategorical_);
+        // Determine if the feature is categorical directly here
+        const isFeatureCategorical = categoricalFeatureList.some(item => item[0] === feature);
+        setIsCategorical(isFeatureCategorical);
+        
+        console.log(`Fetching PDP data for model: ${model}, feature: ${feature}, type: ${isFeatureCategorical ? "categorical" : "numerical"}`);
+        
         const response = await fetch(
-          `/api/get-pdp/?model=${model}&feature=${feature}&type=${isCategorical ? "categorical" : "numerical"}`
+          `/api/get-pdp/?model=${model}&feature=${feature}&type=${isFeatureCategorical ? "categorical" : "numerical"}`
         );
         
         if (!response.ok) {
@@ -122,6 +125,54 @@ const PartialDependencePlot: React.FC = () => {
     return (
       isCategorical ? (
         <Plot
+          data={gridValues.map((value, index) => ({
+            type: 'bar',
+            x: [value],
+            y: [averages[index]],
+            name: index === 0 ? "No" : "Yes",
+            marker: {
+              color: index === 0 ? '#1C2434' : '#ea580c', // Set colors for bars
+            }
+          }))}
+          layout={{
+            title: '',
+            autosize: true,
+            margin: {
+              l: 50,
+              r: 50,
+              t: 10,
+              b: 50
+            },
+            xaxis: {
+              title: featureList.find(item => item[0] === feature)?.[1] || feature,
+              automargin: true
+            },
+            yaxis: {
+              title: 'Average Probability',
+              automargin: true
+            },
+            font: {
+              family: 'Arial, sans-serif'
+            },
+            barmode: 'group', // Group bars for categorical features
+            legend: {
+              orientation: 'h', // Horizontal orientation
+              yanchor: 'bottom', // Anchor to the bottom
+              y: -0.3, // Position below the chart
+              xanchor: 'center', // Center the legend
+              x: 0.5 // Center the legend horizontally
+            }
+          }}
+          config={{
+            responsive: true,
+            displayModeBar: true,
+            displaylogo: false,
+            modeBarButtonsToRemove: ['lasso2d', 'select2d']
+          }}
+          style={{ width: '100%', height: '100%' }}
+        />
+      ) : (
+        <Plot
         data={[
           {
             type: 'scatter',
@@ -167,56 +218,11 @@ const PartialDependencePlot: React.FC = () => {
         }}
         style={{ width: '100%', height: '100%' }}
       />
-      ) : (
-        <Plot
-        data={[
-          {
-            type: 'bar',
-            mode: 'lines+markers',
-            x: gridValues,
-            y: averages,
-            line: {
-              color: '#ea580c',
-              width: 2
-            },
-            marker: {
-              color: '#ea580c',
-              size: 6
-            }
-          }
-        ]}
-        layout={{
-          title: '',
-          autosize: true,
-          margin: {
-            l: 50,
-            r: 50,
-            t: 10,
-            b: 50
-          },
-          xaxis: {
-            title: featureList.find(item => item[0] === feature)?.[1] || feature,
-            automargin: true
-          },
-          yaxis: {
-            title: 'Average Probability',
-            automargin: true
-          },
-          font: {
-            family: 'Arial, sans-serif'
-          }
-        }}
-        config={{
-          responsive: true,
-          displayModeBar: true,
-          displaylogo: false,
-          modeBarButtonsToRemove: ['lasso2d', 'select2d']
-        }}
-        style={{ width: '100%', height: '100%' }}
-      />
       )
     );
   };
+
+  
 
   return (
     <Card sx={{ width: '100%', boxShadow: 2 }}>
@@ -242,7 +248,7 @@ const PartialDependencePlot: React.FC = () => {
                 onChange={(e) => setModel(e.target.value)}
               >
                 <MenuItem value="year1_classification">Year 1 Classification</MenuItem>
-                <MenuItem value="year2_classification">Year 2 Classification</MenuItem>
+                {/* <MenuItem value="year2_classification">Year 2 Classification</MenuItem> */}
               </Select>
             </FormControl>
           </Grid>
