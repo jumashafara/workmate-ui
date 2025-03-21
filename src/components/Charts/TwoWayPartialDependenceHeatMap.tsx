@@ -36,7 +36,7 @@ const TwoWayPartialDependenceHeatMap: React.FC<TwoWayPartialDependenceHeatMapPro
   const [error, setError] = useState<string | null>(null);
 
   const featureList = [
-    ["Land_size_for_Crop_Agriculture_Acres", "Agriculture land size (acres)"],
+    // ["Land_size_for_Crop_Agriculture_Acres", "Agriculture land size (acres)"],
     ["farm_implements_owned", "Farm implements owned"],
     ["tot_hhmembers", "Household members"],
     ["Distance_travelled_one_way_OPD_treatment", "Distance travelled to OPD treatment (one way)"],
