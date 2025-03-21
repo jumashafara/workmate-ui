@@ -7,6 +7,7 @@ import SignIn from "./pages/Authentication/SignIn";
 import SignUp from "./pages/Authentication/SignUp";
 import ForgotPassword from "./pages/Authentication/ForgotPassword";
 import ResetPassword from "./pages/Authentication/ResetPassword";
+import GoogleCallback from "./pages/Authentication/GoogleCallback";
 import ModelMetrics from "./pages/Dashboard/ModelMetricsPage";
 import FeatureImportance from "./pages/Dashboard/FeatureImportancePage";
 import StandardEvaluations from "./pages/Dashboard/StandardEvaluations";
@@ -87,6 +88,15 @@ function App() {
             <>
               <PageTitle title="Forgot Password | RTV" />
               <ForgotPassword />
+            </>
+          }
+        />
+        <Route
+          path="/auth/google/callback"
+          element={
+            <>
+              <PageTitle title="Google Authentication | RTV" />
+              <GoogleCallback />
             </>
           }
         />

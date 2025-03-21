@@ -153,3 +153,39 @@ export const getUser = async () => {
     throw new Error(errorData.detail || "Error getting user");
   }
 };
+
+// Google Authentication methods
+export const getGoogleAuthUrl = async (): Promise<string> => {
+  const response = await fetch(accounts_endpoint + "google/login/", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    return data.auth_url;
+  } else {
+    const error = await response.json();
+    throw new Error(error.error || "Error getting Google auth URL");
+  }
+};
+
+export const googleAuthenticate = async (code: string): Promise<AuthResponse> => {
+  const response = await fetch(accounts_endpoint + "google/callback/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ code }),
+  });
+
+  if (response.ok) {
+    const responseData: AuthResponse = await response.json();
+    return responseData;
+  } else {
+    const error = await response.json();
+    throw new Error(error.error || "Error authenticating with Google");
+  }
+};

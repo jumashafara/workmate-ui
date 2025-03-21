@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Breadcrumb from "../../components/Breadcrumbs/Breadcrumb";
 import LogoDark from "../../images/logo/RTV_Logo.png";
-import Logo from "../../images/logo/RTV_Logo.png";
-import { login } from "../../api/Auth";
+import { login, getGoogleAuthUrl, googleAuthenticate } from "../../api/Auth";
 import { toast } from "react-toastify";
+import GoogleIcon from "@mui/icons-material/Google";
 
 // MUI imports
 import {
@@ -21,7 +21,6 @@ import {
   IconButton,
   Alert,
   CircularProgress,
-  Paper,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import EmailIcon from "@mui/icons-material/Email";
@@ -40,13 +39,37 @@ const OrangeButton = styled(Button)(({ theme }) => ({
   fontWeight: "bold",
 }));
 
+const GoogleButton = styled(Button)(({ theme }) => ({
+  backgroundColor: "#ffffff",
+  color: "#757575",
+  border: "1px solid #dddddd",
+  "&:hover": {
+    backgroundColor: "#f1f1f1",
+  },
+  padding: "12px 0",
+  fontWeight: "bold",
+  textTransform: "none"
+}));
+
 const SignIn: React.FC = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [googleLoading, setGoogleLoading] = useState<boolean>(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Look for the code parameter in the URL (for Google OAuth callback)
+    const urlParams = new URLSearchParams(location.search);
+    const code = urlParams.get('code');
+    
+    if (code) {
+      handleGoogleCallback(code);
+    }
+  }, [location]);
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -74,6 +97,43 @@ const SignIn: React.FC = () => {
       setLoading(false);
       toast.error(error.message);
       setErrorMessage(error.message);
+    }
+  };
+
+  const handleGoogleCallback = async (code: string) => {
+    try {
+      setGoogleLoading(true);
+      const data = await googleAuthenticate(code);
+      
+      // Save the tokens
+      localStorage.setItem("access_token", data.access_token);
+      localStorage.setItem("refresh_token", data.refresh_token);
+      localStorage.setItem("username", data.user.username);
+      localStorage.setItem("email", data.user.email);
+      localStorage.setItem("fullname", data.user.full_name);
+      localStorage.setItem("superuser", `${data.user.is_superuser}`);
+      
+      toast.success("Google login successful! Redirecting...");
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
+    } catch (error: any) {
+      console.log(error);
+      setGoogleLoading(false);
+      toast.error(error.message);
+      setErrorMessage("Google authentication failed: " + error.message);
+    }
+  };
+  
+  const handleGoogleLogin = async () => {
+    try {
+      setGoogleLoading(true);
+      const authUrl = await getGoogleAuthUrl();
+      window.location.href = authUrl;
+    } catch (error: any) {
+      setGoogleLoading(false);
+      toast.error(error.message);
+      setErrorMessage("Failed to initiate Google login: " + error.message);
     }
   };
 
@@ -205,6 +265,17 @@ const SignIn: React.FC = () => {
                       OR
                     </Typography>
                   </Divider>
+
+                  <GoogleButton
+                    fullWidth
+                    variant="contained"
+                    startIcon={<GoogleIcon />}
+                    onClick={handleGoogleLogin}
+                    disabled={googleLoading}
+                    sx={{ mb: 3 }}
+                  >
+                    {googleLoading ? <CircularProgress size={24} color="inherit" /> : "Sign in with Google"}
+                  </GoogleButton>
 
                   <Box sx={{ textAlign: "center" }}>
                     <Typography variant="body2" color="text.secondary">

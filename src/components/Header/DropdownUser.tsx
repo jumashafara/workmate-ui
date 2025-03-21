@@ -50,6 +50,7 @@ const DropdownUser = () => {
   const getUserInfo = () => {
     return {
       username: localStorage.getItem("username"),
+      fullname: localStorage.getItem("fullname"),
       email: localStorage.getItem("email"),
       role: localStorage.getItem("is_staff")? 'staff' : 'user',
       id: localStorage.getItem("id"),
@@ -71,7 +72,7 @@ const DropdownUser = () => {
       >
         <Box sx={{ display: { xs: 'none', lg: 'block' }, textAlign: 'right', mr: 1 }}>
           <Typography variant="body2" fontWeight="medium">
-            {userInfo.username ? userInfo.username : "Unknown User"}
+            {userInfo.fullname ? userInfo.fullname : "Unknown User"}
           </Typography>
           <Typography variant="caption" color="text.secondary">
               {userInfo.role ? userInfo.role : "Unknown Role"}
