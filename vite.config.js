@@ -7,13 +7,6 @@ export default defineConfig({
   server: {
     host: true,
     port: 3000,
-    proxy: {
-      "/api": {
-        // target: "http://127.0.0.1:8000", // Your Django backend
-        target: "http://localhost:8000",
-        changeOrigin: true,
-      },
-    },
   },
   // Use the repository name as the base path for GitHub Pages (process.env.BASE_PATH) or "/" for local development
   base: process.env.BASE_PATH || "/",
