@@ -19,7 +19,14 @@ const GoogleCallback: React.FC = () => {
       const searchParams = new URLSearchParams(location.search);
       code = searchParams.get('code');
       
-      // If no code in search params, try extracting from URL
+      // If no code in search params, check if we're in a hash route with params
+      if (!code && location.hash.includes('?')) {
+        // For hash routing: /#/auth/google/callback?code=...
+        const hashParams = new URLSearchParams(location.hash.split('?')[1]);
+        code = hashParams.get('code');
+      }
+      
+      // If still no code, try extracting from full URL
       if (!code) {
         const fullUrl = window.location.href;
         if (fullUrl.includes('code=')) {
@@ -37,7 +44,7 @@ const GoogleCallback: React.FC = () => {
       }
       
       try {
-        console.log('Authenticating with code:', code);
+        console.log('Processing Google authentication callback with code');
         const data = await googleAuthenticate(code);
         
         // Save the tokens

@@ -18,6 +18,27 @@ The project is already configured for GitHub Pages deployment with the following
 - **Hash Router**: The app uses hash-based routing (`HashRouter`) which is compatible with GitHub Pages.
 - **Base Path**: The build configuration sets the correct base path using the environment variable `BASE_PATH`.
 - **404 Page**: A custom 404.html page handles redirects for deep linking.
+- **Google OAuth**: A special static HTML callback page at `/auth/google/callback/index.html` handles the Google OAuth redirect and passes the authentication code to your hash-based application.
+
+## Google OAuth Configuration
+
+For Google authentication to work properly with GitHub Pages:
+
+1. **Set up Google OAuth credentials**: 
+   - Go to the [Google Cloud Console](https://console.cloud.google.com/)
+   - Create or select your project
+   - Navigate to "APIs & Services" > "Credentials"
+   - Create an OAuth 2.0 Client ID if you don't have one
+
+2. **Configure correct redirect URIs**:
+   - Add `https://workmate.dataidea.org/auth/google/callback` to the authorized redirect URIs
+   - Do NOT include the hash fragment version (`/#/auth/google/callback`)
+
+3. **How it works**:
+   - When users click "Sign in with Google", they're redirected to Google's auth page
+   - After authentication, Google redirects to `/auth/google/callback`
+   - Our static HTML page at that location extracts the code and redirects to our hash-based route
+   - The React application then processes the authentication
 
 ## Deployment Steps
 

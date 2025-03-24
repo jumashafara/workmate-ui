@@ -176,6 +176,8 @@ export const googleAuthenticate = async (code: string): Promise<AuthResponse> =>
   // URL decode the code if it's encoded
   const decodedCode = decodeURIComponent(code);
   
+  console.log('Authenticating with Google code:', decodedCode);
+  
   const response = await fetch(ACCOUNTS_ENDPOINT + "/google/callback/", {
     method: "POST",
     headers: {
