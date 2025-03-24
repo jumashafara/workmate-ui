@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Workmate - Page Not Found</title>
   <script>
-    // Redirect to the homepage with the current path appended as a hash
+    // For custom domain, we can use a simpler redirect approach
     const path = window.location.pathname;
-    const baseHref = path.split('/')[0] + '/';
-    window.location.href = baseHref + '#' + path.replace(baseHref, '/');
+    // Simply redirect to the homepage with the path as hash
+    window.location.href = '/#' + path;
   </script>
   <style>
     body {
