@@ -7,7 +7,7 @@
   <script>
     // Redirect to the homepage with the current path appended as a hash
     const path = window.location.pathname;
-    const baseHref = path.split('/jumashafara/workmate-ui/')[0] + '/jumashafara/workmate-ui/';
+    const baseHref = path.split('/')[0] + '/';
     window.location.href = baseHref + '#' + path.replace(baseHref, '/');
   </script>
   <style>
