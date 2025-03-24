@@ -15,5 +15,6 @@ export default defineConfig({
       },
     },
   },
-  base: "/",
+  // Use the repository name as the base path for GitHub Pages (process.env.BASE_PATH) or "/" for local development
+  base: process.env.BASE_PATH || "/",
 });
