@@ -9,5 +9,5 @@ export default defineConfig({
     port: 3000,
   },
   // Use the repository name as the base path for GitHub Pages (process.env.BASE_PATH) or "/" for local development
-  base: process.env.BASE_PATH || "/",
+  base: "/",
 });
