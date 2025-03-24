@@ -6,15 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:github": "cross-env BASE_PATH=/workmate/frontend/ vite build",
+    "build:github": "cross-env BASE_PATH=/jumashafara/workmate-ui vite build",
     "preview": "vite preview",
     "predeploy": "npm run build:github",
     "deploy": "gh-pages -d dist"
-  },
-  "author": {
-    "name": "TailAdmin",
-    "email": "hello@tailadmin.com",
-    "url": "https://tailadmin.com"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

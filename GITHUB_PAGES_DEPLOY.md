@@ -1,5 +1,3 @@
- 
-
 This guide explains how to deploy the Workmate frontend application to GitHub Pages.
 
 ## Prerequisites
@@ -23,7 +21,28 @@ The project is already configured for GitHub Pages deployment with the following
 
 ## Deployment Steps
 
-### Option 1: Using NPM Scripts (Recommended)
+### Option 1: Automated Deployment with GitHub Actions (Recommended)
+
+The project is configured with a GitHub Actions workflow that automatically deploys to GitHub Pages whenever you push to the main branch.
+
+1. **Ensure your repository has GitHub Pages enabled**:
+   - Go to your repository settings on GitHub
+   - Navigate to the GitHub Pages section
+   - Select the `gh-pages` branch as the source
+   - Save your changes
+
+2. **Push changes to the main branch**:
+   ```bash
+   git add .
+   git commit -m "Your commit message"
+   git push origin main
+   ```
+
+3. **Monitor the deployment**:
+   - Go to the "Actions" tab in your GitHub repository
+   - You'll see the workflow running, and once completed, your site will be deployed
+
+### Option 2: Using NPM Scripts (Manual Deployment)
 
 1. **Update Base Path**: 
    - Open `package.json` and find the `build:github` script
@@ -42,20 +61,6 @@ The project is already configured for GitHub Pages deployment with the following
    - Navigate to the GitHub Pages section
    - Select the `gh-pages` branch as the source
    - Save your changes
-
-### Option 2: Manual Deployment
-
-1. **Build the application**:
-   ```bash
-   npm run build:github
-   ```
-
-2. **Push the `dist` directory to the `gh-pages` branch**:
-   ```bash
-   git add dist -f
-   git commit -m "Deploy to GitHub Pages"
-   git subtree push --prefix dist origin gh-pages
-   ```
 
 ## Troubleshooting
 
