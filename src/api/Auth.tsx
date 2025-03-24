@@ -173,19 +173,23 @@ export const getGoogleAuthUrl = async (): Promise<string> => {
 };
 
 export const googleAuthenticate = async (code: string): Promise<AuthResponse> => {
+  // URL decode the code if it's encoded
+  const decodedCode = decodeURIComponent(code);
+  
   const response = await fetch(ACCOUNTS_ENDPOINT + "/google/callback/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ code }),
+    body: JSON.stringify({ code: decodedCode }),
   });
 
   if (response.ok) {
-    const responseData: AuthResponse = await response.json();
-    return responseData;
+    const data = await response.json();
+    return data;
   } else {
     const error = await response.json();
-    throw new Error(error.error || "Error authenticating with Google");
+    console.error("Google auth error:", error);
+    throw new Error(error.detail || "Error authenticating with Google");
   }
 };

@@ -12,16 +12,32 @@ const GoogleCallback: React.FC = () => {
 
   useEffect(() => {
     const handleGoogleCallback = async () => {
-      const urlParams = new URLSearchParams(location.search);
-      const code = urlParams.get('code');
+      // Handle hash routing parameters
+      let code: string | null = null;
+      
+      // Extract the code from search params
+      const searchParams = new URLSearchParams(location.search);
+      code = searchParams.get('code');
+      
+      // If no code in search params, try extracting from URL
+      if (!code) {
+        const fullUrl = window.location.href;
+        if (fullUrl.includes('code=')) {
+          const codeMatch = fullUrl.match(/[?&]code=([^&]+)/);
+          code = codeMatch ? codeMatch[1] : null;
+        }
+      }
       
       if (!code) {
         setError('No authorization code received from Google');
         setLoading(false);
+        toast.error('Authentication failed: No code received from Google');
+        setTimeout(() => navigate('/auth/signin'), 3000);
         return;
       }
       
       try {
+        console.log('Authenticating with code:', code);
         const data = await googleAuthenticate(code);
         
         // Save the tokens
@@ -41,6 +57,7 @@ const GoogleCallback: React.FC = () => {
         setError(error.message || 'Failed to authenticate with Google');
         setLoading(false);
         toast.error(error.message || 'Failed to authenticate with Google');
+        setTimeout(() => navigate('/auth/signin'), 3000);
       }
     };
     

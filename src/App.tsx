@@ -22,6 +22,26 @@ import Settings from "./pages/Settings";
 
 import Checkins from "./pages/Reports/Checkins";
 
+// Add this special handler component for Google OAuth callback
+function GoogleCallbackHandler() {
+  useEffect(() => {
+    // Extract the code from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    
+    if (code) {
+      // Redirect to the hash-based callback route with the code
+      window.location.href = `/#/auth/google/callback?code=${code}`;
+    } else {
+      // If there's no code, redirect to sign in
+      window.location.href = '/#/auth/signin';
+    }
+  }, []);
+  
+  // Show loading while redirecting
+  return <div>Redirecting...</div>;
+}
+
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const { pathname } = useLocation();
@@ -103,6 +123,12 @@ function App() {
         <Route path="*" element={<Navigate to="/auth/signin" />} />
       </Routes>
     );
+  }
+
+  // Special routes outside DefaultLayout and outside hash routing
+  // This is needed for OAuth callback to work with hash routing
+  if (window.location.pathname === '/auth/google/callback') {
+    return <GoogleCallbackHandler />;
   }
 
   // Render other routes inside DefaultLayout
