@@ -1,5 +1,6 @@
 import { Features } from "../types/features";
 import { PredictionResult } from "../types/prediction_result";
+import { API_ENDPOINT } from "./endpoints";
 
 const getPrediction = async (features: Features): Promise<PredictionResult> => {
     // Ensure all boolean arrays have at least one element
@@ -42,7 +43,7 @@ const getPrediction = async (features: Features): Promise<PredictionResult> => {
     console.log("Formatted features for prediction:", formattedFeatures);
     
     const response = await fetch(
-        "http://localhost:8000/api/single-prediction/",
+        `${API_ENDPOINT}/single-prediction/`,
         {
             method: "POST",
             headers: {

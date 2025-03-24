@@ -23,10 +23,10 @@ interface AuthResponse {
   };
 }
 
-const accounts_endpoint = "http://localhost:8000/accounts/";
+import { ACCOUNTS_ENDPOINT } from "./endpoints";
 
 export const register = async (data: RegisterData) => {
-  const response = await fetch(accounts_endpoint + "register/", {
+  const response = await fetch(ACCOUNTS_ENDPOINT + "register/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -44,7 +44,7 @@ export const register = async (data: RegisterData) => {
 };
 
 export const login = async (data: LoginData): Promise<AuthResponse> => {
-  const response = await fetch(accounts_endpoint + "login/", {
+  const response = await fetch(ACCOUNTS_ENDPOINT + "login/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -62,7 +62,7 @@ export const login = async (data: LoginData): Promise<AuthResponse> => {
 };
 
 export const logout = async () => {
-  const response = await fetch(accounts_endpoint + "logout/", {
+  const response = await fetch(ACCOUNTS_ENDPOINT + "logout/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -83,7 +83,7 @@ export const updatePasswordAPI = async (
   newPassword: string
 ) => {
   // Implement the API call to update the password
-  const response = await fetch(accounts_endpoint + "change-password/", {
+  const response = await fetch(ACCOUNTS_ENDPOINT + "change-password/", {
     method: "POST",
     headers: {
         "Content-Type": "application/json",
@@ -96,7 +96,7 @@ export const updatePasswordAPI = async (
 };
 
 export const requestPasswordResetAPI = async (email: string) => {
-  const response = await fetch(accounts_endpoint + "request-password-reset/", {
+  const response = await fetch(ACCOUNTS_ENDPOINT + "request-password-reset/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -110,7 +110,7 @@ export const validateResetTokenAPI = async (uid: string, token: string) => {
   console.log('validateResetTokenAPI called with:', { uid, token });
   
   try {
-    const response = await fetch(accounts_endpoint + "validate-reset-token/", {
+    const response = await fetch(ACCOUNTS_ENDPOINT + "validate-reset-token/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -131,7 +131,7 @@ export const validateResetTokenAPI = async (uid: string, token: string) => {
 };
 
 export const resetPasswordAPI = async (uid: string, token: string, newPassword: string) => {
-  const response = await fetch(accounts_endpoint + "reset-password/", {
+  const response = await fetch(ACCOUNTS_ENDPOINT + "reset-password/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -142,7 +142,7 @@ export const resetPasswordAPI = async (uid: string, token: string, newPassword: 
 };
 
 export const getUser = async () => {
-  const response = await fetch(accounts_endpoint + "user/", {
+  const response = await fetch(ACCOUNTS_ENDPOINT + "user/", {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("access_token")}`,
     },
@@ -156,7 +156,7 @@ export const getUser = async () => {
 
 // Google Authentication methods
 export const getGoogleAuthUrl = async (): Promise<string> => {
-  const response = await fetch(accounts_endpoint + "google/login/", {
+  const response = await fetch(ACCOUNTS_ENDPOINT + "google/login/", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -173,7 +173,7 @@ export const getGoogleAuthUrl = async (): Promise<string> => {
 };
 
 export const googleAuthenticate = async (code: string): Promise<AuthResponse> => {
-  const response = await fetch(accounts_endpoint + "google/callback/", {
+  const response = await fetch(ACCOUNTS_ENDPOINT + "google/callback/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
