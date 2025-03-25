@@ -1,11 +1,17 @@
 import { Trubrics } from "@trubrics/trubrics";
+import getSecrets from "./secrets";
 
 type TrubricsConfig = {
     apiKey: string;
 }
 
+// get trubrics key from backend
+const secrets = await getSecrets();
+
+console.log(secrets);
+
 const config: TrubricsConfig = {
-    apiKey: import.meta.env.VITE_TRUBRICS_API_KEY,
+    apiKey: secrets.TRUBRICS_API_KEY
 }
 
 const trubrics = new Trubrics(config);
