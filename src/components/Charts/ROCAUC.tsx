@@ -84,8 +84,8 @@ const ROCCurve: React.FC<ROCCurveProps> = ({
       </div>
       <div className="p-3">
         <Plot
-          data={data}
-          layout={layout}
+          data={data as any} // Type assertion to bypass TypeScript error
+          layout={layout as any} // Type assertion to bypass TypeScript error
           config={config}
           style={{ width: '100%', height: 500 }}
         />

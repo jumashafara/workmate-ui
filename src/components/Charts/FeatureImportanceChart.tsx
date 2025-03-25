@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Plot from "react-plotly.js";
-import { Card, CardHeader, CardContent, Box, Typography, Select, MenuItem, FormControl, InputLabel, CircularProgress, Alert } from "@mui/material";
-
+import { Card, CardHeader, CardContent, Box, Select, MenuItem, FormControl, InputLabel, CircularProgress, Alert } from "@mui/material";
+import { API_ENDPOINT } from "../../api/endpoints";
 interface FeatureImportanceChartProps {
   featureNames?: string[];
   importances?: number[];
@@ -19,7 +19,7 @@ const FeatureImportanceChart: React.FC<FeatureImportanceChartProps> = ({ feature
       setLoading(true);
       setError(null);
       const response = await fetch(
-        `/api/models/feature-importances/?model=${model}`
+        `${API_ENDPOINT}/models/feature-importances/?model=${model}`
       );
       
       if (!response.ok) {

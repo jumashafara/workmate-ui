@@ -13,6 +13,7 @@ import {
   CircularProgress,
   Alert
 } from "@mui/material";
+import { API_ENDPOINT } from "../../api/endpoints";
 
 const PartialDependencePlot: React.FC = () => {
   const [model, setModel] = useState<string>("year1_classification");
@@ -68,7 +69,7 @@ const PartialDependencePlot: React.FC = () => {
         console.log(`Fetching PDP data for model: ${model}, feature: ${feature}, type: ${isFeatureCategorical ? "categorical" : "numerical"}`);
         
         const response = await fetch(
-          `/api/get-pdp/?model=${model}&feature=${feature}&type=${isFeatureCategorical ? "categorical" : "numerical"}`
+          `${API_ENDPOINT}/get-pdp/?model=${model}&feature=${feature}&type=${isFeatureCategorical ? "categorical" : "numerical"}`
         );
         
         if (!response.ok) {
