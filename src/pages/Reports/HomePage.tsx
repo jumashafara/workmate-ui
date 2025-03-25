@@ -18,6 +18,7 @@ import {
 } from "@mui/icons-material";
 import DistrictStats from "../../components/Tables/DistrictStats";
 import ClusterStats from "../../components/Tables/ClusterStats";
+import { API_ENDPOINT } from "../../api/endpoints";
 
 interface DashboardStats {
   total_predictions: number;
@@ -44,7 +45,7 @@ const HomePage: React.FC = () => {
 
   const fetchDashboardStats = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/dashboard-stats/");
+      const response = await fetch(`${API_ENDPOINT}/dashboard-stats/`);
       const data = await response.json();
       setStats(data);
       setLoading(false);

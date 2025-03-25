@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { API_ENDPOINT } from "../../api/endpoints";
 
 const MultiplePredictionsPage: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -25,7 +26,7 @@ const MultiplePredictionsPage: React.FC = () => {
     setMessage("");
 
     try {
-      const response = await fetch("http://localhost:8000/api/many-predictions/", {
+        const response = await fetch(`${API_ENDPOINT}/many-predictions/`, {
         method: "POST",
         body: formData,
       });

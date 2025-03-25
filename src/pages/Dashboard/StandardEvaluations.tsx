@@ -3,6 +3,7 @@ import { Grid, Card, CardContent, Typography, Box, Chip, FormControl, InputLabel
 import ClusterStats from '../../components/Tables/ClusterStats';
 import DistrictStats from '../../components/Tables/DistrictStats';
 import { ArrowUpward, ArrowDownward, PeopleAlt, Percent, AttachMoney, BarChart } from '@mui/icons-material';
+import { API_ENDPOINT } from '../../api/endpoints';
 
 // Define interfaces for our data
 interface FilterOption {
@@ -25,6 +26,7 @@ interface PredictionData {
   predicted_income: number;
   // Add other fields as needed
 }
+
 
   const StandardEvaluations: React.FC = () => {
   // State for grouping
@@ -67,7 +69,7 @@ interface PredictionData {
     const fetchPredictions = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/standard-evaluations/');
+        const response = await fetch(`${API_ENDPOINT}/standard-evaluations/`);
         const data = await response.json();
         
         if (data.predictions) {
@@ -134,7 +136,7 @@ interface PredictionData {
         params.append('group_by', groupBy);
       }
       
-      const response = await fetch(`http://localhost:8000/api/standard-evaluations/?${params.toString()}`);
+      const response = await fetch(`${API_ENDPOINT}/standard-evaluations/?${params.toString()}`);
       const data = await response.json();
       
       if (groupBy === 'none' && data.predictions) {

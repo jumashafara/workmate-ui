@@ -139,7 +139,7 @@ const SignIn: React.FC = () => {
 
   return (
     <>
-      <Breadcrumb pageName="Sign In" />
+      <Breadcrumb pageName="" />
 
       <Container maxWidth="lg" sx={{ mt: 2 }}>
         <Card elevation={3} sx={{ overflow: "hidden" }}>

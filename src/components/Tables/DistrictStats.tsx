@@ -12,6 +12,7 @@ import {
   Typography,
   Pagination
 } from "@mui/material";
+import { API_ENDPOINT } from "../../api/endpoints";
 
 interface DistrictStat {
   district: string;
@@ -26,7 +27,7 @@ interface DistrictStatsProps {
   queryParams?: URLSearchParams;
 }
 
-const DistrictStats: React.FC<DistrictStatsProps> = ({ apiUrl = "/api/district-stats/", queryParams }) => {
+  const DistrictStats: React.FC<DistrictStatsProps> = ({ apiUrl = `${API_ENDPOINT}/district-stats/`, queryParams }) => {
   const [districtStats, setDistrictStats] = useState<DistrictStat[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState<keyof DistrictStat>("district");
