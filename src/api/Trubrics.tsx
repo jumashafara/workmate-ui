@@ -8,8 +8,6 @@ type TrubricsConfig = {
 // get trubrics key from backend
 const secrets = await getSecrets();
 
-console.log(secrets);
-
 const config: TrubricsConfig = {
     apiKey: secrets.TRUBRICS_API_KEY
 }
@@ -17,7 +15,7 @@ const config: TrubricsConfig = {
 const trubrics = new Trubrics(config);
 
 const logToTrubrics = async (prompt: string, response: any, email: string, thread_id: string) => {
-    console.log(prompt, response, email);
+    
     try {
         trubrics.track(
             {

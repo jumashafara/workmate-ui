@@ -29,6 +29,9 @@ import {
   DeleteOutline as DeleteIcon
 } from "@mui/icons-material";
 
+import logToDATAIDEA from "../api/Dataidea";
+import { API_ENDPOINT } from "../api/endpoints";
+
 // Create a custom theme with orange as the primary color
 const orangeTheme = createTheme({
   palette: {
@@ -105,43 +108,6 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Load chat history on component mount
-  useEffect(() => {
-    const loadChatHistory = async () => {
-      if (!fullname) return;
-
-      try {
-        const response = await fetch(
-          `http://localhost:8000/chat/history/${fullname}/`
-        );
-        const history = await response.json();
-
-        const formattedMessages = history
-          .map((msg: any, index: number) => [
-            {
-              id: index * 2,
-              text: msg.sent,
-              sender: "user",
-              timestamp: new Date(msg.timestamp).toLocaleTimeString(),
-            },
-            {
-              id: index * 2 + 1,
-              text: msg.received,
-              sender: "bot",
-              timestamp: new Date(msg.timestamp).toLocaleTimeString(),
-            },
-          ])
-          .flat();
-
-        setMessages(formattedMessages);
-      } catch (error) {
-        console.error("Error loading chat history:", error);
-      }
-    };
-
-    loadChatHistory();
-  }, [fullname]);
-
   // Update displayed messages when messages or limit changes
   useEffect(() => {
     const startIndex = Math.max(0, messages.length - messageLimit);
@@ -201,23 +167,8 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
         );
       }
 
-      // // After receiving complete response, store the chat
-      // await fetch("http://localhost:8000/chat/store/", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     // Add your authentication headers here
-      //   },
-      //   body: JSON.stringify({
-      //     // add user
-      //     user: user,
-      //     sent: newMessage.text,
-      //     received: receivedText,
-      //     conversation_id: conversationId,
-      //   }),
-      // });
-
       logToTrubrics(newMessage.text, receivedText, fullname, conversationId);
+      logToDATAIDEA(newMessage.text, receivedText, fullname, conversationId);
     } catch (error) {
       console.error("Error:", error);
       setLoading(false);
