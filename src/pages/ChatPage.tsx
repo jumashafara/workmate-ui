@@ -188,6 +188,12 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
           target="_blank"
           rel="noopener noreferrer"
           color="primary"
+          sx={{
+            wordBreak: 'break-word',
+            overflowWrap: 'break-word',
+            maxWidth: '100%',
+            display: 'inline-block'
+          }}
         >
           {part}
         </Link>
@@ -331,6 +337,8 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
                     p: 1.5,
                     maxWidth: { xs: '85%', md: '70%' },
                     borderRadius: 2,
+                    wordBreak: 'break-word',
+                    overflowWrap: 'break-word',
                     ...(msg.sender === "user" 
                       ? { 
                           bgcolor: 'primary.main', 
@@ -344,7 +352,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
                     )
                   }}
                 >
-                  <Typography variant="body1">
+                  <Typography variant="body1" sx={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                     {renderMessageText(msg.text)}
                   </Typography>
                   <Typography 
