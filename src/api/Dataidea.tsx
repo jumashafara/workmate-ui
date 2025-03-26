@@ -1,10 +1,7 @@
 import getSecrets from "./secrets";
 
-const secrets = await getSecrets();
-
-console.log(secrets.DATAIDEA_API_KEY);
-
 const logToDATAIDEA = async (prompt: string, response: any, email: string, thread_id: string) => {
+    const secrets = await getSecrets()
     const dataidea_api_key = secrets.DATAIDEA_API_KEY;
 
     const data = {
