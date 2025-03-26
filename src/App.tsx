@@ -253,7 +253,8 @@ function App() {
           }
         />}
       </Routes>
-      <FloatingChat />
+      {/* Only show FloatingChat when not on the chat-bot page */}
+      {pathname !== '/chat-bot' && <FloatingChat />}
     </DefaultLayout>
   );
 }
