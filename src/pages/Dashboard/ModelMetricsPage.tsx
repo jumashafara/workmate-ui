@@ -15,25 +15,25 @@ import RegressionModelStatsTable from "../../components/Tables/RegressionModelMe
 const ModelMetrics: React.FC = () => {
   const [classificationModelMetrics, setClassificationModelMetrics] =
     useState<ClassificationMetricsProps | null>(null);
-  const [confusionMatrixData, setConfusionMetrixData] = useState();
+  const [confusionMatrixData, setConfusionMetrixData] = useState<any>(null);
   const [regressionModelMetrics, setRegressionModelMetrics] =
     useState<RegressionMetricsProps | null>(null);
   const [model, setModel] = useState<{ name: string; type: string }>({
-    name: "Year 1 Classification",
+    name: "year1_classification",
     type: "classification",
   });
 
   const modelOptions = [
-    { id: 1, name: "Year 1 Classification", type: "classification" },
-    { id: 2, name: "Year 2 Classification", type: "classification" },
-    { id: 3, name: "Year 1 Regression", type: "regression" },
-    // { id: 4, name: "Year 2 Regression", type: "regression" },
+    { id: 1, name: "Year 1 Classification", value: "year1_classification", type: "classification" },
+    { id: 2, name: "Year 2 Classification", value: "year2_classification", type: "classification" },
+    // { id: 3, name: "Year 1 Regression", value: "year1_regression", type: "regression" },
+    // { id: 4, name: "Year 2 Regression", value: "year2_regression", type: "regression" },
   ];
 
   const getModelMetrics = async (name: string, type: string) => {
     if (type === "classification") {
       const data = await fetchClassificationModelMetrics(name);
-      setClassificationModelMetrics(data.model);
+      setClassificationModelMetrics(data);
       setConfusionMetrixData(data.confusion_matrix);
     } else {
       const metrics = await fetchRegressionModelMetrics(name);
@@ -62,9 +62,8 @@ const ModelMetrics: React.FC = () => {
             const selectedId = Number(e.target.value);
             const selectedModel = modelOptions.find((m) => m.id === selectedId);
             if (selectedModel) {
-              setModel({ name: selectedModel.name, type: selectedModel.type });
-              localStorage.setItem("model_id", selectedModel.name);
-              getModelMetrics(selectedModel.name, selectedModel.type);
+              setModel({ name: selectedModel.value, type: selectedModel.type });
+              getModelMetrics(selectedModel.value, selectedModel.type);
             }
           }}
         >
@@ -83,7 +82,7 @@ const ModelMetrics: React.FC = () => {
       <div>
         {model.type === "classification" ? (
           <ClassificationModelStatsTable
-            model_metrics={classificationModelMetrics}
+            model_metrics={classificationModelMetrics?.model}
           />
         ) : (
           <RegressionModelStatsTable model_metrics={regressionModelMetrics} />
@@ -95,7 +94,7 @@ const ModelMetrics: React.FC = () => {
             <ConfusionMatrix confusion_matrix_data={confusionMatrixData} />
           </div>
           <div className="md:w-1/2">
-            <ROCCurve />
+            <ROCCurve aucScore={classificationModelMetrics?.model?.achieved_roc_auc} />
           </div>
         </div>
       ) : null}

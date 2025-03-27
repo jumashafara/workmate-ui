@@ -18,7 +18,7 @@ import {
 import InfoIcon from "@mui/icons-material/Info";
 
 interface ClassificationModelMetrics {
-  model_metrics: ClassificationMetricsProps | null;
+  model_metrics: ClassificationMetricsProps['model'] | null;
   title?: string;
 }
 
