@@ -126,7 +126,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             </Typography>
           </Box>
           <IconButton onClick={() => setSidebarOpen(false)} ref={trigger} sx={{ color: '#FFFFFF' }}>
-            <ChevronLeftIcon />
+            {/* <ChevronLeftIcon /> */}
           </IconButton>
         </DrawerHeader>
         <Divider />
