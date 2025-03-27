@@ -10,13 +10,13 @@ import ResetPassword from "./pages/Authentication/ResetPassword";
 import GoogleCallback from "./pages/Authentication/GoogleCallback";
 import ModelMetrics from "./pages/Dashboard/ModelMetricsPage";
 import FeatureImportance from "./pages/Dashboard/FeatureImportancePage";
-import StandardEvaluations from "./pages/Dashboard/StandardEvaluations";
+import StandardEvaluations from "./pages/Dashboard/PredictionsDashbord";
 
 import DefaultLayout from "./layout/DefaultLayout";
 import IndividualPredictionPage from "./pages/Dashboard/IndividualPredictionPage";
 import MultiplePredictionsPage from "./pages/Dashboard/MultiplePredictionsPage";
 import ChatPage from "./pages/ChatPage";
-import HomePage from "./pages/Reports/HomePage";
+import HomePage from "./pages/Reports/StandardEvaluations";
 import FloatingChat from "./components/FloatingChat";
 import Settings from "./pages/Settings";
 

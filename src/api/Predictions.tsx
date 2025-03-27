@@ -6,6 +6,8 @@ const getPrediction = async (features: Features): Promise<PredictionResult> => {
     // Ensure all boolean arrays have at least one element
     const formattedFeatures = { ...features };
     
+    console.log("Raw features received by API function:", features);
+    
     // Ensure all boolean fields are arrays
     Object.keys(formattedFeatures).forEach(key => {
         const value = formattedFeatures[key as keyof Features];
@@ -35,12 +37,22 @@ const getPrediction = async (features: Features): Promise<PredictionResult> => {
     
     // Ensure string fields are not undefined or null
     ['cohort', 'cycle', 'region', 'district', 'village', 'cluster', 'household_id'].forEach(field => {
-        if (!formattedFeatures[field as keyof Features]) {
+        if (formattedFeatures[field as keyof Features] === undefined || formattedFeatures[field as keyof Features] === null) {
             (formattedFeatures[field as keyof Features] as any) = '';
+        }
+        
+        // If the string field is present, ensure it's a string
+        if (formattedFeatures[field as keyof Features] !== undefined) {
+            // Log the field value for debugging
+            console.log(`${field} value:`, formattedFeatures[field as keyof Features]);
         }
     });
     
     console.log("Formatted features for prediction:", formattedFeatures);
+    
+    // Prepare the request body
+    const requestBody = JSON.stringify(formattedFeatures);
+    console.log("Request body as JSON string:", requestBody);
     
     const response = await fetch(
         `${API_ENDPOINT}/single-prediction/`,
@@ -49,7 +61,7 @@ const getPrediction = async (features: Features): Promise<PredictionResult> => {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(formattedFeatures),
+            body: requestBody,
         }
     );
     

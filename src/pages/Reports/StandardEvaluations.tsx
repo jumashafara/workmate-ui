@@ -86,7 +86,7 @@ const HomePage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 'bold' }}>
-        Dashboard
+        Standard Evaluations
       </Typography>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>

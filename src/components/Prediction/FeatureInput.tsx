@@ -535,11 +535,16 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
                       placeholder="eg Central"
                       value={formData.region}
                       onChange={(e) => {
-                        setRegion(e.target.value);
-                        setFormData({
+                        const newValue = e.target.value;
+                        setRegion(newValue);
+                        // Create a new copy of formData to ensure state updates
+                        const updatedFormData = {
                           ...formData,
-                          region: e.target.value,
-                        });
+                          region: newValue,
+                        };
+                        console.log("Updated region:", newValue);
+                        console.log("Updated formData:", updatedFormData);
+                        setFormData(updatedFormData);
                       }}
                       className="p-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all dark:bg-gray-800 dark:text-gray-200"
                     />
@@ -599,11 +604,16 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
                       placeholder="eg Cohort 1"
                       value={formData.cohort}
                       onChange={(e) => {
-                        setCohort(e.target.value);
-                        setFormData({
+                        const newValue = e.target.value;
+                        setCohort(newValue);
+                        // Create a new copy of formData to ensure state updates
+                        const updatedFormData = {
                           ...formData,
-                          cohort: e.target.value,
-                        });
+                          cohort: newValue,
+                        };
+                        console.log("Updated cohort:", newValue);
+                        console.log("Updated formData:", updatedFormData);
+                        setFormData(updatedFormData);
                       }}
                       className="p-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all dark:bg-gray-800 dark:text-gray-200"
                     />
@@ -615,11 +625,16 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
                       placeholder="eg Cycle 1"
                       value={formData.cycle}
                       onChange={(e) => {
-                        setCycle(e.target.value);
-                        setFormData({
+                        const newValue = e.target.value;
+                        setCycle(newValue);
+                        // Create a new copy of formData to ensure state updates
+                        const updatedFormData = {
                           ...formData,
-                          cycle: e.target.value,
-                        });
+                          cycle: newValue,
+                        };
+                        console.log("Updated cycle:", newValue);
+                        console.log("Updated formData:", updatedFormData);
+                        setFormData(updatedFormData);
                       }}
                       className="p-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all dark:bg-gray-800 dark:text-gray-200"
                     />

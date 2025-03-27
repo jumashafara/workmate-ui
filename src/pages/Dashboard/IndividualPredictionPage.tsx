@@ -5,7 +5,7 @@ import FeatureInput from "../../components/Prediction/FeatureInput";
 import getPrediction from "../../api/Predictions";
 import { Features } from "../../types/features";
 import FeatureContributionsChart from "../../components/Charts/ContributionsPlot";
-import { Button, Box, Typography, CircularProgress } from "@mui/material";
+import { Button, Box, Typography, CircularProgress, Alert } from "@mui/material";
 
 const IndividualPredictionPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -27,10 +27,10 @@ const IndividualPredictionPage: React.FC = () => {
   const [cluster, setCluster] = useState<string>("");
   const [evaluationMonth, setEvaluationMonth] = useState<number>(1);
   
-  // Add new state variables for the missing fields
-  const [cohort, setCohort] = useState<string>("2024");
-  const [cycle, setCycle] = useState<string>("A");
-  const [region, setRegion] = useState<string>("Central");
+  // Add new state variables for the missing fields - with empty strings as defaults
+  const [cohort, setCohort] = useState<string>("");
+  const [cycle, setCycle] = useState<string>("");
+  const [region, setRegion] = useState<string>("");
   const [standardEvaluation, setStandardEvaluation] = useState<boolean>(true);
   const [checkinEvaluation, setCheckinEvaluation] = useState<boolean>(false);
 
@@ -46,6 +46,9 @@ const IndividualPredictionPage: React.FC = () => {
   // Add state to track if a prediction has been made
   const [predictionMade, setPredictionMade] = useState<boolean>(false);
 
+  // Add validation state
+  const [validationError, setValidationError] = useState<string>("");
+
   // const handleHouseholdChange = async (
   //   event: React.ChangeEvent<HTMLSelectElement>
   // ) => {
@@ -60,10 +63,10 @@ const IndividualPredictionPage: React.FC = () => {
     cluster: "",
     evaluation_month: 1,
     
-    // Add missing fields
-    cohort: "2024",
-    cycle: "A",
-    region: "Central",
+    // Add missing fields with empty strings as default
+    cohort: "",
+    cycle: "",
+    region: "",
     standard_evaluation: [true],
     checkin_evaluation: [false],
     
@@ -101,9 +104,21 @@ const IndividualPredictionPage: React.FC = () => {
     setLoading(true);
     setPredictionMade(false);
     
-    // Ensure all boolean values are properly formatted as arrays
+    // Log the input data to debug
+    console.log("Original form data:", data);
+    
+    // Create a clean copy of the data with explicit string fields
     const formattedData = {
       ...data,
+      // Ensure string fields are explicitly set
+      cohort: data.cohort,
+      cycle: data.cycle,
+      region: data.region,
+      district: data.district,
+      village: data.village,
+      cluster: data.cluster,
+      household_id: data.household_id || "",
+      
       // Convert any single boolean values to arrays if needed
       checkin_evaluation: Array.isArray(data.checkin_evaluation) ? data.checkin_evaluation : [data.checkin_evaluation],
       standard_evaluation: Array.isArray(data.standard_evaluation) ? data.standard_evaluation : [data.standard_evaluation],
@@ -125,16 +140,21 @@ const IndividualPredictionPage: React.FC = () => {
       hhh_sex: Array.isArray(data.hhh_sex) ? data.hhh_sex : [data.hhh_sex],
     };
     
+    // Add additional log to debug the formatted data
+    console.log("Formatted data for prediction:", formattedData);
+    
     try {
       console.log("Sending prediction data:", formattedData);
       const response = await getPrediction(formattedData);
+      console.log("Prediction response:", response);
+      
       const prediction = response.prediction;
       const probability = response.probability;
-      setPrediction(prediction);
+      setPrediction(Number(prediction));
       setContributions(response.contributions);
 
       setPredictedIncomeProduction(response.predicted_income_production);
-      setProbabilities([probability, 1 - probability]);
+      setProbabilities([Number(probability), 1 - Number(probability)]);
       setPredictionMade(true);
     } catch (error) {
       console.error("Prediction failed:", error);
@@ -143,9 +163,47 @@ const IndividualPredictionPage: React.FC = () => {
     }
   };
   
+  // New function to validate the form
+  const validateForm = () => {
+    // Before validating, log current form state
+    console.log("Form data before validation:", formData);
+    
+    // Check if required text fields are filled
+    if (!formData.district.trim()) {
+      setValidationError("District is required");
+      return false;
+    }
+    if (!formData.village.trim()) {
+      setValidationError("Village is required");
+      return false;
+    }
+    if (!formData.cluster.trim()) {
+      setValidationError("Cluster is required");
+      return false;
+    }
+    if (!formData.cohort.trim()) {
+      setValidationError("Cohort is required");
+      return false;
+    }
+    if (!formData.cycle.trim()) {
+      setValidationError("Cycle is required");
+      return false;
+    }
+    if (!formData.region.trim()) {
+      setValidationError("Region is required");
+      return false;
+    }
+    
+    // Clear validation error if all checks pass
+    setValidationError("");
+    return true;
+  };
+  
   // New function to handle form submission
   const handleSubmit = () => {
-    handleGetPrediction(formData);
+    if (validateForm()) {
+      handleGetPrediction(formData);
+    }
   };
 
   return (
@@ -158,6 +216,12 @@ const IndividualPredictionPage: React.FC = () => {
           />
         </div> */}
         <div className="">
+          {validationError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {validationError}
+            </Alert>
+          )}
+          
           <FeatureInput
             formData={formData}
             setFormData={(newData) => {
