@@ -49,6 +49,7 @@ interface PredictionData {
   const [selectedVillages, setSelectedVillages] = useState<string[]>([]);
   
   // State for predictions data
+  const [allPredictions, setAllPredictions] = useState<PredictionData[]>([]);
   const [predictions, setPredictions] = useState<PredictionData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -73,6 +74,7 @@ interface PredictionData {
         const data = await response.json();
         
         if (data.predictions) {
+          setAllPredictions(data.predictions);
           setPredictions(data.predictions);
           
           // Extract unique values for filter options and create option objects
@@ -331,7 +333,7 @@ interface PredictionData {
                           Total Records
                         </Typography>
                         <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
-                          {predictions.length}
+                          {allPredictions.length}
                         </Typography>
                       </Box>
                     </CardContent>
@@ -379,7 +381,7 @@ interface PredictionData {
                           Filtered Records
                         </Typography>
                         <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
-                          {getSortedAndPaginatedData().length}
+                          {predictions.length}
                         </Typography>
                       </Box>
                     </CardContent>
