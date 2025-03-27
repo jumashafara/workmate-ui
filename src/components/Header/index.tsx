@@ -102,7 +102,7 @@ const Header = (props: {
           )}
         </Box>
 
-        <Box sx={{ display: { xs: 'none', sm: 'block' }, flexGrow: 1 }}>
+        {/* <Box sx={{ display: { xs: 'none', sm: 'block' }, flexGrow: 1 }}>
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
@@ -112,7 +112,7 @@ const Header = (props: {
               inputProps={{ 'aria-label': 'search' }}
             />
           </Search>
-        </Box>
+        </Box> */}
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2 } }}>
           {/* <DarkModeSwitcher /> */}
