@@ -28,65 +28,125 @@ interface VariableDescriptionsProps {
 // Default variables if none are provided
 const defaultVariables = [
   {
-    name: "Agriculture Land (Acres)",
-    description: "Size of land used for agriculture",
+    name: "Land_size_for_Crop_Agriculture_Acres",
+    description: "Total landsize owned/rented for agriculture",
     type: "Numerical",
   },
   {
-    name: "Food Banana",
-    description: "If the household planted food banana",
-    type: "Categorical",
-  },
-  {
-    name: "Farm Implements Owned",
-    description: "Number of farm implements like hoes owned by the household",
+    name: "hh_water_collection_Minutes",
+    description: "Total time taken to collect water in minutes",
     type: "Numerical",
   },
   {
-    name: "Total Household Members",
-    description: "The number of members in a household",
+    name: "Distance_travelled_one_way_OPD_treatment",
+    description: "Distance travelled one way for Outpatient department treatment",
     type: "Numerical",
   },
   {
-    name: "Sweet Potatoes",
-    description: "If the household planted sweet potatoes",
-    type: "Categorical",
-  },
-  {
-    name: "Ground Nuts",
-    description: "If the household planted Ground Nuts",
-    type: "Categorical",
-  },
-  {
-    name: "Coffee",
-    description: "If the household planted Coffee",
-    type: "Categorical",
-  },
-  {
-    name: "Business Participation",
-    description: "If any household member participates in a business",
-    type: "Categorical",
-  },
-  {
-    name: "Household Income",
-    description: "Total household income from all sources",
+    name: "tot_hhmembers",
+    description: "Total household members",
     type: "Numerical",
   },
   {
-    name: "Education Level",
-    description: "Highest education level in the household",
+    name: "farm_implements_owned",
+    description: "Total number of small farm implements like hoes, slashers owned by a household",
+    type: "Numerical",
+  },
+  {
+    name: "perennial_crops_grown_food_banana",
+    description: "If a household grows bananas",
     type: "Categorical",
   },
   {
-    name: "Livestock Owned",
-    description: "Number of livestock owned by the household",
+    name: "business_participation",
+    description: "If a member of a household owns a business",
+    type: "Categorical",
+  },
+  {
+    name: "sweet_potatoes",
+    description: "If a household grows sweet potatoes",
+    type: "Categorical",
+  },
+  {
+    name: "Average_Water_Consumed_Per_Day",
+    description: "Average amount of water in jerrycans consumed by a household",
     type: "Numerical",
   },
   {
-    name: "Access to Water",
-    description: "Distance to nearest water source in kilometers",
+    name: "education_level_encoded",
+    description: "Current level of education of the household head",
+    type: "Categorical",
+  },
+  {
+    name: "ground_nuts",
+    description: "If a household grows Ground Nuts",
+    type: "Categorical",
+  },
+  {
+    name: "composts_num",
+    description: "Number of compost pits owned by a household",
     type: "Numerical",
   },
+  {
+    name: "perennial_crops_grown_coffee",
+    description: "If a household is growing coffee",
+    type: "Categorical",
+  },
+  {
+    name: "irish_potatoes",
+    description: "If a household is growing irish potatoes",
+    type: "Categorical",
+  },
+  {
+    name: "sorghum",
+    description: "If a household is growing sorghum",
+    type: "Categorical",
+  },
+  {
+    name: "vsla_participation",
+    description: "If a household or household member is participating in some VSLA",
+    type: "Categorical",
+  },
+  {
+    name: "cassava",
+    description: "If a household is growing cassava",
+    type: "Categorical",
+  },
+  {
+    name: "maize",
+    description: "If a household is growing maize",
+    type: "Categorical",
+  },
+  {
+    name: "hh_produce_organics",
+    description: "If a household produces organic materials",
+    type: "Categorical",
+  },
+  {
+    name: "hh_produce_lq_manure",
+    description: "If a household produced own liquid manure",
+    type: "Categorical",
+  },
+  {
+    name: "hhh_sex",
+    description: "The sex of the household head",
+    type: "Categorical",
+  },
+  {
+    name: "soap_ash_present",
+    description: "If the household has soap ash present",
+    type: "Categorical",
+  },
+  {
+    name: "non_bio_waste_mgt_present",
+    description: "If household has a way of properly managing waste",
+    type: "Categorical",
+  },
+  {
+    name: "tippy_tap_present",
+    description: "If the household has a tippy tap",
+    type: "Categorical",
+  }
 ];
 
 const VariableDescriptions: React.FC<VariableDescriptionsProps> = ({ variables = defaultVariables }) => {
@@ -102,12 +162,11 @@ const VariableDescriptions: React.FC<VariableDescriptionsProps> = ({ variables =
     setSortField(field);
   };
 
-  // Get current rows for pagination
-  const indexOfLastRow = currentPage * rowsPerPage;
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  
+  // Ensure we have variables to display, using default if empty
+  const dataToDisplay = variables && variables.length > 0 ? variables : defaultVariables;
+
   // Sort data
-  const sortedData = [...(variables.length > 0 ? variables : defaultVariables)].sort((a, b) => {
+  const sortedData = [...dataToDisplay].sort((a, b) => {
     const aValue = a[sortField];
     const bValue = b[sortField];
     
@@ -119,12 +178,17 @@ const VariableDescriptions: React.FC<VariableDescriptionsProps> = ({ variables =
       : bString.localeCompare(aString);
   });
   
+  // Get current rows for pagination
+  const indexOfLastRow = currentPage * rowsPerPage;
+  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = sortedData.slice(indexOfFirstRow, indexOfLastRow);
-  const totalPages = Math.ceil(variables.length / rowsPerPage);
+  const totalPages = Math.ceil(sortedData.length / rowsPerPage);
 
-  console.log("Variables:", variables); // Check the incoming variables
-  console.log("Sorted Data:", sortedData); // Check the sorted data
-  console.log("Current Rows:", currentRows); // Check the current rows for pagination
+  console.log("Variables provided:", variables ? variables.length : 0); // Check the incoming variables
+  console.log("Data to display:", dataToDisplay.length); // Check what's being used
+  console.log("Sorted Data:", sortedData.length); // Check the sorted data
+  console.log("Current Rows:", currentRows.length); // Check the current rows for pagination
+  console.log("Total Pages:", totalPages); // Check pagination calculation
 
   return (
     <Box>
@@ -193,7 +257,7 @@ const VariableDescriptions: React.FC<VariableDescriptionsProps> = ({ variables =
         </TableContainer>
       </Card>
 
-      {variables.length > rowsPerPage && (
+      {sortedData.length > rowsPerPage && (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
           <Pagination
             count={totalPages}
