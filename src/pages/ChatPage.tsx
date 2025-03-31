@@ -12,7 +12,6 @@ import {
   InputAdornment,
   Divider,
   List,
-  ListItem,
   ListItemText,
   ListItemButton,
   Button,
@@ -85,23 +84,45 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
   const [input, setInput] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [conversationId] = useState<string>(
-    // Use a fallback for environments where crypto.randomUUID isn't available
-    typeof crypto.randomUUID === "function"
+  const [conversationId] = useState<string>(() => {
+    // Check if we have a stored conversationId in localStorage
+    const storedId = localStorage.getItem("currentConversationId");
+    if (storedId) return storedId;
+    
+    // Otherwise create a new one
+    const newId = typeof crypto.randomUUID === "function"
       ? crypto.randomUUID()
       : Math.random().toString(36).substring(2, 15) +
-          Math.random().toString(36).substring(2, 15)
-  );
+          Math.random().toString(36).substring(2, 15);
+    
+    // Store the new conversationId
+    localStorage.setItem("currentConversationId", newId);
+    return newId;
+  });
   const [fullname, setFullname] = useState<string>("");
   const [hasStartedConversation, setHasStartedConversation] = useState(false);
 
   useEffect(() => {
     setFullname(localStorage.getItem("fullname") || "Unknown User");
-    console.log(fullname);
+    
+    // Load saved messages
+    const savedMessages = localStorage.getItem(`chat_messages_${conversationId}`);
+    if (savedMessages) {
+      const parsedMessages = JSON.parse(savedMessages) as Message[];
+      setMessages(parsedMessages);
+      setHasStartedConversation(parsedMessages.length > 0);
+    }
     
     // Focus input on component mount
     inputRef.current?.focus();
-  }, []);
+  }, [conversationId]);
+
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem(`chat_messages_${conversationId}`, JSON.stringify(messages));
+    }
+  }, [messages, conversationId]);
 
   // Scroll to the bottom when a new message is added
   useEffect(() => {
@@ -211,6 +232,13 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
 
   const handleLoadMore = () => {
     setMessageLimit((prev) => prev + 6);
+  };
+
+  // Updated clear chat function to also clear localStorage
+  const handleClearChat = () => {
+    setMessages([]);
+    localStorage.removeItem(`chat_messages_${conversationId}`);
+    setHasStartedConversation(false);
   };
 
   return (
@@ -433,7 +461,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ isFloating = false, onClose }) => {
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
               <Button
                 startIcon={<DeleteIcon />}
-                onClick={() => setMessages([])}
+                onClick={handleClearChat}
                 color="primary"
                 size="small"
                 variant="text"
