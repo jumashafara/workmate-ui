@@ -346,10 +346,10 @@ interface PredictionData {
                       <Percent sx={{ fontSize: 40, color: 'success.main', mr: 2 }} />
                       <Box>
                         <Typography variant="h6" component="div">
-                          Avg Achieved
+                          Achieved
                         </Typography>
                         <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
-                          {averages.avgPrediction.toFixed(2)}%
+                          {(averages.avgPrediction * 100).toFixed(2)}
                         </Typography>
                       </Box>
                     </CardContent>
@@ -365,7 +365,7 @@ interface PredictionData {
                           Avg Income + Production
                         </Typography>
                         <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
-                          ${averages.avgIncome.toFixed(2)}
+                          {averages.avgIncome.toFixed(2)}
                         </Typography>
                       </Box>
                     </CardContent>

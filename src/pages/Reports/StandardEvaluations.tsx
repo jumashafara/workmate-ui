@@ -14,7 +14,8 @@ import {
   CheckCircle, 
   Cancel, 
   TrendingUp,
-  Assessment
+  Assessment,
+  AttachMoney
 } from "@mui/icons-material";
 import DistrictStats from "../../components/Tables/DistrictStats";
 import ClusterStats from "../../components/Tables/ClusterStats";
@@ -100,22 +101,22 @@ const HomePage: React.FC = () => {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Achieved"
-              value={`${((stats.positive_predictions / stats.total_predictions) * 100)?.toFixed(1)}%`}
+              value={`${((stats.positive_predictions / stats.total_predictions) * 100)?.toFixed(1)}`}
             icon={<CheckCircle sx={{ fontSize: 28, color: 'success.main' }} />}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Not achieved"
-              value={`${((stats.negative_predictions / stats.total_predictions) * 100)?.toFixed(1)}%`}
+              value={`${((stats.negative_predictions / stats.total_predictions) * 100)?.toFixed(1)}`}
             icon={<Cancel sx={{ fontSize: 28, color: 'error.main' }} />}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Avg Income + Production"
-            value={`${(stats.average_income)?.toFixed(1)}%`}
-            icon={<TrendingUp sx={{ fontSize: 28, color: 'info.main' }} />}
+            value={`${(stats.average_income)?.toFixed(1)}`}
+            icon={<AttachMoney sx={{ fontSize: 28, color: 'info.main' }} />}
           />
         </Grid>
       </Grid>
