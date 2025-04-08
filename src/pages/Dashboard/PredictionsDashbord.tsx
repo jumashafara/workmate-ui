@@ -116,6 +116,23 @@ interface PredictionData {
     setterFunction(typeof value === 'string' ? value.split(',') : value);
   };
   
+  // Handle removing a single filter value
+  const handleRemoveFilter = (
+    value: string,
+    currentValues: string[],
+    setterFunction: React.Dispatch<React.SetStateAction<string[]>>,
+    event?: React.MouseEvent
+  ) => {
+    // Stop event propagation to prevent any parent handlers from firing
+    if (event) {
+      event.stopPropagation();
+    }
+    
+    // Filter out the value and update state
+    const updatedValues = currentValues.filter(item => item !== value);
+    setterFunction(updatedValues);
+  };
+  
   // Apply filters and fetch grouped data
   const applyFilters = async () => {
     try {
@@ -239,7 +256,8 @@ interface PredictionData {
     label: string,
     options: FilterOption[],
     value: string[],
-    onChange: (event: SelectChangeEvent<string[]>) => void
+    onChange: (event: SelectChangeEvent<string[]>) => void,
+    setterFunction: React.Dispatch<React.SetStateAction<string[]>>
   ) => (
     <FormControl sx={{ m: 1, width: 200 }} size="small">
       <InputLabel id={`${label.toLowerCase()}-label`}>{label}</InputLabel>
@@ -253,7 +271,11 @@ interface PredictionData {
         renderValue={(selected) => (
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
             {selected.map((value) => (
-              <Chip key={value} label={value} size="small" />
+              <Chip 
+                key={value} 
+                label={value} 
+                size="small" 
+              />
             ))}
           </Box>
         )}
@@ -279,24 +301,115 @@ interface PredictionData {
             Filters
           </Typography>
           
+          {/* Active Filters Display */}
+          <Box sx={{ mb: 2, display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
+            {(selectedCohorts.length > 0 || selectedCycles.length > 0 || selectedRegions.length > 0 || 
+              selectedDistricts.length > 0 || selectedClusters.length > 0 || selectedVillages.length > 0) && (
+              <>
+                <Typography variant="body2" sx={{ mr: 1 }}>
+                  Active Filters:
+                </Typography>
+                <Chip 
+                  label="Clear All" 
+                  size="small" 
+                  color="secondary"
+                  onClick={() => {
+                    setSelectedCohorts([]);
+                    setSelectedCycles([]);
+                    setSelectedRegions([]);
+                    setSelectedDistricts([]);
+                    setSelectedClusters([]);
+                    setSelectedVillages([]);
+                  }}
+                />
+              </>
+            )}
+            
+            {selectedCohorts.length > 0 && selectedCohorts.map(value => (
+              <Chip 
+                key={`cohort-${value}`} 
+                label={`Cohort: ${value}`}
+                size="small"
+                onDelete={() => {
+                  setSelectedCohorts(prev => prev.filter(item => item !== value));
+                }}
+              />
+            ))}
+            
+            {selectedCycles.length > 0 && selectedCycles.map(value => (
+              <Chip 
+                key={`cycle-${value}`} 
+                label={`Cycle: ${value}`}
+                size="small"
+                onDelete={() => {
+                  setSelectedCycles(prev => prev.filter(item => item !== value));
+                }}
+              />
+            ))}
+            
+            {selectedRegions.length > 0 && selectedRegions.map(value => (
+              <Chip 
+                key={`region-${value}`} 
+                label={`Region: ${value}`}
+                size="small"
+                onDelete={() => {
+                  setSelectedRegions(prev => prev.filter(item => item !== value));
+                }}
+              />
+            ))}
+            
+            {selectedDistricts.length > 0 && selectedDistricts.map(value => (
+              <Chip 
+                key={`district-${value}`} 
+                label={`District: ${value}`}
+                size="small"
+                onDelete={() => {
+                  setSelectedDistricts(prev => prev.filter(item => item !== value));
+                }}
+              />
+            ))}
+            
+            {selectedClusters.length > 0 && selectedClusters.map(value => (
+              <Chip 
+                key={`cluster-${value}`} 
+                label={`Cluster: ${value}`}
+                size="small"
+                onDelete={() => {
+                  setSelectedClusters(prev => prev.filter(item => item !== value));
+                }}
+              />
+            ))}
+            
+            {selectedVillages.length > 0 && selectedVillages.map(value => (
+              <Chip 
+                key={`village-${value}`} 
+                label={`Village: ${value}`}
+                size="small"
+                onDelete={() => {
+                  setSelectedVillages(prev => prev.filter(item => item !== value));
+                }}
+              />
+            ))}
+          </Box>
+          
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
             {renderFilter('Cohort', cohortOptions, selectedCohorts, 
-              (e) => handleFilterChange(e, setSelectedCohorts))}
+              (e) => handleFilterChange(e, setSelectedCohorts), setSelectedCohorts)}
               
             {renderFilter('Cycle', cycleOptions, selectedCycles, 
-              (e) => handleFilterChange(e, setSelectedCycles))}
+              (e) => handleFilterChange(e, setSelectedCycles), setSelectedCycles)}
               
             {renderFilter('Region', regionOptions, selectedRegions, 
-              (e) => handleFilterChange(e, setSelectedRegions))}
+              (e) => handleFilterChange(e, setSelectedRegions), setSelectedRegions)}
               
             {renderFilter('District', districtOptions, selectedDistricts, 
-              (e) => handleFilterChange(e, setSelectedDistricts))}
+              (e) => handleFilterChange(e, setSelectedDistricts), setSelectedDistricts)}
               
             {renderFilter('Cluster', clusterOptions, selectedClusters, 
-              (e) => handleFilterChange(e, setSelectedClusters))}
+              (e) => handleFilterChange(e, setSelectedClusters), setSelectedClusters)}
               
             {renderFilter('Village', villageOptions, selectedVillages, 
-              (e) => handleFilterChange(e, setSelectedVillages))}
+              (e) => handleFilterChange(e, setSelectedVillages), setSelectedVillages)}
           </Box>
         </CardContent>
       </Card>

@@ -31,7 +31,7 @@ const IndividualPredictionPage: React.FC = () => {
   const [cohort, setCohort] = useState<string>("");
   const [cycle, setCycle] = useState<string>("");
   const [region, setRegion] = useState<string>("");
-  const [standardEvaluation, setStandardEvaluation] = useState<boolean>(true);
+  const [standardEvaluation, setStandardEvaluation] = useState<boolean>(false);
   const [checkinEvaluation, setCheckinEvaluation] = useState<boolean>(false);
 
   // Add new state variables
@@ -67,7 +67,7 @@ const IndividualPredictionPage: React.FC = () => {
     cohort: "",
     cycle: "",
     region: "",
-    standard_evaluation: [true],
+    standard_evaluation: [false],
     checkin_evaluation: [false],
     
     // Numeric fields with proper defaults
