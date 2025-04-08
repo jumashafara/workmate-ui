@@ -312,7 +312,7 @@ interface PredictionData {
                 <Chip 
                   label="Clear All" 
                   size="small" 
-                  color="secondary"
+                  color="warning"
                   onClick={() => {
                     setSelectedCohorts([]);
                     setSelectedCycles([]);
