@@ -25,7 +25,7 @@ const IndividualPredictionPage: React.FC = () => {
   const [district, setDistrict] = useState<string>("");
   const [village, setVillage] = useState<string>("");
   const [cluster, setCluster] = useState<string>("");
-  const [evaluationMonth, setEvaluationMonth] = useState<number>(1);
+  const [evaluationMonth, setEvaluationMonth] = useState<number>(6);
   
   // Add new state variables for the missing fields - with empty strings as defaults
   const [cohort, setCohort] = useState<string>("");
