@@ -132,7 +132,7 @@ const DropdownUser = () => {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem component={Link} to="/profile">
+        {/* <MenuItem component={Link} to="/profile">
           <ListItemIcon>
             <PersonOutlineIcon fontSize="small" />
           </ListItemIcon>
@@ -144,7 +144,7 @@ const DropdownUser = () => {
             <SettingsIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText primary="Account Settings" />
-        </MenuItem>
+        </MenuItem> */}
         
         <Divider />
         
