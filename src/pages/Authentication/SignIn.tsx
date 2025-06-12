@@ -87,6 +87,8 @@ const SignIn: React.FC = () => {
       localStorage.setItem("email", data.user.email);
       localStorage.setItem("fullname", data.user.full_name);
       localStorage.setItem("superuser", `${data.user.is_superuser}`);
+
+      console.log(data.user.is_superuser)
       
       toast.success("Login successful! Redirecting...");
       setTimeout(() => {

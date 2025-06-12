@@ -21,6 +21,9 @@ import FloatingChat from "./components/FloatingChat";
 import Settings from "./pages/Settings";
 
 import Checkins from "./pages/Reports/Checkins";
+import { Map } from "./pages/TestPage";
+
+
 
 // Add this special handler component for Google OAuth callback
 function GoogleCallbackHandler() {
@@ -220,6 +223,18 @@ function App() {
               <>
                 <PageTitle title="Chatbot | RTV" />
                 <ChatPage />
+              </>
+            ) : (
+              <Navigate to="/auth/signin" />
+            )
+          }
+        />
+        <Route
+          path="/test-page"
+          element={
+            access_token ? (
+              <>
+                <Map />
               </>
             ) : (
               <Navigate to="/auth/signin" />

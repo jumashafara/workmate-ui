@@ -393,16 +393,16 @@ interface PredictionData {
           </Box>
           
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-            {renderFilter('Cohort', cohortOptions, selectedCohorts, 
+            {renderFilter('Cohort', [...cohortOptions].sort(), selectedCohorts, 
               (e) => handleFilterChange(e, setSelectedCohorts), setSelectedCohorts)}
               
-            {renderFilter('Cycle', cycleOptions, selectedCycles, 
+            {renderFilter('Cycle', [...cycleOptions].sort(), selectedCycles, 
               (e) => handleFilterChange(e, setSelectedCycles), setSelectedCycles)}
               
-            {renderFilter('Region', regionOptions, selectedRegions, 
+            {renderFilter('Region', [...regionOptions].sort(), selectedRegions, 
               (e) => handleFilterChange(e, setSelectedRegions), setSelectedRegions)}
               
-            {renderFilter('District', districtOptions, selectedDistricts, 
+            {renderFilter('District', [...districtOptions].sort(), selectedDistricts, 
               (e) => handleFilterChange(e, setSelectedDistricts), setSelectedDistricts)}
               
             {renderFilter('Cluster', clusterOptions, selectedClusters, 
@@ -503,10 +503,9 @@ interface PredictionData {
               </Grid>
 
               <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                <div className="flex flex-wrap gap-4 mb-4">
-                  {/* Filters section remains the same */}
-                  {/* ... existing code ... */}
-                </div>
+                {/* <div className="flex flex-wrap gap-4 mb-4 w-full">
+                  <iframe src="https://workmate.api.dev.nonproftinnovations.io/api/map/"/>
+                </div> */}
                 
                 <TableContainer component={Paper} elevation={0}>
                   <Table sx={{ minWidth: 650 }} aria-label="predictions table">
