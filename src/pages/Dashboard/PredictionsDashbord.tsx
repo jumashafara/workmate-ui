@@ -61,90 +61,24 @@ interface PredictionData {
   // State for query parameters
   const [queryParams, setQueryParams] = useState<URLSearchParams>(new URLSearchParams());
 
-  // State for pagination
+  // State for pagination from API
+  const [totalCount, setTotalCount] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(30);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(50);
   
   // State for sorting
   const [sortField, setSortField] = useState<keyof PredictionData | ''>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  // Fetch all predictions to get filter options
-  useEffect(() => {
-    const fetchPredictions = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`${API_ENDPOINT}/standard-evaluations/`);
-        const data = await response.json();
-        
-        if (data.predictions) {
-          console.log(data.predictions[0]);
-          setAllPredictions(data.predictions);
-          setPredictions(data.predictions);
-          
-          // Extract unique values for filter options and create option objects
-          const extractOptions = (field: keyof PredictionData): FilterOption[] => {
-            const uniqueValues = [...new Set(data.predictions
-              .map((p: PredictionData) => p[field])
-              .filter(Boolean))] as string[];
-              
-            return uniqueValues.map(value => ({ 
-              value: value, 
-              label: value 
-            }));
-          };
-          
-          setCohortOptions(extractOptions('cohort'));
-          setCycleOptions(extractOptions('cycle'));
-          setRegionOptions(extractOptions('region'));
-          setDistrictOptions(extractOptions('district'));
-          setClusterOptions(extractOptions('cluster'));
-          setVillageOptions(extractOptions('village'));
-        }
-      } catch (err) {
-        setError('Failed to fetch predictions');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchPredictions();
-  }, []);
-  
-  // Handle filter changes
-  const handleFilterChange = (
-    event: SelectChangeEvent<string[]>,
-    setterFunction: React.Dispatch<React.SetStateAction<string[]>>
-  ) => {
-    const value = event.target.value;
-    setterFunction(typeof value === 'string' ? value.split(',') : value);
-  };
-  
-  // Handle removing a single filter value
-  const handleRemoveFilter = (
-    value: string,
-    currentValues: string[],
-    setterFunction: React.Dispatch<React.SetStateAction<string[]>>,
-    event?: React.MouseEvent
-  ) => {
-    // Stop event propagation to prevent any parent handlers from firing
-    if (event) {
-      event.stopPropagation();
-    }
-    
-    // Filter out the value and update state
-    const updatedValues = currentValues.filter(item => item !== value);
-    setterFunction(updatedValues);
-  };
-  
-  // Apply filters and fetch grouped data
-  const applyFilters = async () => {
+  // Fetch predictions and filter options in a single optimized call
+  const fetchData = async (page: number = 1) => {
     try {
       setLoading(true);
       
-      // Build query parameters
+      // Build query parameters for both data and filters
       const params = new URLSearchParams();
+      params.append('page', page.toString());
+      params.append('page_size', rowsPerPage.toString());
       
       if (selectedCohorts.length > 0) params.append('cohort', selectedCohorts.join(','));
       if (selectedCycles.length > 0) params.append('cycle', selectedCycles.join(','));
@@ -153,35 +87,79 @@ interface PredictionData {
       if (selectedClusters.length > 0) params.append('cluster', selectedClusters.join(','));
       if (selectedVillages.length > 0) params.append('village', selectedVillages.join(','));
       
-      // Save the query parameters for the child components
-      setQueryParams(params);
-      
       if (groupBy !== 'none') {
         params.append('group_by', groupBy);
       }
       
-      const response = await fetch(`${API_ENDPOINT}/standard-evaluations/?${params.toString()}`);
-      const data = await response.json();
+      console.log('Fetching data with params:', params.toString());
       
-      if (groupBy === 'none' && data.predictions) {
-        setPredictions(data.predictions);
-        // Reset to first page when filters change
-        setCurrentPage(1);
+      // Make parallel API calls for data and filter options
+      const [dataResponse, filterResponse] = await Promise.all([
+        fetch(`${API_ENDPOINT}/standard-evaluations/?${params.toString()}`),
+        fetch(`${API_ENDPOINT}/filter-options/?${params.toString()}`)
+      ]);
+      
+      if (!dataResponse.ok || !filterResponse.ok) {
+        throw new Error('Failed to fetch data');
       }
       
-      // The grouped data will be handled by the ClusterStats or DistrictStats components
+      const [dataResult, filterResult] = await Promise.all([
+        dataResponse.json(),
+        filterResponse.json()
+      ]);
+      
+      console.log('Data received:', dataResult);
+      console.log('Filter options received:', filterResult);
+      
+      // Handle paginated data response
+      if (groupBy === 'none') {
+        if (dataResult.results) {
+          // Paginated response
+          setPredictions(dataResult.results);
+          setTotalCount(dataResult.count || 0);
+          setAllPredictions(dataResult.results); // For summary calculations
+        } else if (dataResult.predictions) {
+          // Non-paginated fallback
+          setPredictions(dataResult.predictions);
+          setTotalCount(dataResult.predictions.length);
+          setAllPredictions(dataResult.predictions);
+        }
+      }
+      
+      // Update filter options
+      if (filterResult) {
+        setCohortOptions(filterResult.cohorts.map((c: string) => ({ value: c, label: c })));
+        setCycleOptions(filterResult.cycles.map((c: string) => ({ value: c, label: c })));
+        setRegionOptions(filterResult.regions.map((r: string) => ({ value: r, label: r })));
+        setDistrictOptions(filterResult.districts.map((d: string) => ({ value: d, label: d })));
+        setClusterOptions(filterResult.clusters.map((c: string) => ({ value: c, label: c })));
+        setVillageOptions(filterResult.villages.map((v: string) => ({ value: v, label: v })));
+      }
+      
+      // Save the query parameters for the child components
+      setQueryParams(params);
       
     } catch (err) {
-      setError('Failed to apply filters');
-      console.error(err);
+      setError('Failed to fetch data');
+      console.error('Data fetch error:', err);
     } finally {
       setLoading(false);
     }
   };
-  
-  // Apply filters when any filter or grouping changes
+
+  // Initial data load
   useEffect(() => {
-    applyFilters();
+    fetchData(1);
+  }, []);
+
+  // Debounced effect for filter changes
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setCurrentPage(1); // Reset to first page when filters change
+      fetchData(1);
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timeoutId);
   }, [
     groupBy,
     selectedCohorts,
@@ -189,8 +167,62 @@ interface PredictionData {
     selectedRegions,
     selectedDistricts,
     selectedClusters,
-    selectedVillages
+    selectedVillages,
+    rowsPerPage
   ]);
+
+  // Handle pagination changes
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    fetchData(newPage);
+  };
+
+  // Handle filter changes with cascading logic
+  const handleFilterChange = (
+    event: SelectChangeEvent<string[]>,
+    setterFunction: React.Dispatch<React.SetStateAction<string[]>>,
+    filterLevel: 'cohort' | 'cycle' | 'region' | 'district' | 'cluster' | 'village'
+  ) => {
+    const value = event.target.value;
+    const newValue = typeof value === 'string' ? value.split(',') : value;
+    
+    // Set the new value for the current filter
+    setterFunction(newValue);
+    
+    // Clear dependent filters when a higher-level filter changes
+    switch (filterLevel) {
+      case 'cohort':
+        setSelectedCycles([]);
+        setSelectedRegions([]);
+        setSelectedDistricts([]);
+        setSelectedClusters([]);
+        setSelectedVillages([]);
+        break;
+      case 'cycle':
+        setSelectedRegions([]);
+        setSelectedDistricts([]);
+        setSelectedClusters([]);
+        setSelectedVillages([]);
+        break;
+      case 'region':
+        setSelectedDistricts([]);
+        setSelectedClusters([]);
+        setSelectedVillages([]);
+        break;
+      case 'district':
+        setSelectedClusters([]);
+        setSelectedVillages([]);
+        break;
+      case 'cluster':
+        setSelectedVillages([]);
+        break;
+      case 'village':
+        // No dependent filters to clear
+        break;
+    }
+  };
+  
+
 
   // Handle sorting
   const handleSort = (field: keyof PredictionData) => {
@@ -199,34 +231,7 @@ interface PredictionData {
     setSortDirection(newDirection);
   };
 
-  // Get sorted and paginated data
-  const getSortedAndPaginatedData = () => {
-    // First sort the data if a sort field is selected
-    let sortedData = [...predictions];
-    
-    if (sortField) {
-      sortedData.sort((a, b) => {
-        // Handle numeric fields
-        if (typeof a[sortField] === 'number' && typeof b[sortField] === 'number') {
-          return sortDirection === 'asc' 
-            ? (a[sortField] as number) - (b[sortField] as number)
-            : (b[sortField] as number) - (a[sortField] as number);
-        }
-        
-        // Handle string fields
-        const aValue = String(a[sortField] || '');
-        const bValue = String(b[sortField] || '');
-        
-        return sortDirection === 'asc'
-          ? aValue.localeCompare(bValue)
-          : bValue.localeCompare(aValue);
-      });
-    }
-    
-    // Then paginate the data
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    return sortedData.slice(startIndex, startIndex + rowsPerPage);
-  };
+  // Server-side pagination is now handled by the API
 
   // Get sort icon
   const getSortIcon = (field: keyof PredictionData) => {
@@ -234,8 +239,8 @@ interface PredictionData {
     return sortDirection === 'asc' ? <ArrowUpward fontSize="small" /> : <ArrowDownward fontSize="small" />;
   };
 
-  // Calculate total pages
-  const totalPages = Math.ceil(predictions.length / rowsPerPage);
+  // Calculate total pages from API response
+  const totalPages = Math.ceil(totalCount / rowsPerPage);
   
   // Calculate averages for the filtered data
   const calculateAverages = () => {
@@ -261,8 +266,7 @@ interface PredictionData {
     label: string,
     options: FilterOption[],
     value: string[],
-    onChange: (event: SelectChangeEvent<string[]>) => void,
-    setterFunction: React.Dispatch<React.SetStateAction<string[]>>
+    onChange: (event: SelectChangeEvent<string[]>) => void
   ) => (
     <FormControl sx={{ m: 1, width: 200 }} size="small">
       <InputLabel id={`${label.toLowerCase()}-label`}>{label}</InputLabel>
@@ -398,23 +402,23 @@ interface PredictionData {
           </Box>
           
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-            {renderFilter('Cohort', [...cohortOptions].sort(), selectedCohorts, 
-              (e) => handleFilterChange(e, setSelectedCohorts), setSelectedCohorts)}
+            {renderFilter('Cohort', cohortOptions, selectedCohorts, 
+              (e) => handleFilterChange(e, setSelectedCohorts, 'cohort'))}
               
-            {renderFilter('Cycle', [...cycleOptions].sort(), selectedCycles, 
-              (e) => handleFilterChange(e, setSelectedCycles), setSelectedCycles)}
+            {renderFilter('Cycle', cycleOptions, selectedCycles, 
+              (e) => handleFilterChange(e, setSelectedCycles, 'cycle'))}
               
-            {renderFilter('Region', [...regionOptions].sort(), selectedRegions, 
-              (e) => handleFilterChange(e, setSelectedRegions), setSelectedRegions)}
+            {renderFilter('Region', regionOptions, selectedRegions, 
+              (e) => handleFilterChange(e, setSelectedRegions, 'region'))}
               
-            {renderFilter('District', [...districtOptions].sort(), selectedDistricts, 
-              (e) => handleFilterChange(e, setSelectedDistricts), setSelectedDistricts)}
+            {renderFilter('District', districtOptions, selectedDistricts, 
+              (e) => handleFilterChange(e, setSelectedDistricts, 'district'))}
               
             {renderFilter('Cluster', clusterOptions, selectedClusters, 
-              (e) => handleFilterChange(e, setSelectedClusters), setSelectedClusters)}
+              (e) => handleFilterChange(e, setSelectedClusters, 'cluster'))}
               
             {renderFilter('Village', villageOptions, selectedVillages, 
-              (e) => handleFilterChange(e, setSelectedVillages), setSelectedVillages)}
+              (e) => handleFilterChange(e, setSelectedVillages, 'village'))}
           </Box>
         </CardContent>
       </Card>
@@ -436,7 +440,7 @@ interface PredictionData {
               <Typography variant="h6" gutterBottom>
                 Individual Predictions
                 <span className="ml-2 text-sm text-gray-500">
-                  (Showing {Math.min(predictions.length, rowsPerPage)} of {predictions.length} records)
+                  (Showing {predictions.length} of {totalCount} records - Page {currentPage} of {totalPages})
                 </span>
               </Typography>
 
@@ -451,7 +455,7 @@ interface PredictionData {
                           Total Records
                         </Typography>
                         <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
-                          {allPredictions.length}
+                          {totalCount}
                         </Typography>
                       </Box>
                     </CardContent>
@@ -511,6 +515,20 @@ interface PredictionData {
                 {/* Insert map here */}
                 <HouseholdMap households={predictions} />
 
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                    <Pagination 
+                      count={totalPages} 
+                      page={currentPage} 
+                      onChange={(event, page) => handlePageChange(page)}
+                      color="primary"
+                      size="large"
+                      showFirstButton 
+                      showLastButton
+                    />
+                  </Box>
+                )}
               </div>
             </div>
           )}
