@@ -64,7 +64,7 @@ interface PredictionData {
   // State for pagination from API
   const [totalCount, setTotalCount] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(50);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(100);
   
   // State for sorting
   const [sortField, setSortField] = useState<keyof PredictionData | ''>('');
