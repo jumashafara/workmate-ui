@@ -39,6 +39,7 @@ interface PredictionData {
   // State for filter options
   const [cohortOptions, setCohortOptions] = useState<FilterOption[]>([]);
   const [cycleOptions, setCycleOptions] = useState<FilterOption[]>([]);
+  const [evaluationMonthOptions, setEvaluationMonthOptions] = useState<FilterOption[]>([]);
   const [regionOptions, setRegionOptions] = useState<FilterOption[]>([]);
   const [districtOptions, setDistrictOptions] = useState<FilterOption[]>([]);
   const [clusterOptions, setClusterOptions] = useState<FilterOption[]>([]);
@@ -47,6 +48,7 @@ interface PredictionData {
   // State for selected filters
   const [selectedCohorts, setSelectedCohorts] = useState<string[]>([]);
   const [selectedCycles, setSelectedCycles] = useState<string[]>([]);
+  const [selectedEvaluationMonths, setSelectedEvaluationMonths] = useState<string[]>([]);
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
   const [selectedClusters, setSelectedClusters] = useState<string[]>([]);
@@ -80,12 +82,13 @@ interface PredictionData {
       params.append('page', page.toString());
       params.append('page_size', rowsPerPage.toString());
       
-      if (selectedCohorts.length > 0) params.append('cohort', selectedCohorts.join(','));
-      if (selectedCycles.length > 0) params.append('cycle', selectedCycles.join(','));
-      if (selectedRegions.length > 0) params.append('region', selectedRegions.join(','));
-      if (selectedDistricts.length > 0) params.append('district', selectedDistricts.join(','));
-      if (selectedClusters.length > 0) params.append('cluster', selectedClusters.join(','));
-      if (selectedVillages.length > 0) params.append('village', selectedVillages.join(','));
+             if (selectedCohorts.length > 0) params.append('cohort', selectedCohorts.join(','));
+       if (selectedCycles.length > 0) params.append('cycle', selectedCycles.join(','));
+       if (selectedEvaluationMonths.length > 0) params.append('evaluation_month', selectedEvaluationMonths.join(','));
+       if (selectedRegions.length > 0) params.append('region', selectedRegions.join(','));
+       if (selectedDistricts.length > 0) params.append('district', selectedDistricts.join(','));
+       if (selectedClusters.length > 0) params.append('cluster', selectedClusters.join(','));
+       if (selectedVillages.length > 0) params.append('village', selectedVillages.join(','));
       
       if (groupBy !== 'none') {
         params.append('group_by', groupBy);
@@ -93,10 +96,19 @@ interface PredictionData {
       
       console.log('Fetching data with params:', params.toString());
       
+      // Build separate parameters for filter options (without pagination)
+      const filterParams = new URLSearchParams();
+      if (selectedCohorts.length > 0) filterParams.append('cohort', selectedCohorts.join(','));
+      if (selectedCycles.length > 0) filterParams.append('cycle', selectedCycles.join(','));
+      if (selectedEvaluationMonths.length > 0) filterParams.append('evaluation_month', selectedEvaluationMonths.join(','));
+      if (selectedRegions.length > 0) filterParams.append('region', selectedRegions.join(','));
+      if (selectedDistricts.length > 0) filterParams.append('district', selectedDistricts.join(','));
+      if (selectedClusters.length > 0) filterParams.append('cluster', selectedClusters.join(','));
+      
       // Make parallel API calls for data and filter options
       const [dataResponse, filterResponse] = await Promise.all([
         fetch(`${API_ENDPOINT}/standard-evaluations/?${params.toString()}`),
-        fetch(`${API_ENDPOINT}/filter-options/?${params.toString()}`)
+        fetch(`${API_ENDPOINT}/filter-options/?${filterParams.toString()}`)
       ]);
       
       if (!dataResponse.ok || !filterResponse.ok) {
@@ -110,6 +122,8 @@ interface PredictionData {
       
       console.log('Data received:', dataResult);
       console.log('Filter options received:', filterResult);
+      console.log('Filter options keys:', Object.keys(filterResult));
+      console.log('Evaluation months specifically:', filterResult.evaluation_months);
       
       // Handle paginated data response
       if (groupBy === 'none') {
@@ -126,15 +140,16 @@ interface PredictionData {
         }
       }
       
-      // Update filter options
-      if (filterResult) {
-        setCohortOptions(filterResult.cohorts.map((c: string) => ({ value: c, label: c })));
-        setCycleOptions(filterResult.cycles.map((c: string) => ({ value: c, label: c })));
-        setRegionOptions(filterResult.regions.map((r: string) => ({ value: r, label: r })));
-        setDistrictOptions(filterResult.districts.map((d: string) => ({ value: d, label: d })));
-        setClusterOptions(filterResult.clusters.map((c: string) => ({ value: c, label: c })));
-        setVillageOptions(filterResult.villages.map((v: string) => ({ value: v, label: v })));
-      }
+             // Update filter options
+       if (filterResult) {
+         setCohortOptions(filterResult.cohorts?.map((c: string) => ({ value: c, label: c })) || []);
+         setCycleOptions(filterResult.cycles?.map((c: string) => ({ value: c, label: c })) || []);
+         setEvaluationMonthOptions(filterResult.evaluation_months?.map((em: number) => ({ value: em.toString(), label: `Month ${em}` })) || []);
+         setRegionOptions(filterResult.regions?.map((r: string) => ({ value: r, label: r })) || []);
+         setDistrictOptions(filterResult.districts?.map((d: string) => ({ value: d, label: d })) || []);
+         setClusterOptions(filterResult.clusters?.map((c: string) => ({ value: c, label: c })) || []);
+         setVillageOptions(filterResult.villages?.map((v: string) => ({ value: v, label: v })) || []);
+       }
       
       // Save the query parameters for the child components
       setQueryParams(params);
@@ -160,16 +175,17 @@ interface PredictionData {
     }, 300); // 300ms debounce
 
     return () => clearTimeout(timeoutId);
-  }, [
-    groupBy,
-    selectedCohorts,
-    selectedCycles,
-    selectedRegions,
-    selectedDistricts,
-    selectedClusters,
-    selectedVillages,
-    rowsPerPage
-  ]);
+     }, [
+     groupBy,
+     selectedCohorts,
+     selectedCycles,
+     selectedEvaluationMonths,
+     selectedRegions,
+     selectedDistricts,
+     selectedClusters,
+     selectedVillages,
+     rowsPerPage
+   ]);
 
   // Handle pagination changes
   const handlePageChange = (newPage: number) => {
@@ -177,49 +193,57 @@ interface PredictionData {
     fetchData(newPage);
   };
 
-  // Handle filter changes with cascading logic
-  const handleFilterChange = (
-    event: SelectChangeEvent<string[]>,
-    setterFunction: React.Dispatch<React.SetStateAction<string[]>>,
-    filterLevel: 'cohort' | 'cycle' | 'region' | 'district' | 'cluster' | 'village'
-  ) => {
+     // Handle filter changes with cascading logic
+   const handleFilterChange = (
+     event: SelectChangeEvent<string[]>,
+     setterFunction: React.Dispatch<React.SetStateAction<string[]>>,
+     filterLevel: 'cohort' | 'cycle' | 'evaluation_month' | 'region' | 'district' | 'cluster' | 'village'
+   ) => {
     const value = event.target.value;
     const newValue = typeof value === 'string' ? value.split(',') : value;
     
     // Set the new value for the current filter
     setterFunction(newValue);
     
-    // Clear dependent filters when a higher-level filter changes
-    switch (filterLevel) {
-      case 'cohort':
-        setSelectedCycles([]);
-        setSelectedRegions([]);
-        setSelectedDistricts([]);
-        setSelectedClusters([]);
-        setSelectedVillages([]);
-        break;
-      case 'cycle':
-        setSelectedRegions([]);
-        setSelectedDistricts([]);
-        setSelectedClusters([]);
-        setSelectedVillages([]);
-        break;
-      case 'region':
-        setSelectedDistricts([]);
-        setSelectedClusters([]);
-        setSelectedVillages([]);
-        break;
-      case 'district':
-        setSelectedClusters([]);
-        setSelectedVillages([]);
-        break;
-      case 'cluster':
-        setSelectedVillages([]);
-        break;
-      case 'village':
-        // No dependent filters to clear
-        break;
-    }
+         // Clear dependent filters when a higher-level filter changes
+     switch (filterLevel) {
+       case 'cohort':
+         setSelectedCycles([]);
+         setSelectedEvaluationMonths([]);
+         setSelectedRegions([]);
+         setSelectedDistricts([]);
+         setSelectedClusters([]);
+         setSelectedVillages([]);
+         break;
+       case 'cycle':
+         setSelectedEvaluationMonths([]);
+         setSelectedRegions([]);
+         setSelectedDistricts([]);
+         setSelectedClusters([]);
+         setSelectedVillages([]);
+         break;
+       case 'evaluation_month':
+         setSelectedRegions([]);
+         setSelectedDistricts([]);
+         setSelectedClusters([]);
+         setSelectedVillages([]);
+         break;
+       case 'region':
+         setSelectedDistricts([]);
+         setSelectedClusters([]);
+         setSelectedVillages([]);
+         break;
+       case 'district':
+         setSelectedClusters([]);
+         setSelectedVillages([]);
+         break;
+       case 'cluster':
+         setSelectedVillages([]);
+         break;
+       case 'village':
+         // No dependent filters to clear
+         break;
+     }
   };
   
 
@@ -312,8 +336,9 @@ interface PredictionData {
           
           {/* Active Filters Display */}
           <Box sx={{ mb: 2, display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
-            {(selectedCohorts.length > 0 || selectedCycles.length > 0 || selectedRegions.length > 0 || 
-              selectedDistricts.length > 0 || selectedClusters.length > 0 || selectedVillages.length > 0) && (
+            {(selectedCohorts.length > 0 || selectedCycles.length > 0 || selectedEvaluationMonths.length > 0 || 
+              selectedRegions.length > 0 || selectedDistricts.length > 0 || selectedClusters.length > 0 || 
+              selectedVillages.length > 0) && (
               <>
                 <Typography variant="body2" sx={{ mr: 1 }}>
                   Active Filters:
@@ -325,6 +350,7 @@ interface PredictionData {
                   onClick={() => {
                     setSelectedCohorts([]);
                     setSelectedCycles([]);
+                    setSelectedEvaluationMonths([]);
                     setSelectedRegions([]);
                     setSelectedDistricts([]);
                     setSelectedClusters([]);
@@ -352,6 +378,17 @@ interface PredictionData {
                 size="small"
                 onDelete={() => {
                   setSelectedCycles(prev => prev.filter(item => item !== value));
+                }}
+              />
+            ))}
+            
+            {selectedEvaluationMonths.length > 0 && selectedEvaluationMonths.map(value => (
+              <Chip 
+                key={`evaluation-month-${value}`} 
+                label={`Month: ${value}`}
+                size="small"
+                onDelete={() => {
+                  setSelectedEvaluationMonths(prev => prev.filter(item => item !== value));
                 }}
               />
             ))}
@@ -407,6 +444,9 @@ interface PredictionData {
               
             {renderFilter('Cycle', cycleOptions, selectedCycles, 
               (e) => handleFilterChange(e, setSelectedCycles, 'cycle'))}
+              
+            {renderFilter('Evaluation Month', evaluationMonthOptions, selectedEvaluationMonths, 
+              (e) => handleFilterChange(e, setSelectedEvaluationMonths, 'evaluation_month'))}
               
             {renderFilter('Region', regionOptions, selectedRegions, 
               (e) => handleFilterChange(e, setSelectedRegions, 'region'))}
