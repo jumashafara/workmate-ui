@@ -4,6 +4,7 @@ import ClusterStats from '../../components/Tables/ClusterStats';
 import DistrictStats from '../../components/Tables/DistrictStats';
 import { ArrowUpward, ArrowDownward, PeopleAlt, Percent, AttachMoney, BarChart } from '@mui/icons-material';
 import { API_ENDPOINT } from '../../api/endpoints';
+import HouseholdMap from '../../components/Maps/HouseholdMap'
 
 // Define interfaces for our data
 interface FilterOption {
@@ -20,6 +21,9 @@ interface PredictionData {
   district: string;
   cluster: string;
   village: string;
+  latitude: number;
+  longitude: number;
+  altitude: number;
   evaluation_month: number;
   prediction: number;
   probability: number;
@@ -74,6 +78,7 @@ interface PredictionData {
         const data = await response.json();
         
         if (data.predictions) {
+          console.log(data.predictions[0]);
           setAllPredictions(data.predictions);
           setPredictions(data.predictions);
           
@@ -502,138 +507,10 @@ interface PredictionData {
                 </Grid>
               </Grid>
 
-              <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                {/* <div className="flex flex-wrap gap-4 mb-4 w-full">
-                  <iframe src="https://workmate.api.dev.nonproftinnovations.io/api/map/"/>
-                </div> */}
-                
-                <TableContainer component={Paper} elevation={0}>
-                  <Table sx={{ minWidth: 650 }} aria-label="predictions table">
-                    <TableHead>
-                      <TableRow sx={{ backgroundColor: '#f3f4f6' }}>
-                        <TableCell>
-                          <TableSortLabel
-                            active={sortField === 'cohort'}
-                            direction={sortField === 'cohort' ? sortDirection : 'asc'}
-                            onClick={() => handleSort('cohort')}
-                          >
-                            Cohort
-                          </TableSortLabel>
-                        </TableCell>
-                        <TableCell>
-                          <TableSortLabel
-                            active={sortField === 'cycle'}
-                            direction={sortField === 'cycle' ? sortDirection : 'asc'}
-                            onClick={() => handleSort('cycle')}
-                          >
-                            Cycle
-                          </TableSortLabel>
-                        </TableCell>
-                        <TableCell>
-                          <TableSortLabel
-                            active={sortField === 'region'}
-                            direction={sortField === 'region' ? sortDirection : 'asc'}
-                            onClick={() => handleSort('region')}
-                          >
-                            Region
-                          </TableSortLabel>
-                        </TableCell>
-                        <TableCell>
-                          <TableSortLabel
-                            active={sortField === 'district'}
-                            direction={sortField === 'district' ? sortDirection : 'asc'}
-                            onClick={() => handleSort('district')}
-                          >
-                            District
-                          </TableSortLabel>
-                        </TableCell>
-                        <TableCell>
-                          <TableSortLabel
-                            active={sortField === 'cluster'}
-                            direction={sortField === 'cluster' ? sortDirection : 'asc'}
-                            onClick={() => handleSort('cluster')}
-                          >
-                            Cluster
-                          </TableSortLabel>
-                        </TableCell>
-                        <TableCell>
-                          <TableSortLabel
-                            active={sortField === 'village'}
-                            direction={sortField === 'village' ? sortDirection : 'asc'}
-                            onClick={() => handleSort('village')}
-                          >
-                            Village
-                          </TableSortLabel>
-                        </TableCell>
-                        <TableCell>
-                          <TableSortLabel
-                            active={sortField === 'evaluation_month'}
-                            direction={sortField === 'evaluation_month' ? sortDirection : 'asc'}
-                            onClick={() => handleSort('evaluation_month')}
-                          >
-                            Evaluation Month
-                          </TableSortLabel>
-                        </TableCell>
-                        <TableCell>
-                          <TableSortLabel
-                            active={sortField === 'prediction'}
-                            direction={sortField === 'prediction' ? sortDirection : 'asc'}
-                            onClick={() => handleSort('prediction')}
-                          >
-                            Prediction
-                          </TableSortLabel>
-                        </TableCell>
-                        <TableCell>
-                          <TableSortLabel
-                            active={sortField === 'predicted_income'}
-                            direction={sortField === 'predicted_income' ? sortDirection : 'asc'}
-                            onClick={() => handleSort('predicted_income')}
-                          >
-                            Predicted Income
-                          </TableSortLabel>
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {getSortedAndPaginatedData().map((prediction) => (
-                        <TableRow 
-                          key={prediction.id} 
-                          hover
-                          sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                        >
-                          <TableCell>{prediction.cohort}</TableCell>
-                          <TableCell>{prediction.cycle}</TableCell>
-                          <TableCell>{prediction.region}</TableCell>
-                          <TableCell>{prediction.district}</TableCell>
-                          <TableCell>{prediction.cluster}</TableCell>
-                          <TableCell>{prediction.village}</TableCell>
-                          <TableCell>{prediction.evaluation_month}</TableCell>
-                          <TableCell>
-                            {prediction.prediction === 1 ? 'Likely to achieve' : 'Not likely to achieve'}
-                          </TableCell>
-                          <TableCell>
-                            ${prediction.predicted_income?.toFixed(2) || '0.00'}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-                
-                {predictions.length > 0 && (
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      Showing {Math.min(rowsPerPage, predictions.length)} of {predictions.length} records
-                    </Typography>
-                    <Pagination
-                      count={totalPages}
-                      page={currentPage}
-                      onChange={(event, page) => setCurrentPage(page)}
-                      color="primary"
-                      shape="rounded"
-                    />
-                  </Box>
-                )}
+              <div className="">
+                {/* Insert map here */}
+                <HouseholdMap households={predictions} />
+
               </div>
             </div>
           )}

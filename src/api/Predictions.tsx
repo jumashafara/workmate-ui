@@ -3,12 +3,9 @@ import { PredictionResult } from "../types/prediction_result";
 import { API_ENDPOINT } from "./endpoints";
 
 const getPrediction = async (features: Features): Promise<PredictionResult> => {
-    // Ensure all boolean arrays have at least one element
     const formattedFeatures = { ...features };
     
     console.log("Raw features received by API function:", features);
-    
-    // Ensure all boolean fields are arrays
     Object.keys(formattedFeatures).forEach(key => {
         const value = formattedFeatures[key as keyof Features];
         if (Array.isArray(value) && value.length === 0) {
