@@ -76,7 +76,7 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({ households }) => {
   // Fallback if no data
   if (!households || households.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6 h-[500px] flex items-center justify-center text-gray-500">
+      <div className="bg-white rounded-md shadow-md p-6 mb-6 h-[500px] flex items-center justify-center text-gray-500">
         No household data available.
       </div>
     );
@@ -92,7 +92,7 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({ households }) => {
 
   if (validHouseholds.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6 h-[500px] flex items-center justify-center text-gray-500">
+      <div className="bg-white rounded-md shadow-md p-6 mb-6 h-[500px] flex items-center justify-center text-gray-500">
         No valid coordinates found.
       </div>
     );
@@ -132,7 +132,7 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({ households }) => {
 
   try {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6 h-[500px]">
+      <div className="bg-white rounded-md shadow-md p-6 mb-6 h-[500px]">
         <div key={mapKey} ref={mapRef} style={{ height: '100%', width: '100%' }}>
           <MapContainer
             center={mapCenter}
@@ -149,7 +149,7 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({ households }) => {
               <CircleMarker
                 key={h.household_id}
                 center={[h.latitude, h.longitude] as LatLngTuple}
-                radius={8}
+                radius={6}
                 pathOptions={{
                   color: '#ffffff',
                   weight: 2,
@@ -219,14 +219,14 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({ households }) => {
                     {(h.maize || h.ground_nuts || h.sweet_potatoes || h.cassava || h.sorghum || h.irish_potatoes || h.perennial_crops_grown_food_banana || h.perennial_crops_grown_coffee) && (
                       <div style={{ marginBottom: '12px' }}>
                         <h4 style={{ margin: '0 0 8px 0', color: '#333' }}>Crops Grown</h4>
-                        {h.maize === 1 && <>🌽 Maize<br /></>}
-                        {h.ground_nuts === 1 && <>🥜 Ground Nuts<br /></>}
-                        {h.sweet_potatoes === 1 && <>🍠 Sweet Potatoes<br /></>}
-                        {h.cassava === 1 && <>🥔 Cassava<br /></>}
-                        {h.sorghum === 1 && <>🌾 Sorghum<br /></>}
-                        {h.irish_potatoes === 1 && <>🥔 Irish Potatoes<br /></>}
-                        {h.perennial_crops_grown_food_banana === 1 && <>🍌 Food Banana<br /></>}
-                        {h.perennial_crops_grown_coffee === 1 && <>☕ Coffee<br /></>}
+                        {h.maize === 1 && <>Maize<br /></>}
+                        {h.ground_nuts === 1 && <>Ground Nuts<br /></>}
+                        {h.sweet_potatoes === 1 && <>Sweet Potatoes<br /></>}
+                        {h.cassava === 1 && <>Cassava<br /></>}
+                        {h.sorghum === 1 && <>Sorghum<br /></>}
+                        {h.irish_potatoes === 1 && <>Irish Potatoes<br /></>}
+                        {h.perennial_crops_grown_food_banana === 1 && <>Food Banana<br /></>}
+                        {h.perennial_crops_grown_coffee === 1 && <>Coffee<br /></>}
                       </div>
                     )}
 
@@ -277,7 +277,7 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({ households }) => {
   } catch (error) {
     console.error('Map rendering error:', error);
     return (
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6 h-[500px] flex items-center justify-center text-red-500">
+      <div className="bg-white rounded-md shadow-md p-6 mb-6 h-[500px] flex items-center justify-center text-red-500">
         Map failed to load: {error instanceof Error ? error.message : 'Unknown error'}
       </div>
     );
