@@ -133,12 +133,12 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({ households }) => {
   try {
     return (
       <div className="bg-white rounded-md shadow-md p-6 mb-6 h-[500px]">
-        <div key={mapKey} ref={mapRef} style={{ height: '100%', width: '100%' }}>
+        <div key={mapKey} ref={mapRef} style={{ height: '100%', width: '100%', zIndex: 1 }}>
           <MapContainer
             center={mapCenter}
             zoom={DEFAULT_ZOOM}
             scrollWheelZoom={true}
-            style={{ height: '100%', width: '100%' }}
+            style={{ height: '100%', width: '100%', zIndex: 1 }}
             ref={containerRef}
           >
             <TileLayer
@@ -274,6 +274,7 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({ households }) => {
         </div>
       </div>
     );
+
   } catch (error) {
     console.error('Map rendering error:', error);
     return (
