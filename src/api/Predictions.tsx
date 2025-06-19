@@ -52,7 +52,7 @@ const getPrediction = async (features: Features): Promise<PredictionResult> => {
     console.log("Request body as JSON string:", requestBody);
     
     const response = await fetch(
-        `${API_ENDPOINT}/single-prediction/`,
+        `${API_ENDPOINT}/single-prediction-test/`,
         {
             method: "POST",
             headers: {
@@ -70,7 +70,7 @@ const getPrediction = async (features: Features): Promise<PredictionResult> => {
     
     const data = await response.json();
     console.log("Prediction response:", data);
-    return data.data;
+    return data;
 };
 
 export default getPrediction;

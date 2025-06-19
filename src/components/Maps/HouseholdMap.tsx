@@ -130,6 +130,8 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({ households }) => {
       .replace(/Lq/g, 'Liquid');
   };
 
+  console.log(validHouseholds[0]);
+
   try {
     return (
       <div className="bg-white rounded-md shadow-md p-6 mb-6 h-[500px]">
