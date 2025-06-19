@@ -233,7 +233,7 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({ households }) => {
                     )}
 
                     {/* Water & Sanitation */}
-                    {(h.Average_Water_Consumed_Per_Day || h.hh_water_collection_Minutes || h.tippy_tap_present || h.soap_ash_present) && (
+                    {/* {(h.Average_Water_Consumed_Per_Day || h.hh_water_collection_Minutes || h.tippy_tap_present || h.soap_ash_present) && (
                       <div style={{ marginBottom: '12px' }}>
                         <h4 style={{ margin: '0 0 8px 0', color: '#333' }}>Water & Sanitation</h4>
                         {h.Average_Water_Consumed_Per_Day && <><strong>Water Consumed/Day:</strong> {h.Average_Water_Consumed_Per_Day}<br /></>}
@@ -241,7 +241,7 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({ households }) => {
                         {h.tippy_tap_present !== undefined && <><strong>Tippy Tap:</strong> {formatBoolean(h.tippy_tap_present)}<br /></>}
                         {h.soap_ash_present !== undefined && <><strong>Soap/Ash Present:</strong> {formatBoolean(h.soap_ash_present)}<br /></>}
                       </div>
-                    )}
+                    )} */}
 
                     {/* Economic Activities */}
                     {(h.business_participation || h.vsla_participation) && (
