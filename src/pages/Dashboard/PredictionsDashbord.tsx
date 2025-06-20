@@ -692,14 +692,16 @@ interface PredictionData {
               </Grid>
 
               <div className="">
-                {/* Cohort Performance Chart */}
-                <CohortPerformanceChart data={predictions} />
+                {/* Insert map here */}
+                <HouseholdMap households={predictions} />
 
                 {/* Region Performance Chart */}
                 <RegionPerformanceChart data={predictions} />
 
-                {/* Insert map here */}
-                <HouseholdMap households={predictions} />
+                {/* Cohort Performance Chart */}
+                {/* <CohortPerformanceChart data={predictions} /> */}
+
+
 
                 {/* Pagination Controls - Only show when not fetching all data */}
                 {!fetchAllData && totalPages > 1 && (

@@ -239,7 +239,7 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
           </Box>
           
           {/* Best and Worst Performing Regions */}
-          {regionStats.length > 1 && (
+          {/* {regionStats.length > 1 && (
             <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
               <Box sx={{ 
                 flex: 1, 
@@ -279,7 +279,7 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
                 </Typography>
               </Box>
             </Box>
-          )}
+          )} */}
         </Box>
       </CardContent>
     </Card>
