@@ -304,7 +304,7 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
                     <Slider
                       aria-labelledby="agriculture-land-slider-label"
                       min={0.1}
-                      max={10}
+                      max={5}
                       step={0.1}
                       value={formData.Land_size_for_Crop_Agriculture_Acres[0]}
                       onChange={(e, value) => {
