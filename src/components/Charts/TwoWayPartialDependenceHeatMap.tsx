@@ -177,7 +177,7 @@ const TwoWayPartialDependenceHeatMap: React.FC<TwoWayPartialDependenceHeatMapPro
                 onChange={(e) => setModel(e.target.value as string)}
               >
                 <MenuItem value="year1_classification">Year 1 Classification</MenuItem>
-                <MenuItem value="year2_classification">Year 2 Classification</MenuItem>
+                {/* <MenuItem value="year2_classification">Year 2 Classification</MenuItem> */}
               </Select>
             </FormControl>
           </Grid>
