@@ -249,7 +249,7 @@ const PartialDependencePlot: React.FC = () => {
                 onChange={(e) => setModel(e.target.value)}
               >
                 <MenuItem value="year1_classification">Year 1 Classification</MenuItem>
-                <MenuItem value="year2_classification">Year 2 Classification</MenuItem>
+                {/* <MenuItem value="year2_classification">Year 2 Classification</MenuItem> */}
               </Select>
             </FormControl>
           </Grid>
