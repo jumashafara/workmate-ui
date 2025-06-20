@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Card, CardContent, Typography, Box, Chip, FormControl, InputLabel, MenuItem, Select, OutlinedInput, SelectChangeEvent, Checkbox, ListItemText, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, Pagination, IconButton } from '@mui/material';
+import { Grid, Card, CardContent, Typography, Box, Chip, FormControl, InputLabel, MenuItem, Select, OutlinedInput, SelectChangeEvent, Checkbox, ListItemText, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, Pagination, IconButton, Button, Switch, FormControlLabel } from '@mui/material';
 import ClusterStats from '../../components/Tables/ClusterStats';
 import DistrictStats from '../../components/Tables/DistrictStats';
-import { ArrowUpward, ArrowDownward, PeopleAlt, Percent, AttachMoney, BarChart } from '@mui/icons-material';
+import CohortPerformanceChart from '../../components/Charts/CohortPerformanceChart';
+import RegionPerformanceChart from '../../components/Charts/RegionPerformanceChart';
+import { ArrowUpward, ArrowDownward, PeopleAlt, Percent, AttachMoney, BarChart, GetApp, ViewList } from '@mui/icons-material';
 import { API_ENDPOINT } from '../../api/endpoints';
 import HouseholdMap from '../../components/Maps/HouseholdMap'
 
@@ -68,14 +70,101 @@ interface PredictionData {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(100);
   
+  // State for fetching all data
+  const [fetchAllData, setFetchAllData] = useState<boolean>(false);
+  const [isLoadingAllData, setIsLoadingAllData] = useState<boolean>(false);
+  
   // State for sorting
   const [sortField, setSortField] = useState<keyof PredictionData | ''>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
+  // Fetch all data by making multiple requests if needed
+  const fetchAllDataIteratively = async () => {
+    try {
+      setIsLoadingAllData(true);
+      let allData: PredictionData[] = [];
+      let currentPage = 1;
+      let hasMoreData = true;
+      const pageSize = 1000; // Use a larger page size for efficiency
+      
+      while (hasMoreData) {
+        const params = new URLSearchParams();
+        params.append('page', currentPage.toString());
+        params.append('page_size', pageSize.toString());
+        
+        // Add filter parameters
+        if (selectedCohorts.length > 0) params.append('cohort', selectedCohorts.join(','));
+        if (selectedCycles.length > 0) params.append('cycle', selectedCycles.join(','));
+        if (selectedEvaluationMonths.length > 0) params.append('evaluation_month', selectedEvaluationMonths.join(','));
+        if (selectedRegions.length > 0) params.append('region', selectedRegions.join(','));
+        if (selectedDistricts.length > 0) params.append('district', selectedDistricts.join(','));
+        if (selectedClusters.length > 0) params.append('cluster', selectedClusters.join(','));
+        if (selectedVillages.length > 0) params.append('village', selectedVillages.join(','));
+        
+        if (groupBy !== 'none') {
+          params.append('group_by', groupBy);
+        }
+        
+        const response = await fetch(`${API_ENDPOINT}/standard-evaluations/?${params.toString()}`);
+        if (!response.ok) throw new Error('Failed to fetch data');
+        
+        const result = await response.json();
+        
+        if (result.results && result.results.length > 0) {
+          allData = [...allData, ...result.results];
+          hasMoreData = result.results.length === pageSize && result.next; // Check if there's more data
+          currentPage++;
+        } else {
+          hasMoreData = false;
+        }
+      }
+      
+      setPredictions(allData);
+      setTotalCount(allData.length);
+      setAllPredictions(allData);
+      
+    } catch (err) {
+      setError('Failed to fetch all data');
+      console.error('Fetch all data error:', err);
+    } finally {
+      setIsLoadingAllData(false);
+    }
+  };
+
   // Fetch predictions and filter options in a single optimized call
-  const fetchData = async (page: number = 1) => {
+  const fetchData = async (page: number = 1, getAllData: boolean = false) => {
     try {
       setLoading(true);
+      if (getAllData) {
+        // Use the iterative approach for fetching all data
+        await fetchAllDataIteratively();
+        
+        // Still fetch filter options
+        const filterParams = new URLSearchParams();
+        if (selectedCohorts.length > 0) filterParams.append('cohort', selectedCohorts.join(','));
+        if (selectedCycles.length > 0) filterParams.append('cycle', selectedCycles.join(','));
+        if (selectedEvaluationMonths.length > 0) filterParams.append('evaluation_month', selectedEvaluationMonths.join(','));
+        if (selectedRegions.length > 0) filterParams.append('region', selectedRegions.join(','));
+        if (selectedDistricts.length > 0) filterParams.append('district', selectedDistricts.join(','));
+        if (selectedClusters.length > 0) filterParams.append('cluster', selectedClusters.join(','));
+        
+        const filterResponse = await fetch(`${API_ENDPOINT}/filter-options/?${filterParams.toString()}`);
+        if (filterResponse.ok) {
+          const filterResult = await filterResponse.json();
+          
+          // Update filter options
+          if (filterResult) {
+            setCohortOptions(filterResult.cohorts?.map((c: string) => ({ value: c, label: c })) || []);
+            setCycleOptions(filterResult.cycles?.map((c: string) => ({ value: c, label: c })) || []);
+            setEvaluationMonthOptions(filterResult.evaluation_months?.map((em: number) => ({ value: em.toString(), label: `Month ${em}` })) || []);
+            setRegionOptions(filterResult.regions?.map((r: string) => ({ value: r, label: r })) || []);
+            setDistrictOptions(filterResult.districts?.map((d: string) => ({ value: d, label: d })) || []);
+            setClusterOptions(filterResult.clusters?.map((c: string) => ({ value: c, label: c })) || []);
+            setVillageOptions(filterResult.villages?.map((v: string) => ({ value: v, label: v })) || []);
+          }
+        }
+        return;
+      }
       
       // Build query parameters for both data and filters
       const params = new URLSearchParams();
@@ -159,6 +248,7 @@ interface PredictionData {
       console.error('Data fetch error:', err);
     } finally {
       setLoading(false);
+      setIsLoadingAllData(false);
     }
   };
 
@@ -171,7 +261,7 @@ interface PredictionData {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setCurrentPage(1); // Reset to first page when filters change
-      fetchData(1);
+      fetchData(1, fetchAllData);
     }, 300); // 300ms debounce
 
     return () => clearTimeout(timeoutId);
@@ -184,13 +274,28 @@ interface PredictionData {
      selectedDistricts,
      selectedClusters,
      selectedVillages,
-     rowsPerPage
+     rowsPerPage,
+     fetchAllData
    ]);
 
   // Handle pagination changes
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     fetchData(newPage);
+  };
+
+  // Handle fetch all data
+  const handleFetchAllData = () => {
+    setFetchAllData(true);
+    setCurrentPage(1);
+    fetchData(1, true);
+  };
+
+  // Handle return to paginated data
+  const handleReturnToPaginated = () => {
+    setFetchAllData(false);
+    setCurrentPage(1);
+    fetchData(1, false);
   };
 
      // Handle filter changes with cascading logic
@@ -330,9 +435,41 @@ interface PredictionData {
       
       <Card className="mb-4">
         <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Filters
-          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              Filters
+            </Typography>
+            
+            {/* Fetch All Data Toggle */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              {fetchAllData ? (
+                <Button
+                  variant="outlined"
+                  startIcon={<ViewList />}
+                  onClick={handleReturnToPaginated}
+                  disabled={isLoadingAllData}
+                  size="small"
+                >
+                  Return to Paginated View
+                </Button>
+              ) : (
+                <Button
+                  variant="contained"
+                  startIcon={<GetApp />}
+                  onClick={handleFetchAllData}
+                  disabled={loading || isLoadingAllData}
+                  size="small"
+                  sx={{ 
+                    bgcolor: '#EA580C', 
+                    '&:hover': { bgcolor: '#C2410C' },
+                    color: 'white'
+                  }}
+                >
+                  {isLoadingAllData ? 'Loading All Data...' : 'Load All Data'}
+                </Button>
+              )}
+            </Box>
+          </Box>
           
           {/* Active Filters Display */}
           <Box sx={{ mb: 2, display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
@@ -480,7 +617,10 @@ interface PredictionData {
               <Typography variant="h6" gutterBottom>
                 Individual Predictions
                 <span className="ml-2 text-sm text-gray-500">
-                  (Showing {predictions.length} of {totalCount} records - Page {currentPage} of {totalPages})
+                  {fetchAllData 
+                    ? `(Showing all ${predictions.length} records)`
+                    : `(Showing ${predictions.length} of ${totalCount} records - Page ${currentPage} of ${totalPages})`
+                  }
                 </span>
               </Typography>
 
@@ -552,11 +692,17 @@ interface PredictionData {
               </Grid>
 
               <div className="">
+                {/* Cohort Performance Chart */}
+                <CohortPerformanceChart data={predictions} />
+
+                {/* Region Performance Chart */}
+                <RegionPerformanceChart data={predictions} />
+
                 {/* Insert map here */}
                 <HouseholdMap households={predictions} />
 
-                {/* Pagination Controls */}
-                {totalPages > 1 && (
+                {/* Pagination Controls - Only show when not fetching all data */}
+                {!fetchAllData && totalPages > 1 && (
                   <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
                     <Pagination 
                       count={totalPages} 
@@ -567,6 +713,21 @@ interface PredictionData {
                       showFirstButton 
                       showLastButton
                     />
+                  </Box>
+                )}
+                
+                {/* All Data Information */}
+                {fetchAllData && (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ 
+                      bgcolor: '#f5f5f5', 
+                      p: 2, 
+                      borderRadius: 1,
+                      border: '1px solid #e0e0e0'
+                    }}>
+                      📊 All available data has been loaded ({predictions.length} records). 
+                      Charts and analysis include complete dataset.
+                    </Typography>
                   </Box>
                 )}
               </div>
