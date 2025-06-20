@@ -203,11 +203,11 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
         </Box>
         
         {/* Summary Statistics */}
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
+        <Box sx={{ mt: 0 }}>
+          {/* <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
             Regional Insights
           </Typography>
-          
+           */}
           <Box sx={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', mb: 2 }}>
             {/* <Box sx={{ textAlign: 'center', minWidth: 120 }}>
               <Typography variant="h6" color="success.main">
@@ -230,12 +230,12 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
               <Typography variant="caption">Need Attention</Typography>
             </Box> */}
             
-            <Box sx={{ textAlign: 'center', minWidth: 120 }}>
+            {/* <Box sx={{ textAlign: 'center', minWidth: 120 }}>
               <Typography variant="h6" color="primary.main">
                 {overallAchievementRate.toFixed(1)}%
               </Typography>
               <Typography variant="caption">Overall Achievement</Typography>
-            </Box>
+            </Box> */}
           </Box>
           
           {/* Best and Worst Performing Regions */}

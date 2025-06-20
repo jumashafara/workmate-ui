@@ -68,7 +68,7 @@ interface PredictionData {
   // State for pagination from API
   const [totalCount, setTotalCount] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(100);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(200);
   
   // State for fetching all data
   const [fetchAllData, setFetchAllData] = useState<boolean>(false);
@@ -85,7 +85,9 @@ interface PredictionData {
       let allData: PredictionData[] = [];
       let currentPage = 1;
       let hasMoreData = true;
-      const pageSize = 1000; // Use a larger page size for efficiency
+      const pageSize = 500; // Reduced page size for better reliability
+      
+      console.log('Starting to fetch all data iteratively...');
       
       while (hasMoreData) {
         const params = new URLSearchParams();
@@ -105,26 +107,49 @@ interface PredictionData {
           params.append('group_by', groupBy);
         }
         
+        console.log(`Fetching page ${currentPage} with params:`, params.toString());
+        
         const response = await fetch(`${API_ENDPOINT}/standard-evaluations/?${params.toString()}`);
-        if (!response.ok) throw new Error('Failed to fetch data');
+        if (!response.ok) {
+          console.error(`Failed to fetch page ${currentPage}, status:`, response.status, response.statusText);
+          throw new Error(`Failed to fetch data on page ${currentPage}: ${response.status}`);
+        }
         
         const result = await response.json();
+        console.log(`Page ${currentPage} result:`, {
+          resultsLength: result.results?.length || 0,
+          hasNext: !!result.next,
+          totalCount: result.count,
+          currentDataLength: allData.length
+        });
         
         if (result.results && result.results.length > 0) {
           allData = [...allData, ...result.results];
-          hasMoreData = result.results.length === pageSize && result.next; // Check if there's more data
+          // Check if there's more data - look for 'next' property or if we got fewer results than requested
+          hasMoreData = result.results.length === pageSize && !!result.next;
           currentPage++;
+          
+          // Safety check to prevent infinite loops
+          if (currentPage > 50) { // Max 50 pages = 25,000 records
+            console.warn('Reached maximum page limit, stopping...');
+            hasMoreData = false;
+          }
         } else {
+          console.log('No more results found, stopping...');
           hasMoreData = false;
         }
+        
+        // Add a small delay to prevent overwhelming the server
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
       
+      console.log(`Fetch complete! Total records: ${allData.length}`);
       setPredictions(allData);
       setTotalCount(allData.length);
       setAllPredictions(allData);
       
     } catch (err) {
-      setError('Failed to fetch all data');
+      setError(`Failed to fetch all data: ${err instanceof Error ? err.message : 'Unknown error'}`);
       console.error('Fetch all data error:', err);
     } finally {
       setIsLoadingAllData(false);
@@ -243,20 +268,20 @@ interface PredictionData {
       // Save the query parameters for the child components
       setQueryParams(params);
       
-    } catch (err) {
+      } catch (err) {
       setError('Failed to fetch data');
       console.error('Data fetch error:', err);
-    } finally {
-      setLoading(false);
+      } finally {
+        setLoading(false);
       setIsLoadingAllData(false);
-    }
-  };
-
+      }
+    };
+    
   // Initial data load
   useEffect(() => {
     fetchData(1);
   }, []);
-
+  
   // Debounced effect for filter changes
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -284,11 +309,77 @@ interface PredictionData {
     fetchData(newPage);
   };
 
+  // Simple approach to fetch all data without pagination
+  const fetchAllDataSimple = async () => {
+    try {
+      setIsLoadingAllData(true);
+      
+      const params = new URLSearchParams();
+      // Don't add pagination parameters at all
+      
+      // Add filter parameters
+      if (selectedCohorts.length > 0) params.append('cohort', selectedCohorts.join(','));
+      if (selectedCycles.length > 0) params.append('cycle', selectedCycles.join(','));
+      if (selectedEvaluationMonths.length > 0) params.append('evaluation_month', selectedEvaluationMonths.join(','));
+      if (selectedRegions.length > 0) params.append('region', selectedRegions.join(','));
+      if (selectedDistricts.length > 0) params.append('district', selectedDistricts.join(','));
+      if (selectedClusters.length > 0) params.append('cluster', selectedClusters.join(','));
+      if (selectedVillages.length > 0) params.append('village', selectedVillages.join(','));
+      
+      if (groupBy !== 'none') {
+        params.append('group_by', groupBy);
+      }
+      
+      console.log('Trying simple approach with params:', params.toString());
+      
+      const response = await fetch(`${API_ENDPOINT}/standard-evaluations/?${params.toString()}`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      
+      const result = await response.json();
+      console.log('Simple approach result:', {
+        hasResults: !!result.results,
+        resultsLength: result.results?.length || 0,
+        hasPredictions: !!result.predictions,
+        predictionsLength: result.predictions?.length || 0,
+        totalCount: result.count,
+        allKeys: Object.keys(result)
+      });
+      
+      // Try different possible response structures
+      let dataArray = [];
+      if (result.results && Array.isArray(result.results)) {
+        dataArray = result.results;
+      } else if (result.predictions && Array.isArray(result.predictions)) {
+        dataArray = result.predictions;
+      } else if (Array.isArray(result)) {
+        dataArray = result;
+      }
+      
+      if (dataArray.length === 0) {
+        console.log('Simple approach failed, trying iterative approach...');
+        await fetchAllDataIteratively();
+        return;
+      }
+      
+      console.log(`Simple approach successful! Got ${dataArray.length} records`);
+      setPredictions(dataArray);
+      setTotalCount(dataArray.length);
+      setAllPredictions(dataArray);
+      
+    } catch (err) {
+      console.error('Simple approach failed:', err);
+      console.log('Falling back to iterative approach...');
+      await fetchAllDataIteratively();
+    } finally {
+      setIsLoadingAllData(false);
+    }
+  };
+
   // Handle fetch all data
   const handleFetchAllData = () => {
     setFetchAllData(true);
     setCurrentPage(1);
-    fetchData(1, true);
+    fetchAllDataSimple();
   };
 
   // Handle return to paginated data
@@ -436,9 +527,9 @@ interface PredictionData {
       <Card className="mb-4">
         <CardContent>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              Filters
-            </Typography>
+          <Typography variant="h6" gutterBottom>
+            Filters
+          </Typography>
             
             {/* Fetch All Data Toggle */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
