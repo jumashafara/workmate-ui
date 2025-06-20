@@ -186,10 +186,10 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
           <Typography variant="h6" gutterBottom>
             Regional Performance Analysis
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Compare achievement rates across different regions. Green indicates high performance (≥70%), 
+           {/* <Typography variant="body2" color="text.secondary">
+            Compare achievement rates across different regions. Green indicates high performance (≥80%), 
             orange indicates moderate performance (50-69%), and gray indicates low performance (&lt;50%).
-          </Typography>
+          </Typography>  */}
         </Box>
         
         <Box sx={{ width: '100%', height: height }}>
@@ -209,7 +209,7 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
           </Typography>
           
           <Box sx={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', mb: 2 }}>
-            <Box sx={{ textAlign: 'center', minWidth: 120 }}>
+            {/* <Box sx={{ textAlign: 'center', minWidth: 120 }}>
               <Typography variant="h6" color="success.main">
                 {regionStats.filter(s => s.achievement_rate >= 70).length}
               </Typography>
@@ -228,7 +228,7 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
                 {regionStats.filter(s => s.achievement_rate < 50).length}
               </Typography>
               <Typography variant="caption">Need Attention</Typography>
-            </Box>
+            </Box> */}
             
             <Box sx={{ textAlign: 'center', minWidth: 120 }}>
               <Typography variant="h6" color="primary.main">
