@@ -425,8 +425,8 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
                     </FormLabel>
                     <Slider
                       aria-labelledby="water-collection-time-slider-label"
-                      min={0}
-                      max={100}
+                      min={1}
+                      max={120}
                       step={1}
                       value={formData.hh_water_collection_Minutes[0]}
                       onChange={(e, value) => {
