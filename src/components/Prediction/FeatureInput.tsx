@@ -532,7 +532,7 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
                   <FormControl fullWidth sx={{ mb: 3 }}>
                     <FormLabel id="region-input-label">Region</FormLabel>
                     <input
-                      placeholder="eg Central"
+                      placeholder="eg East"
                       value={formData.region}
                       onChange={(e) => {
                         const newValue = e.target.value;
@@ -558,7 +558,7 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
                   <FormControl fullWidth sx={{ mb: 3 }}>
                     <FormLabel id="cluster-input-label">Cluster</FormLabel>
                     <input
-                      placeholder="eg Mitooma"
+                      placeholder="eg Bugonza"
                       value={formData.cluster}
                       onChange={(e) => {
                         setCluster(e.target.value);
@@ -575,8 +575,8 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
                     <FormLabel id="evaluation-month-input-label">Evaluation Month</FormLabel>
                     <input
                       type="number"
-                      min={1}
-                      max={12}
+                      min={3}
+                      max={24}
                       value={formData.evaluation_month}
                       onChange={(e) => {
                         const value = Number(e.target.value);
@@ -601,7 +601,7 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
                   <FormControl fullWidth sx={{ mb: 3 }}>
                     <FormLabel id="cohort-input-label">Cohort</FormLabel>
                     <input
-                      placeholder="eg Cohort 1"
+                      placeholder="eg 2024"
                       value={formData.cohort}
                       onChange={(e) => {
                         const newValue = e.target.value;
@@ -622,7 +622,7 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
                   <FormControl fullWidth sx={{ mb: 3 }}>
                     <FormLabel id="cycle-input-label">Cycle</FormLabel>
                     <input
-                      placeholder="eg Cycle 1"
+                      placeholder="eg A"
                       value={formData.cycle}
                       onChange={(e) => {
                         const newValue = e.target.value;
