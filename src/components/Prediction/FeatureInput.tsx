@@ -370,12 +370,12 @@ const FeatureInput: React.FC<FeatureInputProps> = ({
 
                   <FormControl fullWidth sx={{ mb: 3 }}>
                     <FormLabel id="water-consumption-slider-label">
-                      Water Consumption ({formData.Average_Water_Consumed_Per_Day[0]} liters)
+                      Water Consumption ({formData.Average_Water_Consumed_Per_Day[0]} jerrycans)
                     </FormLabel>
                     <Slider
                       aria-labelledby="water-consumption-slider-label"
-                      min={0}
-                      max={100}
+                      min={1}
+                      max={10}
                       step={1}
                       value={formData.Average_Water_Consumed_Per_Day[0]}
                       onChange={(e, value) => {
