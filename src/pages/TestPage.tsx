@@ -9,7 +9,7 @@ const households = [
         longitude: 30.4511119,
         prediction: 0, // Poor - will be red
         predicted_income: 0.8838504935884284,
-        region: "Western",
+        region: "West",
         district: "Kyenjojo",
         cluster: "Kasenyi",
         altitude: 1413.9,
@@ -51,7 +51,7 @@ const households = [
         longitude: 30.4611119,
         prediction: 1, // Non-poor - will be green
         predicted_income: 2.5438504935884284,
-        region: "Western",
+        region: "West",
         district: "Kyenjojo",
         cluster: "Kasenyi",
         altitude: 1500.2,
@@ -93,7 +93,7 @@ const households = [
         longitude: 30.4411119,
         prediction: 0, // Poor - will be red
         predicted_income: 1.2438504935884284,
-        region: "Western",
+        region: "West",
         district: "Kyenjojo",
         cluster: "Kasenyi",
         altitude: 1380.5,
