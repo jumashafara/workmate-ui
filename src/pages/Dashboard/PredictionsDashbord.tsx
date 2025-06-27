@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Card, CardContent, Typography, Box, Chip, FormControl, InputLabel, MenuItem, Select, OutlinedInput, SelectChangeEvent, Checkbox, ListItemText, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, Pagination, IconButton, Button, Switch, FormControlLabel } from '@mui/material';
+import { Grid, Card, CardContent, Typography, Box, Chip, FormControl, InputLabel, MenuItem, Select, OutlinedInput, SelectChangeEvent, Checkbox, ListItemText, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, Pagination, IconButton, Button, Switch, FormControlLabel, Skeleton } from '@mui/material';
 import ClusterStats from '../../components/Tables/ClusterStats';
 import DistrictStats from '../../components/Tables/DistrictStats';
 import CohortPerformanceChart from '../../components/Charts/CohortPerformanceChart';
 import RegionPerformanceChart from '../../components/Charts/RegionPerformanceChart';
+import DashboardCharts from '../../components/Charts/DashboardCharts';
 import { ArrowUpward, ArrowDownward, PeopleAlt, Percent, AttachMoney, BarChart, GetApp, ViewList } from '@mui/icons-material';
 import { API_ENDPOINT } from '../../api/endpoints';
 import HouseholdMap from '../../components/Maps/HouseholdMap'
@@ -692,8 +693,90 @@ interface PredictionData {
       </Card>
       
       {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+        <div>
+          {/* Dashboard Charts Skeleton */}
+          <Card sx={{ mb: 4 }}>
+            <CardContent>
+              <Grid container spacing={3}>
+                {[1, 2, 3, 4].map(i => (
+                  <Grid item xs={12} sm={6} md={3} key={i}>
+                    <Box>
+                      <Skeleton variant="text" width="70%" height={24} />
+                      <Skeleton variant="text" width="50%" height={48} />
+                      <Skeleton variant="text" width="40%" height={20} />
+                    </Box>
+                  </Grid>
+                ))}
+              </Grid>
+            </CardContent>
+          </Card>
+
+          {/* Map Skeleton */}
+          <Card sx={{ mb: 4 }}>
+            <CardContent>
+              <Skeleton variant="text" width="25%" height={32} sx={{ mb: 2 }} />
+              <Skeleton variant="rectangular" width="100%" height={400} />
+            </CardContent>
+          </Card>
+
+          {/* Charts Skeleton */}
+          <Grid container spacing={4}>
+            {/* Region Performance Chart */}
+            <Grid item xs={12} md={6}>
+              <Card>
+                <CardContent>
+                  <Skeleton variant="text" width="40%" height={32} sx={{ mb: 2 }} />
+                  <Skeleton variant="rectangular" width="100%" height={300} />
+                </CardContent>
+              </Card>
+            </Grid>
+
+            {/* Additional Chart Placeholder */}
+            <Grid item xs={12} md={6}>
+              <Card>
+                <CardContent>
+                  <Skeleton variant="text" width="35%" height={32} sx={{ mb: 2 }} />
+                  <Skeleton variant="rectangular" width="100%" height={300} />
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+
+          {/* Table/Data Skeleton */}
+          <Card sx={{ mt: 4 }}>
+            <CardContent>
+              <Skeleton variant="text" width="30%" height={32} sx={{ mb: 2 }} />
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      {[1, 2, 3, 4, 5, 6].map(i => (
+                        <TableCell key={i}>
+                          <Skeleton variant="text" width="80%" height={24} />
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map(row => (
+                      <TableRow key={row}>
+                        {[1, 2, 3, 4, 5, 6].map(col => (
+                          <TableCell key={col}>
+                            <Skeleton variant="text" width="90%" height={20} />
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </CardContent>
+          </Card>
+
+          {/* Pagination Skeleton */}
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+            <Skeleton variant="rounded" width={300} height={40} />
+          </Box>
         </div>
       ) : error ? (
         <Typography color="error">{error}</Typography>
@@ -715,72 +798,8 @@ interface PredictionData {
                 </span>
               </Typography>
 
-              {/* Summary Cards */}
-              <Grid container spacing={3} sx={{ mb: 4 }}>
-                <Grid item xs={12} sm={6} md={3}>
-                  <Card sx={{ height: '100%', boxShadow: 2 }}>
-                    <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
-                      <PeopleAlt sx={{ fontSize: 40, color: 'primary.main', mr: 2 }} />
-                      <Box>
-                        <Typography variant="h6" component="div">
-                          Total Records
-                        </Typography>
-                        <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
-                          {totalCount}
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Grid>
-                
-                <Grid item xs={12} sm={6} md={3}>
-                  <Card sx={{ height: '100%', boxShadow: 2 }}>
-                    <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Percent sx={{ fontSize: 40, color: 'success.main', mr: 2 }} />
-                      <Box>
-                        <Typography variant="h6" component="div">
-                          Achieved
-                        </Typography>
-                        <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
-                          {(averages.avgPrediction * 100).toFixed(2)}
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Grid>
-                
-                <Grid item xs={12} sm={6} md={3}>
-                  <Card sx={{ height: '100%', boxShadow: 2 }}>
-                    <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
-                      <AttachMoney sx={{ fontSize: 40, color: 'warning.main', mr: 2 }} />
-                      <Box>
-                        <Typography variant="h6" component="div">
-                          Avg Income + Production
-                        </Typography>
-                        <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
-                          {averages.avgIncome.toFixed(2)}
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Grid>
-                
-                <Grid item xs={12} sm={6} md={3}>
-                  <Card sx={{ height: '100%', boxShadow: 2 }}>
-                    <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
-                      <BarChart sx={{ fontSize: 40, color: 'info.main', mr: 2 }} />
-                      <Box>
-                        <Typography variant="h6" component="div">
-                          Filtered Records
-                        </Typography>
-                        <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
-                          {predictions.length}
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              </Grid>
+              {/* Interactive Dashboard Charts */}
+              <DashboardCharts data={predictions} totalCount={totalCount} />
 
               <div className="">
                 {/* Insert map here */}

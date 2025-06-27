@@ -11,6 +11,7 @@ import GoogleCallback from "./pages/Authentication/GoogleCallback";
 import ModelMetrics from "./pages/Dashboard/ModelMetricsPage";
 import FeatureImportance from "./pages/Dashboard/FeatureImportancePage";
 import StandardEvaluations from "./pages/Dashboard/PredictionsDashbord";
+import ClusterIncomeAnalysisPage from "./pages/Dashboard/ClusterIncomeAnalysisPage";
 
 import DefaultLayout from "./layout/DefaultLayout";
 import IndividualPredictionPage from "./pages/Dashboard/IndividualPredictionPage";
@@ -197,6 +198,19 @@ function App() {
               <>
                 <PageTitle title="Multiple Predictions | RTV" />
                 <MultiplePredictionsPage />
+              </>
+            ) : (
+              <Navigate to="/auth/signin" />
+            )
+          }
+        />
+        <Route
+          path="/cluster-income-analysis"
+          element={
+            access_token && isSuperuser ? (
+              <>
+                <PageTitle title="Trends by Evaluation Month | RTV" />
+                <ClusterIncomeAnalysisPage />
               </>
             ) : (
               <Navigate to="/auth/signin" />

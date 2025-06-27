@@ -133,26 +133,26 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({ households }) => {
   console.log(validHouseholds[0]);
 
   try {
-    return (
+  return (
       <div className="bg-white rounded-md shadow-md p-6 mb-6 h-[500px]">
         <div key={mapKey} ref={mapRef} style={{ height: '100%', width: '100%', zIndex: 1 }}>
-          <MapContainer
+      <MapContainer
             center={mapCenter}
             zoom={DEFAULT_ZOOM}
-            scrollWheelZoom={true}
+        scrollWheelZoom={true}
             style={{ height: '100%', width: '100%', zIndex: 1 }}
             ref={containerRef}
-          >
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution="&copy; OpenStreetMap contributors"
-            />
+        />
             {validHouseholds.map((h) => (
-              <CircleMarker
+          <CircleMarker
                 key={h.household_id}
                 center={[h.latitude, h.longitude] as LatLngTuple}
-                radius={6}
-                pathOptions={{
+            radius={6}
+            pathOptions={{
                   color: '#ffffff',
                   weight: 2,
                   fillColor: getMarkerColor(h.prediction),
@@ -269,10 +269,10 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({ households }) => {
                       {h.non_bio_waste_mgt_present !== undefined && <><strong>Waste Management:</strong> {formatBoolean(h.non_bio_waste_mgt_present)}<br /></>}
                     </div>
                   </div>
-                </Popup>
-              </CircleMarker>
-            ))}
-          </MapContainer>
+            </Popup>
+          </CircleMarker>
+        ))}
+      </MapContainer>
         </div>
       </div>
     );
@@ -282,8 +282,8 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({ households }) => {
     return (
       <div className="bg-white rounded-md shadow-md p-6 mb-6 h-[500px] flex items-center justify-center text-red-500">
         Map failed to load: {error instanceof Error ? error.message : 'Unknown error'}
-      </div>
-    );
+    </div>
+  );
   }
 };
 

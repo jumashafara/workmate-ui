@@ -136,7 +136,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             {/* Dashboard */}
               {isSuperuser && <SidebarLinkGroup
                 activeCondition={
-                pathname === '/' || pathname.includes('dashboard')
+                pathname === '/' || pathname.includes('dashboard') || pathname === '/cluster-income-analysis'
                 }
               >
                 {(handleClick, open) => {
@@ -154,7 +154,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         sx={{ 
                           borderRadius: 1,
                           mb: 0.5,
-                          backgroundColor: (pathname === '/' || pathname.includes('dashboard')) ? 
+                          backgroundColor: (pathname === '/' || pathname.includes('dashboard') || pathname === '/cluster-income-analysis') ? 
                             'rgba(255, 255, 255, 0.08)' : 
                             'transparent',
                           color: '#DEE4EE',
@@ -188,7 +188,19 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             <ListItemText primary="Predictions Dashboard" />
                           </ListItemButton>
                         </StyledNavLink>
-                        <StyledNavLink 
+                        <StyledNavLink to="/cluster-income-analysis">
+                          <ListItemButton sx={{ 
+                            pl: 4, 
+                            borderRadius: 1,
+                            color: '#DEE4EE',
+                            '&:hover': {
+                              backgroundColor: 'rgba(255, 255, 255, 0.04)'
+                            }
+                          }}>
+                            <ListItemText primary="Predictions Trends" />
+                          </ListItemButton>
+                        </StyledNavLink>
+                        {/* <StyledNavLink 
                           to="/standard-evaluations"
                           onClick={(e) => e.stopPropagation()}
                         >
@@ -202,7 +214,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           }}>
                             <ListItemText primary="Standard Evaluations" />
                           </ListItemButton>
-                        </StyledNavLink>
+                        </StyledNavLink> */}
                         <StyledNavLink to="/checkin-evaluations">
                           <ListItemButton sx={{ 
                             pl: 4, 
@@ -215,6 +227,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             <ListItemText primary="Check-in Evaluations" />
                           </ListItemButton>
                         </StyledNavLink>
+                        
                       </List>
                     </Collapse>
                   </React.Fragment>
