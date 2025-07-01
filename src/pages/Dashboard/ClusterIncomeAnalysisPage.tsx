@@ -265,7 +265,7 @@ const ClusterIncomeAnalysisPage: React.FC = () => {
       
       // Actual data trace
       const actualTrace = {
-        x: clusterData.map(d => `Month ${d.evaluation_month}`),
+        x: clusterData.map(d => d.evaluation_month),
         y: clusterData.map(d => d.avg_income),
         type: 'scatter',
         mode: 'lines+markers',
@@ -297,7 +297,7 @@ const ClusterIncomeAnalysisPage: React.FC = () => {
         if (predictedIncome > 0) {
           // Create prediction trace (dotted line)
           const predictionTrace = {
-            x: [`Month ${lastMonth}`, `Month ${nextMonth}`],
+            x: [lastMonth, nextMonth],
             y: [clusterData[clusterData.length - 1].avg_income, predictedIncome],
             type: 'scatter',
             mode: 'lines+markers',
@@ -339,7 +339,7 @@ const ClusterIncomeAnalysisPage: React.FC = () => {
       
       // Add overall trend trace
       const overallTrendTrace = {
-        x: [`Month ${minMonth}`, `Month ${maxMonth}`],
+        x: [minMonth, maxMonth],
         y: [trendStartIncome, trendEndIncome],
         type: 'scatter',
         mode: 'lines',
@@ -364,7 +364,7 @@ const ClusterIncomeAnalysisPage: React.FC = () => {
       
       if (nextTrendIncome > 0) {
         const trendPredictionTrace = {
-          x: [`Month ${maxMonth}`, `Month ${nextTrendMonth}`],
+          x: [maxMonth, nextTrendMonth],
           y: [overallSlope * maxMonth + overallIntercept, nextTrendIncome],
           type: 'scatter',
           mode: 'lines+markers',
@@ -640,10 +640,24 @@ const ClusterIncomeAnalysisPage: React.FC = () => {
                   width: 1000,
                   height: 500,
                   title: '',
-                  xaxis: { title: 'Evaluation Month' },
-                  yaxis: { title: 'Average Income ($)' },
+                  xaxis: { 
+                    title: 'Evaluation Month',
+                    tickmode: 'linear',
+                    dtick: 3,
+                    tickformat: 'd',
+                    ticksuffix: '',
+                    showgrid: true,
+                    gridcolor: '#f0f0f0'
+                  },
+                  yaxis: { 
+                    title: 'Average Income ($)',
+                    showgrid: true,
+                    gridcolor: '#f0f0f0'
+                  },
                   margin: { t: 40, b: 60, l: 80, r: 60 },
-                  legend: { x: 1.02, y: 1 }
+                  legend: { x: 1.02, y: 1 },
+                  plot_bgcolor: 'white',
+                  paper_bgcolor: 'white'
                 }}
                 config={{ displayModeBar: true, responsive: true }}
               />
