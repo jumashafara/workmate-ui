@@ -83,6 +83,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const [colorMode, setColorMode] = useColorMode();
 
   const isSuperuser = localStorage.getItem("superuser") === "true";
+  const isAreaManager = localStorage.getItem("role") === "area_manager";
+  const isProjectManager = localStorage.getItem("role") === "project_manager";
+  const isProjectOfficer = localStorage.getItem("role") === "project_officer";  
+  const isTeamLead = localStorage.getItem("role") === "team_lead";
   const access_token = localStorage.getItem("access_token");
   // Close on click outside
   useEffect(() => {
@@ -134,7 +138,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         <Box sx={{ overflow: 'auto', height: '100%' }}>
           <List component="nav" sx={{ px: 1 }}>
             {/* Dashboard */}
-              {isSuperuser && <SidebarLinkGroup
+              { (isSuperuser || isAreaManager || isProjectManager || isProjectOfficer || isTeamLead) && <SidebarLinkGroup
                 activeCondition={
                 pathname === '/' || pathname.includes('dashboard') || pathname === '/cluster-income-analysis'
                 }

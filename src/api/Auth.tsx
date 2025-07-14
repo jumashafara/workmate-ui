@@ -20,6 +20,9 @@ interface AuthResponse {
     is_superuser: boolean;
     username: string;
     groups: Array<string>;
+    role: string;
+    region: string;
+    district: string;
   };
 }
 

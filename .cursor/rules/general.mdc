@@ -1,0 +1,5 @@
+---
+alwaysApply: true
+---
+
+Always use plotly for visualization unless asked otherwise

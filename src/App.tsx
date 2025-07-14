@@ -10,8 +10,8 @@ import ResetPassword from "./pages/Authentication/ResetPassword";
 import GoogleCallback from "./pages/Authentication/GoogleCallback";
 import ModelMetrics from "./pages/Dashboard/ModelMetricsPage";
 import FeatureImportance from "./pages/Dashboard/FeatureImportancePage";
-import StandardEvaluations from "./pages/Dashboard/PredictionsDashbord";
-import ClusterIncomeAnalysisPage from "./pages/Dashboard/ClusterIncomeAnalysisPage";
+import SuperUserPredictionsDashbord from "./pages/Dashboard/SuperUserPredictionsDashbord";
+import ClusterIncomeAnalysisPage from "./pages/Dashboard/ClusterTrends";
 
 import DefaultLayout from "./layout/DefaultLayout";
 import IndividualPredictionPage from "./pages/Dashboard/IndividualPredictionPage";
@@ -23,6 +23,11 @@ import Settings from "./pages/Settings";
 
 import Checkins from "./pages/Reports/Checkins";
 import { Map } from "./pages/TestPage";
+import AreaManagerPredictionsDashbord from "./pages/Dashboard/AreaManagerPredictionsDashbord";
+import ProjectManagerPredictionsDashbord from "./pages/Dashboard/ProjectManagerPredictionsDashbord";
+import ProjectOfficerPredictionsDashbord from "./pages/Dashboard/ProjectOfficerPredictionsDashbord";
+import TeamLeadPredictionsDashbord from "./pages/Dashboard/TeamLeadPredictionsDashbord";
+import AreaManagerClusterTrends from "./pages/Dashboard/AreaManagerClusterTrends";
 
 
 
@@ -50,6 +55,12 @@ function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const { pathname } = useLocation();
   const access_token = localStorage.getItem("access_token");
+  const region = localStorage.getItem("region");
+  const district = localStorage.getItem("district");
+
+  const userRole = localStorage.getItem('role');
+  console.log('User Role: ', userRole)  
+  
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -63,6 +74,10 @@ function App() {
   const isAuthRoute = pathname.includes('/auth/');
   const isResetPasswordRoute = pathname.includes('/auth/reset-password/');
   const isSuperuser = localStorage.getItem("superuser") === "true";
+  const isAreaManager = localStorage.getItem("role") === "area_manager";
+  const isProjectManager = localStorage.getItem("role") === "project_manager";
+  const isProjectOfficer = localStorage.getItem("role") === "project_officer";
+  const isTeamLead = localStorage.getItem("role") === "team_lead";
 
   if (loading) {
     return <Loader />;
@@ -139,19 +154,60 @@ function App() {
   return (
     <DefaultLayout>
       <Routes>
-        <Route
-          index
-          element={
-            access_token && isSuperuser ? (
-              <>
-                <PageTitle title="Standard Evaluations | RTV" />
-                <StandardEvaluations />
-              </>
-            ) : (
+      <Route
+  index
+  element={
+    (() => {
+      if (access_token) {
+        if (isSuperuser) {
+          return (
+            <>
+              <PageTitle title="Super User Predictions | RTV" />
+              <SuperUserPredictionsDashbord />
+            </>
+          );
+        } else if (isAreaManager) {
+          return (
+            <>
+              <PageTitle title="Area Manager Predictions | RTV" />
+              <AreaManagerPredictionsDashbord />
+            </>
+          );
+        } else if (isProjectManager) {
+          return (
+            <>
+              <PageTitle title="Project Manager Predictions | RTV" />
+              <ProjectManagerPredictionsDashbord />
+            </>
+          );
+        } else if (isProjectOfficer) {
+          return (
+            <>
+              <PageTitle title="Project Officer Predictions | RTV" />
+              <ProjectOfficerPredictionsDashbord />
+            </>
+          );
+        } else if (isTeamLead) {
+          return (
+            <>
+              <PageTitle title="Team Lead Predictions | RTV" />
+              <TeamLeadPredictionsDashbord />
+            </>
+          );
+        } else {
+          return (
+            <>
+              <PageTitle title="Standard Evaluations | RTV" />
               <Navigate to="/chat-bot" />
-            )
-          }
-        />
+            </>
+          );
+        }
+      }
+      return <Navigate to="/chat-bot" />;
+    })()
+  }
+/>
+
         <Route
           path="/model-metrics"
           element={
@@ -207,11 +263,17 @@ function App() {
         <Route
           path="/cluster-income-analysis"
           element={
-            access_token && isSuperuser ? (
-              <>
-                <PageTitle title="Trends by Evaluation Month | RTV" />
-                <ClusterIncomeAnalysisPage />
-              </>
+            access_token ? (
+              isSuperuser ? (
+                <Navigate to="/standard-evaluations" />
+              ) : isAreaManager ? (
+                <>
+                  <PageTitle title="Trends by Evaluation Month | RTV" />
+                  <AreaManagerClusterTrends />
+                </>
+              ) : (
+                <Navigate to="/auth/signin" />
+              )
             ) : (
               <Navigate to="/auth/signin" />
             )

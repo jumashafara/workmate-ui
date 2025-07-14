@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Grid, Card, CardContent, Typography, Box, Chip, FormControl, InputLabel, MenuItem, Select, OutlinedInput, SelectChangeEvent, Checkbox, ListItemText, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, Pagination, IconButton, Button, Switch, FormControlLabel, Skeleton } from '@mui/material';
 import ClusterStats from '../../components/Tables/ClusterStats';
 import DistrictStats from '../../components/Tables/DistrictStats';
-import CohortPerformanceChart from '../../components/Charts/CohortPerformanceChart';
 import RegionPerformanceChart from '../../components/Charts/RegionPerformanceChart';
 import DashboardCharts from '../../components/Charts/DashboardCharts';
-import { ArrowUpward, ArrowDownward, PeopleAlt, Percent, AttachMoney, BarChart, GetApp, ViewList } from '@mui/icons-material';
+import { ArrowUpward, ArrowDownward, GetApp, ViewList } from '@mui/icons-material';
 import { API_ENDPOINT } from '../../api/endpoints';
 import HouseholdMap from '../../components/Maps/HouseholdMap'
 
@@ -36,6 +35,8 @@ interface PredictionData {
 
 
   const StandardEvaluations: React.FC = () => {
+  const region = localStorage.getItem("region");
+
   // State for grouping
   const [groupBy, setGroupBy] = useState<string>('none');
   
@@ -52,7 +53,7 @@ interface PredictionData {
   const [selectedCohorts, setSelectedCohorts] = useState<string[]>([]);
   const [selectedCycles, setSelectedCycles] = useState<string[]>([]);
   const [selectedEvaluationMonths, setSelectedEvaluationMonths] = useState<string[]>([]);
-  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
+  const [selectedRegions, setSelectedRegions] = useState<string[]>(region ? [region] : []);
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
   const [selectedClusters, setSelectedClusters] = useState<string[]>([]);
   const [selectedVillages, setSelectedVillages] = useState<string[]>([]);
@@ -79,6 +80,13 @@ interface PredictionData {
   const [sortField, setSortField] = useState<keyof PredictionData | ''>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
+  // Effect to set initial region filter
+  useEffect(() => {
+    if (region) {
+      setSelectedRegions([region]);
+    }
+  }, [region]);
+
   // Fetch all data by making multiple requests if needed
   const fetchAllDataIteratively = async () => {
     try {
@@ -99,7 +107,8 @@ interface PredictionData {
         if (selectedCohorts.length > 0) params.append('cohort', selectedCohorts.join(','));
         if (selectedCycles.length > 0) params.append('cycle', selectedCycles.join(','));
         if (selectedEvaluationMonths.length > 0) params.append('evaluation_month', selectedEvaluationMonths.join(','));
-        if (selectedRegions.length > 0) params.append('region', selectedRegions.join(','));
+        // Always include user's region in params
+        params.append('region', region || '');
         if (selectedDistricts.length > 0) params.append('district', selectedDistricts.join(','));
         if (selectedClusters.length > 0) params.append('cluster', selectedClusters.join(','));
         if (selectedVillages.length > 0) params.append('village', selectedVillages.join(','));
@@ -121,11 +130,17 @@ interface PredictionData {
           resultsLength: result.results?.length || 0,
           hasNext: !!result.next,
           totalCount: result.count,
-          currentDataLength: allData.length
+          currentDataLength: allData.length,
+          regionFilter: region // Log region filter for verification
         });
         
         if (result.results && result.results.length > 0) {
-          allData = [...allData, ...result.results];
+          // Verify that all results are from the user's region
+          const filteredResults = region 
+            ? result.results.filter((item: PredictionData) => item.region === region)
+            : result.results;
+            
+          allData = [...allData, ...filteredResults];
           // Check if there's more data - look for 'next' property or if we got fewer results than requested
           hasMoreData = result.results.length === pageSize && !!result.next;
           currentPage++;
@@ -144,7 +159,7 @@ interface PredictionData {
         await new Promise(resolve => setTimeout(resolve, 100));
       }
       
-      console.log(`Fetch complete! Total records: ${allData.length}`);
+      console.log(`Fetch complete! Total records: ${allData.length}, Region filter: ${region}`);
       setPredictions(allData);
       setTotalCount(allData.length);
       setAllPredictions(allData);
@@ -170,7 +185,8 @@ interface PredictionData {
         if (selectedCohorts.length > 0) filterParams.append('cohort', selectedCohorts.join(','));
         if (selectedCycles.length > 0) filterParams.append('cycle', selectedCycles.join(','));
         if (selectedEvaluationMonths.length > 0) filterParams.append('evaluation_month', selectedEvaluationMonths.join(','));
-        if (selectedRegions.length > 0) filterParams.append('region', selectedRegions.join(','));
+        // Always include user's region in filter params
+        filterParams.append('region', region || '');
         if (selectedDistricts.length > 0) filterParams.append('district', selectedDistricts.join(','));
         if (selectedClusters.length > 0) filterParams.append('cluster', selectedClusters.join(','));
         
@@ -183,7 +199,10 @@ interface PredictionData {
             setCohortOptions(filterResult.cohorts?.map((c: string) => ({ value: c, label: c })) || []);
             setCycleOptions(filterResult.cycles?.map((c: string) => ({ value: c, label: c })) || []);
             setEvaluationMonthOptions(filterResult.evaluation_months?.map((em: number) => ({ value: em.toString(), label: `Month ${em}` })) || []);
-            setRegionOptions(filterResult.regions?.map((r: string) => ({ value: r, label: r })) || []);
+            // Only set region options if user is superuser
+            if (!region) {
+              setRegionOptions(filterResult.regions?.map((r: string) => ({ value: r, label: r })) || []);
+            }
             setDistrictOptions(filterResult.districts?.map((d: string) => ({ value: d, label: d })) || []);
             setClusterOptions(filterResult.clusters?.map((c: string) => ({ value: c, label: c })) || []);
             setVillageOptions(filterResult.villages?.map((v: string) => ({ value: v, label: v })) || []);
@@ -197,13 +216,14 @@ interface PredictionData {
       params.append('page', page.toString());
       params.append('page_size', rowsPerPage.toString());
       
-             if (selectedCohorts.length > 0) params.append('cohort', selectedCohorts.join(','));
-       if (selectedCycles.length > 0) params.append('cycle', selectedCycles.join(','));
-       if (selectedEvaluationMonths.length > 0) params.append('evaluation_month', selectedEvaluationMonths.join(','));
-       if (selectedRegions.length > 0) params.append('region', selectedRegions.join(','));
-       if (selectedDistricts.length > 0) params.append('district', selectedDistricts.join(','));
-       if (selectedClusters.length > 0) params.append('cluster', selectedClusters.join(','));
-       if (selectedVillages.length > 0) params.append('village', selectedVillages.join(','));
+      if (selectedCohorts.length > 0) params.append('cohort', selectedCohorts.join(','));
+      if (selectedCycles.length > 0) params.append('cycle', selectedCycles.join(','));
+      if (selectedEvaluationMonths.length > 0) params.append('evaluation_month', selectedEvaluationMonths.join(','));
+      // Always include user's region in params
+      params.append('region', region || '');
+      if (selectedDistricts.length > 0) params.append('district', selectedDistricts.join(','));
+      if (selectedClusters.length > 0) params.append('cluster', selectedClusters.join(','));
+      if (selectedVillages.length > 0) params.append('village', selectedVillages.join(','));
       
       if (groupBy !== 'none') {
         params.append('group_by', groupBy);
@@ -216,7 +236,8 @@ interface PredictionData {
       if (selectedCohorts.length > 0) filterParams.append('cohort', selectedCohorts.join(','));
       if (selectedCycles.length > 0) filterParams.append('cycle', selectedCycles.join(','));
       if (selectedEvaluationMonths.length > 0) filterParams.append('evaluation_month', selectedEvaluationMonths.join(','));
-      if (selectedRegions.length > 0) filterParams.append('region', selectedRegions.join(','));
+      // Always include user's region in filter params
+      filterParams.append('region', region || '');
       if (selectedDistricts.length > 0) filterParams.append('district', selectedDistricts.join(','));
       if (selectedClusters.length > 0) filterParams.append('cluster', selectedClusters.join(','));
       
@@ -237,8 +258,6 @@ interface PredictionData {
       
       console.log('Data received:', dataResult);
       console.log('Filter options received:', filterResult);
-      console.log('Filter options keys:', Object.keys(filterResult));
-      console.log('Evaluation months specifically:', filterResult.evaluation_months);
       
       // Handle paginated data response
       if (groupBy === 'none') {
@@ -246,7 +265,7 @@ interface PredictionData {
           // Paginated response
           setPredictions(dataResult.results);
           setTotalCount(dataResult.count || 0);
-          setAllPredictions(dataResult.results); // For summary calculations
+          setAllPredictions(dataResult.results);
         } else if (dataResult.predictions) {
           // Non-paginated fallback
           setPredictions(dataResult.predictions);
@@ -255,29 +274,32 @@ interface PredictionData {
         }
       }
       
-             // Update filter options
-       if (filterResult) {
-         setCohortOptions(filterResult.cohorts?.map((c: string) => ({ value: c, label: c })) || []);
-         setCycleOptions(filterResult.cycles?.map((c: string) => ({ value: c, label: c })) || []);
-         setEvaluationMonthOptions(filterResult.evaluation_months?.map((em: number) => ({ value: em.toString(), label: `Month ${em}` })) || []);
-         setRegionOptions(filterResult.regions?.map((r: string) => ({ value: r, label: r })) || []);
-         setDistrictOptions(filterResult.districts?.map((d: string) => ({ value: d, label: d })) || []);
-         setClusterOptions(filterResult.clusters?.map((c: string) => ({ value: c, label: c })) || []);
-         setVillageOptions(filterResult.villages?.map((v: string) => ({ value: v, label: v })) || []);
-       }
+      // Update filter options
+      if (filterResult) {
+        setCohortOptions(filterResult.cohorts?.map((c: string) => ({ value: c, label: c })) || []);
+        setCycleOptions(filterResult.cycles?.map((c: string) => ({ value: c, label: c })) || []);
+        setEvaluationMonthOptions(filterResult.evaluation_months?.map((em: number) => ({ value: em.toString(), label: `Month ${em}` })) || []);
+        // Only set region options if user is superuser
+        if (!region) {
+          setRegionOptions(filterResult.regions?.map((r: string) => ({ value: r, label: r })) || []);
+        }
+        setDistrictOptions(filterResult.districts?.map((d: string) => ({ value: d, label: d })) || []);
+        setClusterOptions(filterResult.clusters?.map((c: string) => ({ value: c, label: c })) || []);
+        setVillageOptions(filterResult.villages?.map((v: string) => ({ value: v, label: v })) || []);
+      }
       
       // Save the query parameters for the child components
       setQueryParams(params);
       
-      } catch (err) {
+    } catch (err) {
       setError('Failed to fetch data');
       console.error('Data fetch error:', err);
-      } finally {
-        setLoading(false);
+    } finally {
+      setLoading(false);
       setIsLoadingAllData(false);
-      }
-    };
-    
+    }
+  };
+  
   // Initial data load
   useEffect(() => {
     fetchData(1);
@@ -322,7 +344,8 @@ interface PredictionData {
       if (selectedCohorts.length > 0) params.append('cohort', selectedCohorts.join(','));
       if (selectedCycles.length > 0) params.append('cycle', selectedCycles.join(','));
       if (selectedEvaluationMonths.length > 0) params.append('evaluation_month', selectedEvaluationMonths.join(','));
-      if (selectedRegions.length > 0) params.append('region', selectedRegions.join(','));
+      // Always include user's region in params
+      params.append('region', region || '');
       if (selectedDistricts.length > 0) params.append('district', selectedDistricts.join(','));
       if (selectedClusters.length > 0) params.append('cluster', selectedClusters.join(','));
       if (selectedVillages.length > 0) params.append('village', selectedVillages.join(','));
@@ -343,7 +366,8 @@ interface PredictionData {
         hasPredictions: !!result.predictions,
         predictionsLength: result.predictions?.length || 0,
         totalCount: result.count,
-        allKeys: Object.keys(result)
+        allKeys: Object.keys(result),
+        regionFilter: region // Log region filter for verification
       });
       
       // Try different possible response structures
@@ -355,6 +379,11 @@ interface PredictionData {
       } else if (Array.isArray(result)) {
         dataArray = result;
       }
+
+      // Verify that all results are from the user's region
+      if (region) {
+        dataArray = dataArray.filter((item: PredictionData) => item.region === region);
+      }
       
       if (dataArray.length === 0) {
         console.log('Simple approach failed, trying iterative approach...');
@@ -362,7 +391,7 @@ interface PredictionData {
         return;
       }
       
-      console.log(`Simple approach successful! Got ${dataArray.length} records`);
+      console.log(`Simple approach successful! Got ${dataArray.length} records for region: ${region}`);
       setPredictions(dataArray);
       setTotalCount(dataArray.length);
       setAllPredictions(dataArray);
@@ -677,7 +706,7 @@ interface PredictionData {
             {renderFilter('Evaluation Month', evaluationMonthOptions, selectedEvaluationMonths, 
               (e) => handleFilterChange(e, setSelectedEvaluationMonths, 'evaluation_month'))}
               
-            {renderFilter('Region', regionOptions, selectedRegions, 
+            {!region && renderFilter('Region', regionOptions, selectedRegions, 
               (e) => handleFilterChange(e, setSelectedRegions, 'region'))}
               
             {renderFilter('District', districtOptions, selectedDistricts, 
