@@ -650,7 +650,7 @@ const ClusterIncomeAnalysisPage: React.FC = () => {
                     gridcolor: '#f0f0f0'
                   },
                   yaxis: { 
-                    title: 'Average Income ($)',
+                    title: 'Average Income + Production ($)',
                     showgrid: true,
                     gridcolor: '#f0f0f0'
                   },
@@ -681,7 +681,7 @@ const ClusterIncomeAnalysisPage: React.FC = () => {
                   width: 1000,
                   height: 500,
                   title: '',
-                  xaxis: { title: 'Average Income ($)' },
+                  xaxis: { title: 'Average Income + Production ($)' },
                   yaxis: { title: 'Achievement Rate (%)' },
                   margin: { t: 40, b: 60, l: 80, r: 60 }
                 }}
@@ -712,7 +712,7 @@ const ClusterIncomeAnalysisPage: React.FC = () => {
               </Typography>
             </Grid>
             <Grid item xs={6} md={3}>
-              <Typography variant="body2" color="text.secondary">Avg Income (Overall)</Typography>
+              <Typography variant="body2" color="text.secondary">Avg Income + Production (Overall)</Typography>
               <Typography variant="h5" color="#EA580C">
                 ${data.length > 0 ? (data.reduce((sum, d) => sum + d.avg_income, 0) / data.length).toFixed(2) : '0.00'}
               </Typography>

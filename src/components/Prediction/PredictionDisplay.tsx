@@ -61,7 +61,7 @@ const PredictionDisplay: React.FC<PredictionDisplayProps> = ({
                     <TableCell>{prediction === 1 ? "Likely to achieve" : "Not likely to achieve"}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell>Predicted Income Production</TableCell>
+                    <TableCell>Predicted Income + Production</TableCell>
                     <TableCell>{predicted_income_production.toFixed(3)}</TableCell>
                   </TableRow>
                 </TableBody>

@@ -62,7 +62,7 @@ const AreaManagerClusterTrends: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Filter states - Initialize selectedRegions with user's region if it exists
+  // Filter states - Initialize selectedRegions with user's region
   const [selectedRegions, setSelectedRegions] = useState<string[]>(region ? [region] : []);
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
   const [selectedClusters, setSelectedClusters] = useState<string[]>([]);
@@ -82,20 +82,17 @@ const AreaManagerClusterTrends: React.FC = () => {
       // Build query parameters
       const params = new URLSearchParams();
       
-      // Use the current selectedRegions state
-      if (selectedRegions.length > 0) {
-        params.append('region', selectedRegions.join(','));
-      }
-
+      // Always include user's region in params
+      params.append('region', region || '');
+      
       if (selectedDistricts.length > 0) params.append('district', selectedDistricts.join(','));
       if (selectedClusters.length > 0) params.append('cluster', selectedClusters.join(','));
       if (selectedMonths.length > 0) params.append('evaluation_month', selectedMonths.join(','));
       
-      // Build separate parameters for filter options (without pagination)
+      // Build separate parameters for filter options
       const filterParams = new URLSearchParams();
-      if (selectedRegions.length > 0) {
-        filterParams.append('region', selectedRegions.join(','));
-      }
+      // Always include user's region in filter params
+      filterParams.append('region', region || '');
       
       if (selectedDistricts.length > 0) filterParams.append('district', selectedDistricts.join(','));
       if (selectedClusters.length > 0) filterParams.append('cluster', selectedClusters.join(','));
@@ -130,7 +127,7 @@ const AreaManagerClusterTrends: React.FC = () => {
         predictions = dataResult;
       }
 
-      // Double check that all predictions are for the user's region if it exists
+      // Double check that all predictions are for the user's region
       if (region) {
         predictions = predictions.filter(pred => pred.region === region);
       }
@@ -166,14 +163,14 @@ const AreaManagerClusterTrends: React.FC = () => {
     fetchData();
   }, []); // Only run once on mount
 
-  // Debounced effect for filter changes - don't include selectedRegions if region is set
+  // Debounced effect for filter changes - don't include selectedRegions since it's fixed for area managers
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       fetchData();
     }, 300); // 300ms debounce
 
     return () => clearTimeout(timeoutId);
-  }, [region ? selectedDistricts : selectedRegions, selectedDistricts, selectedClusters, selectedMonths]);
+  }, [selectedDistricts, selectedClusters, selectedMonths]);
 
   // Process raw data into cluster-month aggregations
   const processClusterData = (predictions: PredictionData[]): ClusterIncomeData[] => {
@@ -246,7 +243,7 @@ const AreaManagerClusterTrends: React.FC = () => {
   // Clear all filters except region for area managers
   const clearFilters = () => {
     if (!region) {
-      setSelectedRegions([]);
+    setSelectedRegions([]);
     }
     setSelectedDistricts([]);
     setSelectedClusters([]);
@@ -571,23 +568,23 @@ const AreaManagerClusterTrends: React.FC = () => {
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
             {/* Only show region filter if user doesn't have a specific region */}
             {!region && (
-              <FormControl sx={{ minWidth: 200 }} size="small">
-                <InputLabel>Regions</InputLabel>
-                <Select
-                  multiple
-                  value={selectedRegions}
-                  onChange={handleRegionChange}
-                  input={<OutlinedInput label="Regions" />}
-                  renderValue={(selected) => selected.join(', ')}
-                >
-                  {regionOptions.map(option => (
-                    <MenuItem key={option.value} value={option.value}>
-                      <Checkbox checked={selectedRegions.indexOf(option.value) > -1} />
-                      <ListItemText primary={option.label} />
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+            <FormControl sx={{ minWidth: 200 }} size="small">
+              <InputLabel>Regions</InputLabel>
+              <Select
+                multiple
+                value={selectedRegions}
+                onChange={handleRegionChange}
+                input={<OutlinedInput label="Regions" />}
+                renderValue={(selected) => selected.join(', ')}
+              >
+                {regionOptions.map(option => (
+                  <MenuItem key={option.value} value={option.value}>
+                    <Checkbox checked={selectedRegions.indexOf(option.value) > -1} />
+                    <ListItemText primary={option.label} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             )}
             
             <FormControl sx={{ minWidth: 200 }} size="small">
@@ -654,7 +651,7 @@ const AreaManagerClusterTrends: React.FC = () => {
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                Average Income Trends by Cluster
+                Average Income + Production Trends by Cluster
               </Typography>
               <Typography variant="body2" color="text.secondary" gutterBottom>
                 Solid lines show actual data, dotted lines show predictions. Orange dashed line shows overall trend across all selected clusters.
@@ -675,7 +672,7 @@ const AreaManagerClusterTrends: React.FC = () => {
                     gridcolor: '#f0f0f0'
                   },
                   yaxis: { 
-                    title: 'Average Income ($)',
+                    title: 'Average Income + Production ($)',
                     showgrid: true,
                     gridcolor: '#f0f0f0'
                   },
@@ -706,7 +703,7 @@ const AreaManagerClusterTrends: React.FC = () => {
                   width: 1000,
                   height: 500,
                   title: '',
-                  xaxis: { title: 'Average Income ($)' },
+                  xaxis: { title: 'Average Income + Production ($)' },
                   yaxis: { title: 'Achievement Rate (%)' },
                   margin: { t: 40, b: 60, l: 80, r: 60 }
                 }}
@@ -737,7 +734,7 @@ const AreaManagerClusterTrends: React.FC = () => {
               </Typography>
             </Grid>
             <Grid item xs={6} md={3}>
-              <Typography variant="body2" color="text.secondary">Avg Income (Overall)</Typography>
+              <Typography variant="body2" color="text.secondary">Avg Income + Production (Overall)</Typography>
               <Typography variant="h5" color="#EA580C">
                 ${data.length > 0 ? (data.reduce((sum, d) => sum + d.avg_income, 0) / data.length).toFixed(2) : '0.00'}
               </Typography>

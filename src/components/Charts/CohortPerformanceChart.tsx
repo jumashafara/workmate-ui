@@ -100,7 +100,7 @@ const CohortPerformanceChart: React.FC<CohortPerformanceChartProps> = ({
         '<b>%{x}</b><br>' +
         'Achievement Rate: %{y:.1f}%<br>' +
         'Total Households: %{customdata[0]}<br>' +
-        'Average Income: $%{customdata[1]:.0f}<br>' +
+        'Average Income + Production: $%{customdata[1]:.0f}<br>' +
         'Average Probability: %{customdata[2]:.3f}' +
         '<extra></extra>',
       customdata: cohortStats.map(stat => [

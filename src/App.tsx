@@ -154,9 +154,9 @@ function App() {
   return (
     <DefaultLayout>
       <Routes>
-      <Route
-  index
-  element={
+        <Route
+          index
+          element={
     (() => {
       if (access_token) {
         if (isSuperuser) {
@@ -196,8 +196,8 @@ function App() {
           );
         } else {
           return (
-            <>
-              <PageTitle title="Standard Evaluations | RTV" />
+              <>
+                <PageTitle title="Standard Evaluations | RTV" />
               <Navigate to="/chat-bot" />
             </>
           );
@@ -205,8 +205,8 @@ function App() {
       }
       return <Navigate to="/chat-bot" />;
     })()
-  }
-/>
+          }
+        />
 
         <Route
           path="/model-metrics"
@@ -267,10 +267,10 @@ function App() {
               isSuperuser ? (
                 <Navigate to="/standard-evaluations" />
               ) : isAreaManager ? (
-                <>
-                  <PageTitle title="Trends by Evaluation Month | RTV" />
+              <>
+                <PageTitle title="Trends by Evaluation Month | RTV" />
                   <AreaManagerClusterTrends />
-                </>
+              </>
               ) : (
                 <Navigate to="/auth/signin" />
               )

@@ -201,7 +201,7 @@ interface PredictionData {
             setEvaluationMonthOptions(filterResult.evaluation_months?.map((em: number) => ({ value: em.toString(), label: `Month ${em}` })) || []);
             // Only set region options if user is superuser
             if (!region) {
-              setRegionOptions(filterResult.regions?.map((r: string) => ({ value: r, label: r })) || []);
+            setRegionOptions(filterResult.regions?.map((r: string) => ({ value: r, label: r })) || []);
             }
             setDistrictOptions(filterResult.districts?.map((d: string) => ({ value: d, label: d })) || []);
             setClusterOptions(filterResult.clusters?.map((c: string) => ({ value: c, label: c })) || []);
@@ -216,14 +216,14 @@ interface PredictionData {
       params.append('page', page.toString());
       params.append('page_size', rowsPerPage.toString());
       
-      if (selectedCohorts.length > 0) params.append('cohort', selectedCohorts.join(','));
-      if (selectedCycles.length > 0) params.append('cycle', selectedCycles.join(','));
-      if (selectedEvaluationMonths.length > 0) params.append('evaluation_month', selectedEvaluationMonths.join(','));
+             if (selectedCohorts.length > 0) params.append('cohort', selectedCohorts.join(','));
+       if (selectedCycles.length > 0) params.append('cycle', selectedCycles.join(','));
+       if (selectedEvaluationMonths.length > 0) params.append('evaluation_month', selectedEvaluationMonths.join(','));
       // Always include user's region in params
       params.append('region', region || '');
-      if (selectedDistricts.length > 0) params.append('district', selectedDistricts.join(','));
-      if (selectedClusters.length > 0) params.append('cluster', selectedClusters.join(','));
-      if (selectedVillages.length > 0) params.append('village', selectedVillages.join(','));
+       if (selectedDistricts.length > 0) params.append('district', selectedDistricts.join(','));
+       if (selectedClusters.length > 0) params.append('cluster', selectedClusters.join(','));
+       if (selectedVillages.length > 0) params.append('village', selectedVillages.join(','));
       
       if (groupBy !== 'none') {
         params.append('group_by', groupBy);
@@ -274,36 +274,38 @@ interface PredictionData {
         }
       }
       
-      // Update filter options
-      if (filterResult) {
-        setCohortOptions(filterResult.cohorts?.map((c: string) => ({ value: c, label: c })) || []);
-        setCycleOptions(filterResult.cycles?.map((c: string) => ({ value: c, label: c })) || []);
-        setEvaluationMonthOptions(filterResult.evaluation_months?.map((em: number) => ({ value: em.toString(), label: `Month ${em}` })) || []);
+             // Update filter options
+       if (filterResult) {
+         setCohortOptions(filterResult.cohorts?.map((c: string) => ({ value: c, label: c })) || []);
+         setCycleOptions(filterResult.cycles?.map((c: string) => ({ value: c, label: c })) || []);
+         setEvaluationMonthOptions(filterResult.evaluation_months?.map((em: number) => ({ value: em.toString(), label: `Month ${em}` })) || []);
         // Only set region options if user is superuser
         if (!region) {
-          setRegionOptions(filterResult.regions?.map((r: string) => ({ value: r, label: r })) || []);
+         setRegionOptions(filterResult.regions?.map((r: string) => ({ value: r, label: r })) || []);
         }
-        setDistrictOptions(filterResult.districts?.map((d: string) => ({ value: d, label: d })) || []);
-        setClusterOptions(filterResult.clusters?.map((c: string) => ({ value: c, label: c })) || []);
-        setVillageOptions(filterResult.villages?.map((v: string) => ({ value: v, label: v })) || []);
-      }
+         setDistrictOptions(filterResult.districts?.map((d: string) => ({ value: d, label: d })) || []);
+         setClusterOptions(filterResult.clusters?.map((c: string) => ({ value: c, label: c })) || []);
+         setVillageOptions(filterResult.villages?.map((v: string) => ({ value: v, label: v })) || []);
+       }
       
       // Save the query parameters for the child components
       setQueryParams(params);
       
-    } catch (err) {
+      } catch (err) {
       setError('Failed to fetch data');
       console.error('Data fetch error:', err);
-    } finally {
-      setLoading(false);
+      } finally {
+        setLoading(false);
       setIsLoadingAllData(false);
-    }
-  };
-  
+      }
+    };
+    
   // Initial data load
   useEffect(() => {
-    fetchData(1);
-  }, []);
+    // Automatically load all data for area manager
+    setFetchAllData(true);
+    fetchAllDataSimple();
+  }, []); // Only run once on mount
   
   // Debounced effect for filter changes
   useEffect(() => {
