@@ -1,5 +1,5 @@
 // HouseholdMap.tsx
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import type { LatLngTuple } from 'leaflet';
 import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -59,9 +59,18 @@ const DEFAULT_ZOOM = 7;
 const HouseholdMap: React.FC<HouseholdMapProps> = ({ households }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<any>(null);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const mapContainerRef = useRef<HTMLDivElement>(null); // Ref for the element to make fullscreen
+
 
   // Cleanup on unmount
   useEffect(() => {
+    const handleFullScreenChange = () => {
+      setIsFullScreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullScreenChange);
+
     return () => {
       if (containerRef.current) {
         try {
@@ -70,7 +79,22 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({ households }) => {
           console.warn('Map cleanup error:', e);
         }
       }
+      document.removeEventListener('fullscreenchange', handleFullScreenChange);
     };
+  }, []);
+
+  const toggleFullScreen = useCallback(() => {
+    if (!mapContainerRef.current) return;
+
+    if (!document.fullscreenElement) {
+      mapContainerRef.current.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
   }, []);
 
   // Fallback if no data
@@ -133,14 +157,24 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({ households }) => {
   console.log(validHouseholds[0]);
 
   try {
-  return (
-      <div className="bg-white rounded-md shadow-md p-6 mb-6 h-[500px]">
-        <div key={mapKey} ref={mapRef} style={{ height: '100%', width: '100%', zIndex: 1 }}>
+    return (
+      <div 
+        ref={mapContainerRef} 
+        className={`bg-white rounded-md shadow-md mb-6 relative ${isFullScreen ? 'fixed inset-0 z-[9999] p-0 border-0' : 'h-[500px] p-6'}`}
+      >
+        <button
+          onClick={toggleFullScreen}
+          className="absolute top-8 right-8 z-[1000] bg-white text-black px-3 py-1.5 rounded-md shadow-lg hover:bg-gray-100 transition-colors"
+          title={isFullScreen ? 'Exit Full Screen' : 'View Full Screen'}
+        >
+          {isFullScreen ? 'Exit Full Screen' : 'Full Screen'}
+        </button>
+        <div key={mapKey} ref={mapRef} style={{ height: '100%', width: '100%'}}>
       <MapContainer
             center={mapCenter}
             zoom={DEFAULT_ZOOM}
         scrollWheelZoom={true}
-            style={{ height: '100%', width: '100%', zIndex: 1 }}
+            style={{ height: '100%', width: '100%' }}
             ref={containerRef}
       >
         <TileLayer
