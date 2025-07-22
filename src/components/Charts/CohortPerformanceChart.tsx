@@ -93,7 +93,7 @@ const CohortPerformanceChart: React.FC<CohortPerformanceChartProps> = ({
       text: cohortStats.map(stat => 
         `${stat.achievement_rate.toFixed(1)}%<br>` +
         `Households: ${stat.total_households}<br>` +
-        `Avg Income: $${stat.avg_income.toFixed(0)}`
+        `Avg Income + Production: $${stat.avg_income.toFixed(0)}`
       ),
       textposition: 'outside' as const,
       hovertemplate: 

@@ -154,7 +154,7 @@ const ClusterStats: React.FC<ClusterStatsProps> = ({ apiUrl = `${API_ENDPOINT}/c
                   direction={sortField === 'avg_income' ? sortDirection : 'asc'}
                   onClick={() => handleSort('avg_income')}
                 >
-                  Predicted Income
+                  Predicted Income + Production
                 </TableSortLabel>
               </TableCell>
               {clusterStats[0]?.count !== undefined && (

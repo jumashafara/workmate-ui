@@ -218,7 +218,7 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({ households }) => {
                     <div style={{ marginBottom: '12px' }}>
                       <h4 style={{ margin: '0 0 8px 0', color: '#333' }}>Prediction Results</h4>
                       <strong>Classification:</strong> {h.prediction === 0 ? 'Not Likely to hit the target' : 'Likely to hit the target'}<br />
-                      <strong>Predicted Income:</strong> ${h.predicted_income.toFixed(2)}<br />
+                      <strong>Predicted Income + Production:</strong> ${h.predicted_income.toFixed(2)}<br />
                       {/* {h.probability && <><strong>Probability:</strong> {(h.probability * 100).toFixed(1)}%<br /></>} */}
                     </div>
 

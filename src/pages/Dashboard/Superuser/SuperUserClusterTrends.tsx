@@ -274,7 +274,7 @@ const SuperUserClusterTrends: React.FC = () => {
         name: cluster,
         line: { width: 3 },
         marker: { size: 8 },
-        hovertemplate: '<b>%{fullData.name}</b><br>Month: %{x}<br>Avg Income: $%{y:.2f}<extra></extra>',
+        hovertemplate: '<b>%{fullData.name}</b><br>Month: %{x}<br>Avg Income + Production: $%{y:.2f}<extra></extra>',
         showlegend: true
       };
       
@@ -314,7 +314,7 @@ const SuperUserClusterTrends: React.FC = () => {
               symbol: 'diamond',
               color: actualTrace.line?.color || '#999999'
             },
-            hovertemplate: '<b>%{fullData.name}</b><br>Month: %{x}<br>Predicted Income: $%{y:.2f}<br><i>Linear trend projection</i><extra></extra>',
+            hovertemplate: '<b>%{fullData.name}</b><br>Month: %{x}<br>Predicted Income + Production: $%{y:.2f}<br><i>Linear trend projection</i><extra></extra>',
             showlegend: false, // Don't clutter legend with predictions
             opacity: 0.7
           };
@@ -351,7 +351,7 @@ const SuperUserClusterTrends: React.FC = () => {
           color: '#EA580C',
           dash: 'dash'
         },
-        hovertemplate: '<b>Overall Trend</b><br>Month: %{x}<br>Trend Income: $%{y:.2f}<br><i>Best fit across all selected clusters</i><extra></extra>',
+        hovertemplate: '<b>Overall Trend</b><br>Month: %{x}<br>Trend Income + Production: $%{y:.2f}<br><i>Best fit across all selected clusters</i><extra></extra>',
         showlegend: true,
         opacity: 0.8
       };
@@ -381,7 +381,7 @@ const SuperUserClusterTrends: React.FC = () => {
             symbol: 'star',
             color: '#EA580C'
           },
-          hovertemplate: '<b>Overall Trend Prediction</b><br>Month: %{x}<br>Predicted Income: $%{y:.2f}<br><i>Overall trend projection</i><extra></extra>',
+          hovertemplate: '<b>Overall Trend Prediction</b><br>Month: %{x}<br>Predicted Income + Production: $%{y:.2f}<br><i>Overall trend projection</i><extra></extra>',
           showlegend: false,
           opacity: 0.8
         };
@@ -414,7 +414,7 @@ const SuperUserClusterTrends: React.FC = () => {
         }
       },
       text: data.map(d => `${d.cluster} - Month ${d.evaluation_month}`),
-      hovertemplate: '<b>%{text}</b><br>Avg Income: $%{x:.2f}<br>Achievement Rate: %{y:.1f}%<br>Households: %{marker.size}<extra></extra>'
+      hovertemplate: '<b>%{text}</b><br>Avg Income + Production: $%{x:.2f}<br>Achievement Rate: %{y:.1f}%<br>Households: %{marker.size}<extra></extra>'
     }];
   };
 
@@ -673,7 +673,7 @@ const SuperUserClusterTrends: React.FC = () => {
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                Income vs Achievement Rate
+                Income + Production vs Achievement Rate
               </Typography>
               <Typography variant="body2" color="text.secondary" gutterBottom>
                 Bubble size = number of households

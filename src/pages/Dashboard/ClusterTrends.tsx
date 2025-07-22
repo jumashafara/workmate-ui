@@ -379,7 +379,7 @@ const ClusterIncomeAnalysisPage: React.FC = () => {
             symbol: 'star',
             color: '#EA580C'
           },
-          hovertemplate: '<b>Overall Trend Prediction</b><br>Month: %{x}<br>Predicted Income: $%{y:.2f}<br><i>Overall trend projection</i><extra></extra>',
+          hovertemplate: '<b>Overall Trend Prediction</b><br>Month: %{x}<br>Predicted Income + Production: $%{y:.2f}<br><i>Overall trend projection</i><extra></extra>',
           showlegend: false,
           opacity: 0.8
         };
@@ -629,7 +629,7 @@ const ClusterIncomeAnalysisPage: React.FC = () => {
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                Average Income Trends by Cluster
+                Average Income + Production Trends by Cluster
               </Typography>
               <Typography variant="body2" color="text.secondary" gutterBottom>
                 Solid lines show actual data, dotted lines show predictions. Orange dashed line shows overall trend across all selected clusters.

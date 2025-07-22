@@ -22,7 +22,6 @@ import FloatingChat from "./components/FloatingChat";
 import Settings from "./pages/Settings";
 
 import Checkins from "./pages/Reports/Checkins";
-import { Map } from "./pages/TestPage";
 import AreaManagerPredictionsDashbord from "./pages/Dashboard/AreaManager/AreaManagerPredictionsDashbord";
 import ProjectManagerPredictionsDashbord from "./pages/Dashboard/ProjectManagerPredictionsDashbord";
 import ProjectOfficerPredictionsDashbord from "./pages/Dashboard/ProjectOfficerPredictionsDashbord";
@@ -301,18 +300,6 @@ function App() {
               <>
                 <PageTitle title="Chatbot | RTV" />
                 <ChatPage />
-              </>
-            ) : (
-              <Navigate to="/auth/signin" />
-            )
-          }
-        />
-        <Route
-          path="/test-page"
-          element={
-            access_token ? (
-              <>
-                <Map />
               </>
             ) : (
               <Navigate to="/auth/signin" />

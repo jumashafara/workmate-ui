@@ -102,7 +102,7 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
         'Achievement Rate: %{y:.1f}%<br>' +
         'Achieved: %{customdata[0]} households<br>' +
         'Total Households: %{customdata[1]}<br>' +
-        'Average Income: $%{customdata[2]:.0f}<br>' +
+        'Average Income + Production: $%{customdata[2]:.0f}<br>' +
         'Average Probability: %{customdata[3]:.3f}' +
         '<extra></extra>',
       customdata: regionStats.map(stat => [

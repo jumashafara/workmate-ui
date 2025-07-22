@@ -115,7 +115,7 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({ data, totalCount }) =
         <Card sx={{ height: 300 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom align="center">
-              Average Income
+              Average Income + Production
             </Typography>
             <Plot
               data={[
