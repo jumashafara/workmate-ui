@@ -10,8 +10,8 @@ import ResetPassword from "./pages/Authentication/ResetPassword";
 import GoogleCallback from "./pages/Authentication/GoogleCallback";
 import ModelMetrics from "./pages/Dashboard/ModelMetricsPage";
 import FeatureImportance from "./pages/Dashboard/FeatureImportancePage";
-import SuperUserPredictionsDashbord from "./pages/Dashboard/SuperUserPredictionsDashbord";
-import ClusterIncomeAnalysisPage from "./pages/Dashboard/ClusterTrends";
+import SuperUserPredictionsDashbord from "./pages/Dashboard/Superuser/SuperUserPredictionsDashbord";
+import SuperUserClusterTrends from "./pages/Dashboard/Superuser/SuperUserClusterTrends";
 
 import DefaultLayout from "./layout/DefaultLayout";
 import IndividualPredictionPage from "./pages/Dashboard/IndividualPredictionPage";
@@ -23,12 +23,11 @@ import Settings from "./pages/Settings";
 
 import Checkins from "./pages/Reports/Checkins";
 import { Map } from "./pages/TestPage";
-import AreaManagerPredictionsDashbord from "./pages/Dashboard/AreaManagerPredictionsDashbord";
+import AreaManagerPredictionsDashbord from "./pages/Dashboard/AreaManager/AreaManagerPredictionsDashbord";
 import ProjectManagerPredictionsDashbord from "./pages/Dashboard/ProjectManagerPredictionsDashbord";
 import ProjectOfficerPredictionsDashbord from "./pages/Dashboard/ProjectOfficerPredictionsDashbord";
 import TeamLeadPredictionsDashbord from "./pages/Dashboard/TeamLeadPredictionsDashbord";
-import AreaManagerClusterTrends from "./pages/Dashboard/AreaManagerClusterTrends";
-
+import AreaManagerClusterTrends from "./pages/Dashboard/AreaManager/AreaManagerClusterTrends";
 
 
 // Add this special handler component for Google OAuth callback
@@ -265,7 +264,10 @@ function App() {
           element={
             access_token ? (
               isSuperuser ? (
-                <Navigate to="/standard-evaluations" />
+                <>
+                  <PageTitle title="Trends by Evaluation Month | RTV" />
+                  <SuperUserClusterTrends />
+                </>
               ) : isAreaManager ? (
               <>
                 <PageTitle title="Trends by Evaluation Month | RTV" />

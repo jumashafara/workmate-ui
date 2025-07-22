@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, Card, CardContent, Typography, Box, Chip, FormControl, InputLabel, MenuItem, Select, OutlinedInput, SelectChangeEvent, Checkbox, ListItemText, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, Pagination, IconButton, Button, Switch, FormControlLabel, Skeleton } from '@mui/material';
-import ClusterStats from '../../components/Tables/ClusterStats';
-import DistrictStats from '../../components/Tables/DistrictStats';
-import RegionPerformanceChart from '../../components/Charts/RegionPerformanceChart';
-import DashboardCharts from '../../components/Charts/DashboardCharts';
+import ClusterStats from '../../../components/Tables/ClusterStats';
+import DistrictStats from '../../../components/Tables/DistrictStats';
+import RegionPerformanceChart from '../../../components/Charts/RegionPerformanceChart';
+import DashboardCharts from '../../../components/Charts/DashboardCharts';
 import { ArrowUpward, ArrowDownward, GetApp, ViewList } from '@mui/icons-material';
-import { API_ENDPOINT } from '../../api/endpoints';
-import HouseholdMap from '../../components/Maps/HouseholdMap'
+import { API_ENDPOINT } from '../../../api/endpoints';
+import HouseholdMap from '../../../components/Maps/HouseholdMap'
 
 // Define interfaces for our data
 interface FilterOption {
@@ -34,7 +34,7 @@ interface PredictionData {
 }
 
 
-  const StandardEvaluations: React.FC = () => {
+  const AreaManagerPredictionsDashbord: React.FC = () => {
   const region = localStorage.getItem("region");
 
   // State for grouping
@@ -882,5 +882,5 @@ interface PredictionData {
   );
 };
 
-export default StandardEvaluations;
+export default AreaManagerPredictionsDashbord;
 

@@ -18,7 +18,7 @@ import {
   Skeleton
 } from '@mui/material';
 import Plot from 'react-plotly.js';
-import { API_ENDPOINT } from '../../api/endpoints';
+import { API_ENDPOINT } from '../../../api/endpoints';
 
 interface FilterOption {
   value: string;
@@ -53,17 +53,14 @@ interface ClusterIncomeData {
   district: string;
 }
 
-const AreaManagerClusterTrends: React.FC = () => {
-  const region = localStorage.getItem("region");
-  const district = localStorage.getItem("district");
-
+const SuperUserClusterTrends: React.FC = () => {
   const [data, setData] = useState<ClusterIncomeData[]>([]);
   const [allPredictions, setAllPredictions] = useState<PredictionData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   
   // Filter states - Initialize selectedRegions with user's region
-  const [selectedRegions, setSelectedRegions] = useState<string[]>(region ? [region] : []);
+  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
   const [selectedClusters, setSelectedClusters] = useState<string[]>([]);
   const [selectedMonths, setSelectedMonths] = useState<string[]>([]);
@@ -82,18 +79,14 @@ const AreaManagerClusterTrends: React.FC = () => {
       // Build query parameters
       const params = new URLSearchParams();
       
-      // Always include user's region in params
-      params.append('region', region || '');
-      
+      if (selectedRegions.length > 0) params.append('region', selectedRegions.join(','));
       if (selectedDistricts.length > 0) params.append('district', selectedDistricts.join(','));
       if (selectedClusters.length > 0) params.append('cluster', selectedClusters.join(','));
       if (selectedMonths.length > 0) params.append('evaluation_month', selectedMonths.join(','));
       
       // Build separate parameters for filter options
       const filterParams = new URLSearchParams();
-      // Always include user's region in filter params
-      filterParams.append('region', region || '');
-      
+      if (selectedRegions.length > 0) filterParams.append('region', selectedRegions.join(','));
       if (selectedDistricts.length > 0) filterParams.append('district', selectedDistricts.join(','));
       if (selectedClusters.length > 0) filterParams.append('cluster', selectedClusters.join(','));
       
@@ -126,11 +119,6 @@ const AreaManagerClusterTrends: React.FC = () => {
       } else if (Array.isArray(dataResult)) {
         predictions = dataResult;
       }
-
-      // Double check that all predictions are for the user's region
-      if (region) {
-        predictions = predictions.filter(pred => pred.region === region);
-      }
       
       setAllPredictions(predictions);
       
@@ -141,10 +129,7 @@ const AreaManagerClusterTrends: React.FC = () => {
       // Update filter options
       if (filterResult) {
         // If user has a region, only show that region in options
-        setRegionOptions(region 
-          ? [{ value: region, label: region }] 
-          : filterResult.regions?.map((r: string) => ({ value: r, label: r })) || []
-        );
+        setRegionOptions(filterResult.regions?.map((r: string) => ({ value: r, label: r })) || []);
         setDistrictOptions(filterResult.districts?.map((d: string) => ({ value: d, label: d })) || []);
         setClusterOptions(filterResult.clusters?.map((c: string) => ({ value: c, label: c })) || []);
         setMonthOptions(filterResult.evaluation_months?.map((em: number) => ({ value: em.toString(), label: `Month ${em}` })) || []);
@@ -240,11 +225,9 @@ const AreaManagerClusterTrends: React.FC = () => {
     handleFilterChange(event, setSelectedMonths, 'evaluation_month');
   };
 
-  // Clear all filters except region for area managers
+  // Clear all filters
   const clearFilters = () => {
-    if (!region) {
     setSelectedRegions([]);
-    }
     setSelectedDistricts([]);
     setSelectedClusters([]);
     setSelectedMonths([]);
@@ -283,7 +266,7 @@ const AreaManagerClusterTrends: React.FC = () => {
       });
       
       // Actual data trace
-      const actualTrace = {
+      const actualTrace: any = {
         x: clusterData.map(d => d.evaluation_month),
         y: clusterData.map(d => d.avg_income),
         type: 'scatter',
@@ -417,7 +400,7 @@ const AreaManagerClusterTrends: React.FC = () => {
       x: data.map(d => d.avg_income),
       y: data.map(d => d.achievement_rate),
       mode: 'markers',
-      type: 'scatter',
+      type: 'scatter' as const,
       marker: {
         size: data.map(d => Math.sqrt(d.household_count) * 3),
         color: data.map(d => d.evaluation_month),
@@ -567,7 +550,6 @@ const AreaManagerClusterTrends: React.FC = () => {
           
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
             {/* Only show region filter if user doesn't have a specific region */}
-            {!region && (
             <FormControl sx={{ minWidth: 200 }} size="small">
               <InputLabel>Regions</InputLabel>
               <Select
@@ -585,7 +567,6 @@ const AreaManagerClusterTrends: React.FC = () => {
                 ))}
               </Select>
             </FormControl>
-            )}
             
             <FormControl sx={{ minWidth: 200 }} size="small">
               <InputLabel>Districts</InputLabel>
@@ -752,4 +733,4 @@ const AreaManagerClusterTrends: React.FC = () => {
   );
 };
 
-export default AreaManagerClusterTrends; 
+export default SuperUserClusterTrends; 
