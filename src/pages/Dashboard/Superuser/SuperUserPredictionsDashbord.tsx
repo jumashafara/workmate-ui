@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Grid, Card, CardContent, Typography, Box, Chip, FormControl, InputLabel, MenuItem, Select, OutlinedInput, SelectChangeEvent, Checkbox, ListItemText, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, Pagination, IconButton, Button, Switch, FormControlLabel, Skeleton } from '@mui/material';
 import ClusterStats from '../../../components/Tables/ClusterStats';
 import DistrictStats from '../../../components/Tables/DistrictStats';
-import CohortPerformanceChart from '../../../components/Charts/CohortPerformanceChart';
 import RegionPerformanceChart from '../../../components/Charts/RegionPerformanceChart';
 import DashboardCharts from '../../../components/Charts/DashboardCharts';
-import { ArrowUpward, ArrowDownward, PeopleAlt, Percent, AttachMoney, BarChart, GetApp, ViewList } from '@mui/icons-material';
+import { ArrowUpward, ArrowDownward, GetApp, ViewList } from '@mui/icons-material';
 import { API_ENDPOINT } from '../../../api/endpoints';
 import HouseholdMap from '../../../components/Maps/HouseholdMap'
 
