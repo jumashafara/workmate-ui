@@ -94,13 +94,13 @@ const TwoWayPartialDependenceHeatMap: React.FC<TwoWayPartialDependenceHeatMapPro
       );
     }
 
-    // if (!pdpData || !pdpData.x || !pdpData.y || !pdpData.z) {
-    //   return (
-    //     <Box sx={{ p: 2 }}>
-    //       <Alert severity="info">No 2D partial dependence data available for these features.</Alert>
-    //     </Box>
-    //   );
-    // }
+    if (!pdpData || !pdpData.x || !pdpData.y || !pdpData.z) {
+      return (
+        <Box sx={{ p: 2 }}>
+          <Alert severity="info">No 2D partial dependence data available for these features.</Alert>
+        </Box>
+      );
+    }
 
     // Get feature display names
     const feature1Display = featureList.find(f => f[0] === feature1)?.[1] || feature1;
@@ -114,6 +114,9 @@ const TwoWayPartialDependenceHeatMap: React.FC<TwoWayPartialDependenceHeatMapPro
             x: pdpData.x,
             y: pdpData.y,
             z: pdpData.z,
+            text: pdpData.z.map((row: number[]) => row.map(val => val.toFixed(3))),
+            texttemplate: "%{text}",
+            hoverinfo: 'x+y+z',
             colorscale: 'YlOrRd',
             colorbar: {
               title: 'Predicted Value',
@@ -131,11 +134,11 @@ const TwoWayPartialDependenceHeatMap: React.FC<TwoWayPartialDependenceHeatMapPro
             b: 70
           },
           xaxis: {
-            title: feature1Display,
+            title: { text: feature1Display },
             automargin: true
           },
           yaxis: {
-            title: feature2Display,
+            title: { text: feature2Display },
             automargin: true
           },
           font: {
