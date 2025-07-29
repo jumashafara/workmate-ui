@@ -46,163 +46,183 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       {/* Total Records Chart */}
-      <Card className="h-80">
-        <CardHeader>
+      <Card className="h-80 flex flex-col">
+        <CardHeader className="flex-shrink-0">
           <CardTitle className="text-center">Total Records</CardTitle>
         </CardHeader>
-        <CardContent>
-          <Plot
-            data={[
-              {
-                type: "indicator",
-                mode: "number",
-                value: totalRecords,
-                title: {
-                  text: "records",
-                  font: { size: 14, color: "#1c2434" },
+        <CardContent className="flex-1 flex items-center justify-center p-4">
+          <div className="w-full h-full flex items-center justify-center">
+            <Plot
+              data={[
+                {
+                  type: "indicator",
+                  mode: "number",
+                  value: totalRecords,
+                  title: {
+                    text: "records",
+                    font: { size: 14, color: "#1c2434" },
+                  },
+                  number: {
+                    font: { size: 40, color: "#EA580C" },
+                  },
                 },
-                number: {
-                  font: { size: 40, color: "#EA580C" },
-                },
-              },
-            ]}
-            layout={{
-              width: 250,
-              height: 200,
-              margin: { t: 20, b: 20, l: 20, r: 20 },
-              font: { color: "#1c2434" },
-            }}
-            config={{ displayModeBar: false }}
-          />
+              ]}
+              layout={{
+                autosize: true,
+                margin: { t: 20, b: 20, l: 20, r: 20 },
+                font: { color: "#1c2434" },
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent'
+              }}
+              config={{ displayModeBar: false, responsive: true }}
+              style={{ width: '100%', height: '100%' }}
+              useResizeHandler={true}
+            />
+          </div>
         </CardContent>
       </Card>
 
       {/* Achieved Chart */}
-      <Card className="h-80">
-        <CardHeader>
+      <Card className="h-80 flex flex-col">
+        <CardHeader className="flex-shrink-0">
           <CardTitle className="text-center">Achieved</CardTitle>
         </CardHeader>
-        <CardContent>
-          <Plot
-            data={[
-              {
-                type: "pie",
-                values: [achievedCount, data.length - achievedCount],
-                labels: ["Achieved", "Not Achieved"],
-                marker: {
-                  colors: ["#EA580C", "#1c2434"],
-                },
-                textinfo: "label+percent",
-                hovertemplate:
-                  "<b>%{label}</b><br>Count: %{value}<br>Percentage: %{percent}<extra></extra>",
-                hole: 0.4,
-              },
-            ]}
-            layout={{
-              width: 250,
-              height: 200,
-              margin: { t: 20, b: 20, l: 20, r: 20 },
-              showlegend: false,
-              font: { color: "#1c2434" },
-              annotations: [
+        <CardContent className="flex-1 flex items-center justify-center p-4">
+          <div className="w-full h-full flex items-center justify-center">
+            <Plot
+              data={[
                 {
-                  text: `${achievedPercentage.toFixed(1)}%`,
-                  x: 0.5,
-                  y: 0.5,
-                  font: { size: 20, color: "#EA580C" },
-                  showarrow: false,
+                  type: "pie",
+                  values: [achievedCount, data.length - achievedCount],
+                  labels: ["Achieved", "Not Achieved"],
+                  marker: {
+                    colors: ["#EA580C", "#1c2434"],
+                  },
+                  textinfo: "label+percent",
+                  hovertemplate:
+                    "<b>%{label}</b><br>Count: %{value}<br>Percentage: %{percent}<extra></extra>",
+                  hole: 0.4,
                 },
-              ],
-            }}
-            config={{ displayModeBar: false }}
-          />
+              ]}
+              layout={{
+                autosize: true,
+                margin: { t: 20, b: 20, l: 20, r: 20 },
+                showlegend: false,
+                font: { color: "#1c2434" },
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                annotations: [
+                  {
+                    text: `${achievedPercentage.toFixed(1)}%`,
+                    x: 0.5,
+                    y: 0.5,
+                    font: { size: 20, color: "#EA580C" },
+                    showarrow: false,
+                  },
+                ],
+              }}
+              config={{ displayModeBar: false, responsive: true }}
+              style={{ width: '100%', height: '100%' }}
+              useResizeHandler={true}
+            />
+          </div>
         </CardContent>
       </Card>
 
       {/* Average Income Chart */}
-      <Card className="h-80">
-        <CardHeader>
+      <Card className="h-80 flex flex-col">
+        <CardHeader className="flex-shrink-0">
           <CardTitle className="text-center">
             Average Income + Production
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <Plot
-            data={[
-              {
-                type: "indicator",
-                mode: "gauge+number",
-                value: avgIncome,
-                title: { text: "USD", font: { size: 14, color: "#1c2434" } },
-                number: {
-                  font: { size: 30, color: "#EA580C" },
-                  prefix: "$",
-                  suffix: "",
-                },
-                gauge: {
-                  axis: { range: [0, Math.max(avgIncome * 2, 3)] },
-                  bar: { color: "#EA580C" },
-                  steps: [
-                    { range: [0, avgIncome * 0.5], color: "#f3f4f6" },
-                    {
-                      range: [avgIncome * 0.5, avgIncome * 1.5],
-                      color: "#e5e7eb",
+        <CardContent className="flex-1 flex items-center justify-center p-4">
+          <div className="w-full h-full flex items-center justify-center">
+            <Plot
+              data={[
+                {
+                  type: "indicator",
+                  mode: "gauge+number",
+                  value: avgIncome,
+                  title: { text: "USD", font: { size: 14, color: "#1c2434" } },
+                  number: {
+                    font: { size: 30, color: "#EA580C" },
+                    prefix: "$",
+                    suffix: "",
+                  },
+                  gauge: {
+                    axis: { range: [0, Math.max(avgIncome * 2, 3)] },
+                    bar: { color: "#EA580C" },
+                    steps: [
+                      { range: [0, avgIncome * 0.5], color: "#f3f4f6" },
+                      {
+                        range: [avgIncome * 0.5, avgIncome * 1.5],
+                        color: "#e5e7eb",
+                      },
+                    ],
+                    threshold: {
+                      line: { color: "#1c2434", width: 4 },
+                      thickness: 0.75,
+                      value: avgIncome * 1.2,
                     },
-                  ],
-                  threshold: {
-                    line: { color: "#1c2434", width: 4 },
-                    thickness: 0.75,
-                    value: avgIncome * 1.2,
                   },
                 },
-              },
-            ]}
-            layout={{
-              width: 250,
-              height: 200,
-              margin: { t: 20, b: 20, l: 20, r: 20 },
-              font: { size: 12, color: "#1c2434" },
-            }}
-            config={{ displayModeBar: false }}
-          />
+              ]}
+              layout={{
+                autosize: true,
+                margin: { t: 20, b: 20, l: 20, r: 20 },
+                font: { size: 12, color: "#1c2434" },
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent'
+              }}
+              config={{ displayModeBar: false, responsive: true }}
+              style={{ width: '100%', height: '100%' }}
+              useResizeHandler={true}
+            />
+          </div>
         </CardContent>
       </Card>
 
       {/* Filtered Records Chart */}
-      <Card className="h-80">
-        <CardHeader>
+      <Card className="h-80 flex flex-col">
+        <CardHeader className="flex-shrink-0">
           <CardTitle className="text-center">Filtered Records</CardTitle>
         </CardHeader>
-        <CardContent>
-          <Plot
-            data={[
-              {
-                type: "indicator",
-                mode: "number+delta",
-                value: filteredRecords,
-                delta: {
-                  reference: totalRecords,
-                  valueformat: ".0f",
-                  relative: false,
-                  position: "bottom",
+        <CardContent className="flex-1 flex items-center justify-center p-4">
+          <div className="w-full h-full flex items-center justify-center">
+            <Plot
+              data={[
+                {
+                  type: "indicator",
+                  mode: "number+delta",
+                  value: filteredRecords,
+                  delta: {
+                    reference: totalRecords,
+                    valueformat: ".0f",
+                    relative: false,
+                    position: "bottom",
+                  },
+                  title: {
+                    text: `of ${totalRecords} total`,
+                    font: { size: 14, color: "#1c2434" },
+                  },
+                  number: {
+                    font: { size: 40, color: "#EA580C" },
+                  },
                 },
-                title: {
-                  text: `of ${totalRecords} total`,
-                  font: { size: 14, color: "#1c2434" },
-                },
-                number: {
-                  font: { size: 40, color: "#EA580C" },
-                },
-              },
-            ]}
-            layout={{
-              width: 250,
-              height: 200,
-              margin: { t: 20, b: 20, l: 20, r: 20 },
-              font: { color: "#1c2434" },
-            }}
-            config={{ displayModeBar: false }}
-          />
+              ]}
+              layout={{
+                autosize: true,
+                margin: { t: 20, b: 20, l: 20, r: 20 },
+                font: { color: "#1c2434" },
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent'
+              }}
+              config={{ displayModeBar: false, responsive: true }}
+              style={{ width: '100%', height: '100%' }}
+              useResizeHandler={true}
+            />
+          </div>
         </CardContent>
       </Card>
     </div>

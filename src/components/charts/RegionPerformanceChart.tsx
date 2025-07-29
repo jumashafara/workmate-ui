@@ -119,7 +119,9 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
   const layout = {
     title: {
       text: 'Regional Performance Analysis',
-      font: { size: 16, family: 'Arial, sans-serif', color: '#1c2434' }
+      font: { size: 16, family: 'Arial, sans-serif', color: '#1c2434' },
+      x: 0.5,
+      xanchor: 'center'
     },
     xaxis: {
       title: { text: 'Region', font: { color: '#1c2434' } },
@@ -133,6 +135,7 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
       tickfont: { color: '#1c2434' }
     },
     showlegend: false,
+    autosize: true,
     margin: {
       l: 60,
       r: 60,
@@ -148,6 +151,7 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
     displayModeBar: true,
     modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d'] as any,
     displaylogo: false,
+    responsive: true,
     toImageButtonOptions: {
       format: 'png' as const,
       filename: 'region-performance',
@@ -184,15 +188,17 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
           Compare achievement rates across different regions
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="w-full mb-4" style={{ height: height }}>
-          <Plot
-            data={plotData}
-            layout={layout}
-            config={config}
-            style={{ width: '100%', height: '100%' }}
-            useResizeHandler={true}
-          />
+      <CardContent className="p-6">
+        <div className="w-full mb-4 flex items-center justify-center" style={{ height: height }}>
+          <div className="w-full h-full">
+            <Plot
+              data={plotData}
+              layout={layout}
+              config={config}
+              style={{ width: '100%', height: '100%' }}
+              useResizeHandler={true}
+            />
+          </div>
         </div>
       </CardContent>
     </Card>

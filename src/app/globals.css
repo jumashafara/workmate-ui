@@ -110,6 +110,18 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  
+}
+
+@layer utilities {
+
+  .popover-content-width-same-as-its-trigger {
+    width: var(--radix-popover-trigger-width);
+    max-width: var(--radix-popover-content-available-width);
+    max-height: var(--radix-popover-content-available-height);
+    overflow: auto;
+  }
 }
 
 @layer base {
