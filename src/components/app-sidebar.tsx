@@ -7,6 +7,7 @@ import {
   Users,
   Settings,
   Home,
+  ChevronsUpDown,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -19,6 +20,7 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  SidebarMenuButton,
   SidebarRail,
 } from "@/components/ui/sidebar";
 
@@ -50,11 +52,6 @@ const data = {
       url: "/dashboard",
       icon: Home,
       isActive: true,
-    },
-    {
-      title: "Superuser",
-      url: "#",
-      icon: Users,
       items: [
         {
           title: "Predictions Dashboard",
@@ -79,11 +76,29 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <SidebarMenuButton
+          size="lg"
+          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+        >
+          <div className=" text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+            <Image
+              src="/RTV_Logo.png"
+              alt="RTV Logo"
+              className="object-contain"
+              width={50}
+              height={50}
+            />
+          </div>
+          <div className="grid flex-1 text-left text-sm leading-tight">
+            <span className="truncate font-medium">Workmate</span>
+            <span className="truncate text-xs">Analytics</span>
+          </div>
+          <ChevronsUpDown className="ml-auto" />
+        </SidebarMenuButton>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        {/* <NavProjects projects={data.projects} /> */}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
