@@ -8,6 +8,7 @@ import {
   Settings,
   Home,
   ChevronsUpDown,
+  MessageCircle,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -25,11 +26,6 @@ import {
 } from "@/components/ui/sidebar";
 
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   teams: [
     {
       name: "Workmate",
@@ -64,9 +60,9 @@ const data = {
       ],
     },
     {
-      title: "Settings",
-      url: "/settings",
-      icon: Settings,
+      title: "Chat",
+      url: "/chat",
+      icon: MessageCircle,
     },
   ],
   projects: [],
@@ -90,18 +86,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             />
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-medium">Workmate</span>
+            <span className="truncate font-medium">Workmate App</span>
             <span className="truncate text-xs">Analytics</span>
           </div>
-          <ChevronsUpDown className="ml-auto" />
         </SidebarMenuButton>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        {/* <NavProjects projects={data.projects} /> */}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

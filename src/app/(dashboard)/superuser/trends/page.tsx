@@ -5,7 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Label } from "@/components/ui/label" 
+import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 import { 
   Select,
   SelectContent,
@@ -14,6 +15,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Filter, X, TrendingUp, BarChart3 } from "lucide-react"
+import dynamic from 'next/dynamic'
+import { API_ENDPOINT } from "@/utils/endpoints"
+
+const Plot = dynamic(() => import('react-plotly.js'), { ssr: false })
 
 interface ClusterIncomeData {
   cluster: string
@@ -25,43 +30,33 @@ interface ClusterIncomeData {
   district: string
 }
 
+interface PredictionData {
+  id: number
+  household_id: string
+  cohort: string
+  cycle: string
+  region: string
+  district: string
+  cluster: string
+  village: string
+  latitude: number
+  longitude: number
+  altitude: number
+  evaluation_month: number
+  prediction: number
+  probability: number
+  predicted_income: number
+}
+
 interface FilterOption {
   value: string
   label: string
 }
 
-// Mock chart component - replace with actual charting library
-function MockLineChart({ data }: { data: ClusterIncomeData[] }) {
-  return (
-    <div className="h-96 bg-gray-50 rounded-lg flex items-center justify-center border">
-      <div className="text-center">
-        <BarChart3 className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-        <p className="text-gray-500">Line Chart: Income Trends by Cluster</p>
-        <p className="text-sm text-gray-400 mt-2">
-          {data.length} data points across {[...new Set(data.map(d => d.cluster))].length} clusters
-        </p>
-      </div>
-    </div>
-  )
-}
-
-function MockScatterPlot({ data }: { data: ClusterIncomeData[] }) {
-  return (
-    <div className="h-96 bg-gray-50 rounded-lg flex items-center justify-center border">
-      <div className="text-center">
-        <TrendingUp className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-        <p className="text-gray-500">Scatter Plot: Income vs Achievement Rate</p>
-        <p className="text-sm text-gray-400 mt-2">
-          Bubble size represents household count
-        </p>
-      </div>
-    </div>
-  )
-}
-
 export default function SuperuserTrendsPage() {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<ClusterIncomeData[]>([])
+  const [allPredictions, setAllPredictions] = useState<PredictionData[]>([])
   
   // Filter states
   const [selectedRegions, setSelectedRegions] = useState<string[]>([])
@@ -75,49 +70,130 @@ export default function SuperuserTrendsPage() {
   const [clusterOptions, setClusterOptions] = useState<FilterOption[]>([])
   const [monthOptions, setMonthOptions] = useState<FilterOption[]>([])
 
-  // Mock data loading simulation
-  useEffect(() => {
-    const loadData = async () => {
+  // Process raw data into cluster-month aggregations
+  const processClusterData = (predictions: PredictionData[]): ClusterIncomeData[] => {
+    const groupedData: { [key: string]: any } = {}
+    
+    predictions.forEach(pred => {
+      const key = `${pred.cluster}-${pred.evaluation_month}-${pred.region}-${pred.district}`
+      
+      if (!groupedData[key]) {
+        groupedData[key] = {
+          cluster: pred.cluster,
+          evaluation_month: pred.evaluation_month,
+          region: pred.region,
+          district: pred.district,
+          incomes: [],
+          achievements: []
+        }
+      }
+      
+      groupedData[key].incomes.push(pred.predicted_income || 0)
+      groupedData[key].achievements.push(pred.prediction)
+    })
+    
+    return Object.values(groupedData).map((group: any) => ({
+      cluster: group.cluster,
+      evaluation_month: group.evaluation_month,
+      region: group.region,
+      district: group.district,
+      avg_income: group.incomes.length > 0 ? group.incomes.reduce((sum: number, income: number) => sum + income, 0) / group.incomes.length : 0,
+      household_count: group.incomes.length,
+      achievement_rate: group.achievements.length > 0 ? (group.achievements.reduce((sum: number, ach: number) => sum + ach, 0) / group.achievements.length) * 100 : 0
+    }))
+  }
+
+  // Fetch data using the same pattern as PredictionsDashboard
+  const fetchData = async () => {
+    try {
       setLoading(true)
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      // Build query parameters
+      const params = new URLSearchParams()
       
-      // Generate mock cluster data
-      const clusters = ['Cluster A', 'Cluster B', 'Cluster C', 'Cluster D', 'Cluster E']
-      const regions = ['Central', 'Northern', 'Western', 'Eastern']
-      const districts = ['District A', 'District B', 'District C', 'District D']
-      const months = [6, 9, 12, 15]
+      if (selectedRegions.length > 0) params.append('region', selectedRegions.join(','))
+      if (selectedDistricts.length > 0) params.append('district', selectedDistricts.join(','))
+      if (selectedClusters.length > 0) params.append('cluster', selectedClusters.join(','))
+      if (selectedMonths.length > 0) params.append('evaluation_month', selectedMonths.join(','))
       
-      const mockData: ClusterIncomeData[] = []
+      // Build separate parameters for filter options
+      const filterParams = new URLSearchParams()
+      if (selectedRegions.length > 0) filterParams.append('region', selectedRegions.join(','))
+      if (selectedDistricts.length > 0) filterParams.append('district', selectedDistricts.join(','))
+      if (selectedClusters.length > 0) filterParams.append('cluster', selectedClusters.join(','))
       
-      clusters.forEach((cluster, clusterIndex) => {
-        months.forEach((month, monthIndex) => {
-          mockData.push({
-            cluster,
-            evaluation_month: month,
-            avg_income: 2000 + Math.random() * 2000 + (monthIndex * 200), // Trending upward
-            household_count: Math.floor(50 + Math.random() * 100),
-            achievement_rate: 40 + Math.random() * 40, // 40-80%
-            region: regions[clusterIndex % regions.length],
-            district: districts[clusterIndex % districts.length],
-          })
-        })
-      })
+      // Make parallel API calls for data and filter options
+      const [dataResponse, filterResponse] = await Promise.all([
+        fetch(`${API_ENDPOINT}/standard-evaluations/?${params.toString()}`),
+        fetch(`${API_ENDPOINT}/filter-options/?${filterParams.toString()}`)
+      ])
       
-      setData(mockData)
+      if (!dataResponse.ok || !filterResponse.ok) {
+        throw new Error('Failed to fetch data')
+      }
       
-      // Set filter options
-      setRegionOptions(regions.map(r => ({ value: r, label: r })))
-      setDistrictOptions(districts.map(d => ({ value: d, label: d })))
-      setClusterOptions(clusters.map(c => ({ value: c, label: c })))
-      setMonthOptions(months.map(m => ({ value: m.toString(), label: `Month ${m}` })))
+      const [dataResult, filterResult] = await Promise.all([
+        dataResponse.json(),
+        filterResponse.json()
+      ])
       
+      // Handle data response
+      let predictions: PredictionData[] = []
+      if (dataResult.results && Array.isArray(dataResult.results)) {
+        predictions = dataResult.results
+      } else if (dataResult.predictions && Array.isArray(dataResult.predictions)) {
+        predictions = dataResult.predictions
+      } else if (Array.isArray(dataResult)) {
+        predictions = dataResult
+      }
+      
+      setAllPredictions(predictions)
+      
+      // Process data to get cluster-month aggregations
+      const clusterData = processClusterData(predictions)
+      setData(clusterData)
+      
+      // Update filter options
+      if (filterResult) {
+        setRegionOptions(filterResult.regions?.map((r: string) => ({ value: r, label: r })) || [])
+        setDistrictOptions(filterResult.districts?.map((d: string) => ({ value: d, label: d })) || [])
+        setClusterOptions(filterResult.clusters?.map((c: string) => ({ value: c, label: c })) || [])
+        setMonthOptions(filterResult.evaluation_months?.map((em: number) => ({ value: em.toString(), label: `Month ${em}` })) || [])
+      }
+      
+    } catch (err) {
+      console.error('Data fetch error:', err)
+    } finally {
       setLoading(false)
     }
+  }
 
-    loadData()
+  // Initial data load
+  useEffect(() => {
+    fetchData()
   }, [])
+
+  // Debounced effect for filter changes
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      fetchData()
+    }, 300)
+
+    return () => clearTimeout(timeoutId)
+  }, [selectedRegions, selectedDistricts, selectedClusters, selectedMonths])
+
+  // Handle multi-select changes
+  const handleMultiSelectChange = (
+    value: string,
+    selectedValues: string[],
+    setSelectedValues: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
+    if (selectedValues.includes(value)) {
+      setSelectedValues(selectedValues.filter(v => v !== value))
+    } else {
+      setSelectedValues([...selectedValues, value])
+    }
+  }
 
   const clearFilters = () => {
     setSelectedRegions([])
@@ -127,6 +203,159 @@ export default function SuperuserTrendsPage() {
   }
 
   const activeFiltersCount = selectedRegions.length + selectedDistricts.length + selectedClusters.length + selectedMonths.length
+
+  // Simple linear regression function
+  const linearRegression = (x: number[], y: number[]) => {
+    const n = x.length
+    const sumX = x.reduce((a, b) => a + b, 0)
+    const sumY = y.reduce((a, b) => a + b, 0)
+    const sumXY = x.reduce((acc, xi, i) => acc + xi * y[i], 0)
+    const sumXX = x.reduce((acc, xi) => acc + xi * xi, 0)
+    
+    const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX)
+    const intercept = (sumY - slope * sumX) / n
+    
+    return { slope, intercept }
+  }
+
+  // Prepare chart data with predictions
+  const getLineChartData = () => {
+    const clusters = [...new Set(data.map(d => d.cluster))]
+    const allTraces: any[] = []
+    
+    // Collect all data points for overall trend calculation
+    const allDataPoints: { month: number; income: number }[] = []
+    
+    clusters.forEach(cluster => {
+      const clusterData = data.filter(d => d.cluster === cluster).sort((a, b) => a.evaluation_month - b.evaluation_month)
+      
+      if (clusterData.length === 0) return
+      
+      // Add to overall data points
+      clusterData.forEach(d => {
+        allDataPoints.push({ month: d.evaluation_month, income: d.avg_income })
+      })
+      
+      // Actual data trace
+      const actualTrace: any = {
+        x: clusterData.map(d => d.evaluation_month),
+        y: clusterData.map(d => d.avg_income),
+        type: 'scatter',
+        mode: 'lines+markers',
+        name: cluster,
+        line: { width: 3 },
+        marker: { size: 8 },
+        hovertemplate: '<b>%{fullData.name}</b><br>Month: %{x}<br>Avg Income + Production: $%{y:.2f}<extra></extra>',
+        showlegend: true
+      }
+      
+      allTraces.push(actualTrace)
+      
+      // Generate prediction if we have at least 2 data points
+      if (clusterData.length >= 2) {
+        const xValues = clusterData.map(d => d.evaluation_month)
+        const yValues = clusterData.map(d => d.avg_income)
+        
+        // Calculate linear regression
+        const { slope, intercept } = linearRegression(xValues, yValues)
+        
+        // Predict next evaluation month
+        const lastMonth = Math.max(...xValues)
+        const interval = xValues.length > 1 ? Math.min(...xValues.slice(1).map((x, i) => x - xValues[i])) : 3
+        const nextMonth = lastMonth + interval
+        
+        const predictedIncome = slope * nextMonth + intercept
+        
+        // Only show prediction if it's reasonable (positive income)
+        if (predictedIncome > 0) {
+          // Create prediction trace (dotted line)
+          const predictionTrace = {
+            x: [lastMonth, nextMonth],
+            y: [clusterData[clusterData.length - 1].avg_income, predictedIncome],
+            type: 'scatter',
+            mode: 'lines+markers',
+            name: `${cluster} (Predicted)`,
+            line: { 
+              width: 2, 
+              dash: 'dot',
+              color: actualTrace.line?.color || '#999999'
+            },
+            marker: { 
+              size: 6,
+              symbol: 'diamond',
+              color: actualTrace.line?.color || '#999999'
+            },
+            hovertemplate: '<b>%{fullData.name}</b><br>Month: %{x}<br>Predicted Income + Production: $%{y:.2f}<br><i>Linear trend projection</i><extra></extra>',
+            showlegend: false,
+            opacity: 0.7
+          }
+          
+          allTraces.push(predictionTrace)
+        }
+      }
+    })
+    
+    // Add overall trend line if we have enough data points
+    if (allDataPoints.length >= 2) {
+      const allMonths = allDataPoints.map(d => d.month)
+      const allIncomes = allDataPoints.map(d => d.income)
+      
+      // Calculate overall trend
+      const { slope: overallSlope, intercept: overallIntercept } = linearRegression(allMonths, allIncomes)
+      
+      // Create trend line points across the actual data range
+      const minMonth = Math.min(...allMonths)
+      const maxMonth = Math.max(...allMonths)
+      
+      const trendStartIncome = overallSlope * minMonth + overallIntercept
+      const trendEndIncome = overallSlope * maxMonth + overallIntercept
+      
+      // Add overall trend trace
+      const overallTrendTrace = {
+        x: [minMonth, maxMonth],
+        y: [trendStartIncome, trendEndIncome],
+        type: 'scatter',
+        mode: 'lines',
+        name: 'Overall Trend',
+        line: { 
+          width: 4, 
+          color: '#EA580C',
+          dash: 'dash'
+        },
+        hovertemplate: '<b>Overall Trend</b><br>Month: %{x}<br>Trend Income + Production: $%{y:.2f}<br><i>Best fit across all selected clusters</i><extra></extra>',
+        showlegend: true,
+        opacity: 0.8
+      }
+      
+      // Add trend line first so it appears behind other lines
+      allTraces.unshift(overallTrendTrace)
+    }
+    
+    return allTraces
+  }
+
+  const getScatterData = () => {
+    return [{
+      x: data.map(d => d.avg_income),
+      y: data.map(d => d.achievement_rate),
+      mode: 'markers',
+      type: 'scatter' as const,
+      marker: {
+        size: data.map(d => Math.sqrt(d.household_count) * 3),
+        color: data.map(d => d.evaluation_month),
+        colorscale: [
+          [0, '#1c2434'],
+          [1, '#EA580C']
+        ],
+        showscale: true,
+        colorbar: {
+          title: 'Evaluation Month'
+        }
+      },
+      text: data.map(d => `${d.cluster} - Month ${d.evaluation_month}`),
+      hovertemplate: '<b>%{text}</b><br>Avg Income + Production: $%{x:.2f}<br>Achievement Rate: %{y:.1f}%<br>Households: %{marker.size}<extra></extra>'
+    }]
+  }
 
   // Calculate summary statistics
   const summaryStats = {
@@ -209,66 +438,74 @@ export default function SuperuserTrendsPage() {
           <div className="grid gap-4 md:grid-cols-4">
             <div>
               <Label>Region</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select regions" />
-                </SelectTrigger>
-                <SelectContent>
-                  {regionOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
+              <div className="border rounded-md p-2 max-h-32 overflow-y-auto">
+                {regionOptions.map((option) => (
+                  <div key={option.value} className="flex items-center space-x-2 mb-1">
+                    <Checkbox
+                      id={`region-${option.value}`}
+                      checked={selectedRegions.includes(option.value)}
+                      onCheckedChange={() => handleMultiSelectChange(option.value, selectedRegions, setSelectedRegions)}
+                    />
+                    <Label htmlFor={`region-${option.value}`} className="text-sm">
                       {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    </Label>
+                  </div>
+                ))}
+              </div>
             </div>
             
             <div>
               <Label>District</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select districts" />
-                </SelectTrigger>
-                <SelectContent>
-                  {districtOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
+              <div className="border rounded-md p-2 max-h-32 overflow-y-auto">
+                {districtOptions.map((option) => (
+                  <div key={option.value} className="flex items-center space-x-2 mb-1">
+                    <Checkbox
+                      id={`district-${option.value}`}
+                      checked={selectedDistricts.includes(option.value)}
+                      onCheckedChange={() => handleMultiSelectChange(option.value, selectedDistricts, setSelectedDistricts)}
+                    />
+                    <Label htmlFor={`district-${option.value}`} className="text-sm">
                       {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    </Label>
+                  </div>
+                ))}
+              </div>
             </div>
             
             <div>
               <Label>Cluster</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select clusters" />
-                </SelectTrigger>
-                <SelectContent>
-                  {clusterOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
+              <div className="border rounded-md p-2 max-h-32 overflow-y-auto">
+                {clusterOptions.map((option) => (
+                  <div key={option.value} className="flex items-center space-x-2 mb-1">
+                    <Checkbox
+                      id={`cluster-${option.value}`}
+                      checked={selectedClusters.includes(option.value)}
+                      onCheckedChange={() => handleMultiSelectChange(option.value, selectedClusters, setSelectedClusters)}
+                    />
+                    <Label htmlFor={`cluster-${option.value}`} className="text-sm">
                       {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    </Label>
+                  </div>
+                ))}
+              </div>
             </div>
             
             <div>
               <Label>Evaluation Month</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select months" />
-                </SelectTrigger>
-                <SelectContent>
-                  {monthOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
+              <div className="border rounded-md p-2 max-h-32 overflow-y-auto">
+                {monthOptions.map((option) => (
+                  <div key={option.value} className="flex items-center space-x-2 mb-1">
+                    <Checkbox
+                      id={`month-${option.value}`}
+                      checked={selectedMonths.includes(option.value)}
+                      onCheckedChange={() => handleMultiSelectChange(option.value, selectedMonths, setSelectedMonths)}
+                    />
+                    <Label htmlFor={`month-${option.value}`} className="text-sm">
                       {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    </Label>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -327,7 +564,36 @@ export default function SuperuserTrendsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <MockLineChart data={data} />
+            <div className="w-full h-[500px]">
+              <Plot
+                data={getLineChartData()}
+                layout={{
+                  autosize: true,
+                  title: '',
+                  xaxis: { 
+                    title: 'Evaluation Month',
+                    tickmode: 'linear',
+                    dtick: 3,
+                    tickformat: 'd',
+                    ticksuffix: '',
+                    showgrid: true,
+                    gridcolor: '#f0f0f0'
+                  },
+                  yaxis: { 
+                    title: 'Average Income + Production ($)',
+                    showgrid: true,
+                    gridcolor: '#f0f0f0'
+                  },
+                  margin: { t: 40, b: 60, l: 80, r: 60 },
+                  legend: { x: 1.02, y: 1 },
+                  plot_bgcolor: 'white',
+                  paper_bgcolor: 'white'
+                }}
+                config={{ displayModeBar: true, responsive: true }}
+                style={{ width: '100%', height: '100%' }}
+                useResizeHandler={true}
+              />
+            </div>
           </CardContent>
         </Card>
         
@@ -340,7 +606,21 @@ export default function SuperuserTrendsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <MockScatterPlot data={data} />
+            <div className="w-full h-[500px]">
+              <Plot
+                data={getScatterData()}
+                layout={{
+                  autosize: true,
+                  title: '',
+                  xaxis: { title: 'Average Income + Production ($)' },
+                  yaxis: { title: 'Achievement Rate (%)' },
+                  margin: { t: 40, b: 60, l: 80, r: 60 }
+                }}
+                config={{ displayModeBar: true, responsive: true }}
+                style={{ width: '100%', height: '100%' }}
+                useResizeHandler={true}
+              />
+            </div>
           </CardContent>
         </Card>
       </div>

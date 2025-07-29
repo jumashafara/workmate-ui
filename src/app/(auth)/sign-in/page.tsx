@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react"
@@ -13,6 +13,8 @@ import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Separator } from "@/components/ui/separator"
 import { signInSchema, type SignInFormData } from "@/lib/schemas/auth"
+import { login, getGoogleAuthUrl, googleAuthenticate } from "@/api/auth"
+import { setAuthToken, setRefreshToken, setUserData } from "@/utils/ccokie"
 
 export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -20,6 +22,16 @@ export default function SignInPage() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
+
+  // Check for Google OAuth callback
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const code = urlParams.get('code')
+    
+    if (code) {
+      handleGoogleCallback(code)
+    }
+  }, [])
 
   const {
     register,
@@ -34,18 +46,52 @@ export default function SignInPage() {
     setError("")
 
     try {
-      // TODO: Implement actual API call
-      console.log("Sign in data:", data)
+      const response = await login({ username: data.email, password: data.password })
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      // Save the tokens
+      setAuthToken(response.access_token)
+      setRefreshToken(response.refresh_token)
+      setUserData({
+        email: response.user.email,
+        full_name: response.user.full_name,
+        username: response.user.username,
+        role: response.user.role,
+        region: response.user.region,
+        district: response.user.district,
+        superuser: response.user.is_superuser
+      })
       
       // Redirect to dashboard on success
       router.push("/dashboard")
-    } catch (err) {
-      setError("Invalid email or password. Please try again.")
+    } catch (err: any) {
+      setError(err.message || "Invalid email or password. Please try again.")
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleGoogleCallback = async (code: string) => {
+    try {
+      setIsGoogleLoading(true)
+      const response = await googleAuthenticate(code)
+      
+      // Save the tokens
+      setAuthToken(response.access_token)
+      setRefreshToken(response.refresh_token)
+      setUserData({
+        email: response.user.email,
+        full_name: response.user.full_name,
+        username: response.user.username,
+        role: response.user.role,
+        region: response.user.region,
+        district: response.user.district,
+        superuser: response.user.is_superuser
+      })
+      
+      router.push("/dashboard")
+    } catch (err: any) {
+      setIsGoogleLoading(false)
+      setError("Google authentication failed: " + err.message)
     }
   }
 
@@ -54,17 +100,11 @@ export default function SignInPage() {
     setError("")
 
     try {
-      // TODO: Implement Google OAuth
-      console.log("Google sign in")
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      router.push("/dashboard")
-    } catch (err) {
-      setError("Google sign in failed. Please try again.")
-    } finally {
+      const authUrl = await getGoogleAuthUrl()
+      window.location.href = authUrl
+    } catch (err: any) {
       setIsGoogleLoading(false)
+      setError("Failed to initiate Google login: " + err.message)
     }
   }
 
