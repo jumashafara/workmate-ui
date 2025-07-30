@@ -1,18 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import {
   Sheet,
   SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
 import {
   Dialog,
@@ -21,9 +16,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Tooltip,
   TooltipContent,
@@ -38,7 +32,6 @@ import {
   Bot,
   User,
   Copy,
-  MoreVertical,
   RefreshCw,
   MessageSquare,
   Loader2,
@@ -839,10 +832,27 @@ const ChatPage = () => {
                     <div
                       key={message.id}
                       className={cn(
-                        "flex mb-4 animate-fadeIn w-full",
-                        message.sender === "user" ? "justify-end" : "justify-start"
+                        "flex mb-4 animate-fadeIn w-full items-start gap-3",
+                        message.sender === "user" ? "flex-row-reverse" : "flex-row"
                       )}
                     >
+                      {/* Avatar */}
+                      <Avatar className="h-8 w-8 flex-shrink-0 mt-1">
+                        <AvatarFallback
+                          className="text-white text-xs font-medium"
+                          style={{
+                            backgroundColor: message.sender === "user" ? THEME_COLORS.primary.main : '#6B7280'
+                          }}
+                        >
+                          {message.sender === "user" ? (
+                            <User className="h-4 w-4" />
+                          ) : (
+                            <Bot className="h-4 w-4" />
+                          )}
+                        </AvatarFallback>
+                      </Avatar>
+
+                      {/* Message Bubble */}
                       <div
                         className={cn(
                           "max-w-[85%] md:max-w-[70%] rounded-2xl px-4 py-3 shadow-sm break-words",
@@ -886,7 +896,15 @@ const ChatPage = () => {
                   ))}
 
                   {isLoading && (
-                    <div className="flex justify-start mb-4 w-full">
+                    <div className="flex mb-4 w-full items-start gap-3 flex-row">
+                      {/* Bot Avatar */}
+                      <Avatar className="h-8 w-8 flex-shrink-0 mt-1">
+                        <AvatarFallback className="text-white text-xs font-medium bg-gray-600">
+                          <Bot className="h-4 w-4" />
+                        </AvatarFallback>
+                      </Avatar>
+
+                      {/* Loading Bubble */}
                       <div className="max-w-[85%] md:max-w-[70%] rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm bg-gray-100 dark:bg-gray-800">
                         <div className="flex items-center space-x-2">
                           <Loader2 className="h-4 w-4 animate-spin" style={{ color: THEME_COLORS.primary.main }} />
