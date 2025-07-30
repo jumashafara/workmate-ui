@@ -43,6 +43,50 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({
         data.length
       : 0;
 
+  // Calculate insights for filtered data
+  const insights = React.useMemo(() => {
+    if (data.length === 0) {
+      return {
+        regions: 0,
+        districts: 0,
+        clusters: 0,
+        cohorts: 0,
+        avgProbability: 0,
+        incomeRange: { min: 0, max: 0 },
+        filterPercentage: 0
+      };
+    }
+
+    const uniqueRegions = new Set(data.map(d => d.region)).size;
+    const uniqueDistricts = new Set(data.map(d => d.district)).size;
+    const uniqueClusters = new Set(data.map(d => d.cluster)).size;
+    const uniqueCohorts = new Set(data.map(d => d.cohort)).size;
+    
+    // Filter out records with valid probability values
+    const recordsWithProbability = data.filter(item => item.probability != null && !isNaN(item.probability));
+    const avgProbability = recordsWithProbability.length > 0 
+      ? recordsWithProbability.reduce((sum, item) => sum + item.probability, 0) / recordsWithProbability.length
+      : 0;
+    
+    const incomes = data.map(d => d.predicted_income).filter(income => income > 0);
+    const incomeRange = {
+      min: incomes.length > 0 ? Math.min(...incomes) : 0,
+      max: incomes.length > 0 ? Math.max(...incomes) : 0
+    };
+    
+    const filterPercentage = totalRecords > 0 ? (filteredRecords / totalRecords) * 100 : 0;
+
+    return {
+      regions: uniqueRegions,
+      districts: uniqueDistricts,
+      clusters: uniqueClusters,
+      cohorts: uniqueCohorts,
+      avgProbability: avgProbability * 100,
+      incomeRange,
+      filterPercentage
+    };
+  }, [data, totalRecords, filteredRecords]);
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       {/* Total Records Chart */}
@@ -183,45 +227,65 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({
         </CardContent>
       </Card>
 
-      {/* Filtered Records Chart */}
+      {/* Data Insights Chart */}
       <Card className="h-80 flex flex-col">
         <CardHeader className="flex-shrink-0">
-          <CardTitle className="text-center">Filtered Records</CardTitle>
+          <CardTitle className="text-center">Data Insights</CardTitle>
         </CardHeader>
-        <CardContent className="flex-1 flex items-center justify-center p-4">
-          <div className="w-full h-full flex items-center justify-center">
-            <Plot
-              data={[
-                {
-                  type: "indicator",
-                  mode: "number+delta",
-                  value: filteredRecords,
-                  delta: {
-                    reference: totalRecords,
-                    valueformat: ".0f",
-                    relative: false,
-                    position: "bottom",
-                  },
-                  title: {
-                    text: `of ${totalRecords} total`,
-                    font: { size: 14, color: "#1c2434" },
-                  },
-                  number: {
-                    font: { size: 40, color: "#EA580C" },
-                  },
-                },
-              ]}
-              layout={{
-                autosize: true,
-                margin: { t: 20, b: 20, l: 20, r: 20 },
-                font: { color: "#1c2434" },
-                paper_bgcolor: 'transparent',
-                plot_bgcolor: 'transparent'
-              }}
-              config={{ displayModeBar: false, responsive: true }}
-              style={{ width: '100%', height: '100%' }}
-              useResizeHandler={true}
-            />
+        <CardContent className="flex-1 p-4">
+          <div className="h-full flex flex-col justify-between text-sm">
+            {/* Main Metric - Removed percentage display */}
+            
+            {/* Geographic Coverage */}
+            <div className="space-y-2 text-xs">
+              <div className="font-semibold text-gray-700 border-b pb-1">Geographic Coverage</div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Regions:</span>
+                  <span className="font-medium text-[#EA580C]">{insights.regions}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Districts:</span>
+                  <span className="font-medium text-[#EA580C]">{insights.districts}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Clusters:</span>
+                  <span className="font-medium text-[#EA580C]">{insights.clusters}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Cohorts:</span>
+                  <span className="font-medium text-[#EA580C]">{insights.cohorts}</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Model Performance */}
+            <div className="space-y-2 text-xs">
+              <div className="font-semibold text-gray-700 border-b pb-1">Model Performance</div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Avg Confidence:</span>
+                <span className="font-medium text-[#EA580C]">
+                  {insights.avgProbability > 0 ? `${insights.avgProbability.toFixed(1)}%` : 'N/A'}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Success Rate:</span>
+                <span className="font-medium text-[#EA580C]">{achievedPercentage.toFixed(1)}%</span>
+              </div>
+            </div>
+            
+            {/* Income Range */}
+            {insights.incomeRange.max > 0 && (
+              <div className="space-y-2 text-xs">
+                <div className="font-semibold text-gray-700 border-b pb-1">Income Range</div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Min - Max:</span>
+                  <span className="font-medium text-[#EA580C]">
+                    ${insights.incomeRange.min.toFixed(0)} - ${insights.incomeRange.max.toFixed(0)}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
