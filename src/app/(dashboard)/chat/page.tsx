@@ -83,6 +83,9 @@ const ChatPage = () => {
     useState<string>("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [copiedMessageId, setCopiedMessageId] = useState<number | null>(null);
+  const [loadingConversationId, setLoadingConversationId] = useState<
+    string | null
+  >(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -112,10 +115,15 @@ const ChatPage = () => {
 
     if (userData.full_name && conversationId) {
       // Check if this is a brand new conversation
-      const isNewConversation = localStorage.getItem(`isNewConversation_${conversationId}`);
-      
+      const isNewConversation = localStorage.getItem(
+        `isNewConversation_${conversationId}`
+      );
+
       if (isNewConversation === "true") {
-        console.log("New conversation detected, skipping API load:", conversationId);
+        console.log(
+          "New conversation detected, skipping API load:",
+          conversationId
+        );
         setMessages([]);
         setHasStartedConversation(false);
         // Remove the flag since we've handled it
@@ -187,11 +195,12 @@ const ChatPage = () => {
   };
 
   const loadChatConversation = async (convId: string) => {
+    setLoadingConversationId(convId);
     try {
       console.log("Loading conversation from backend:", convId);
       // Remove new conversation flag since we're loading an existing one
       localStorage.removeItem(`isNewConversation_${convId}`);
-      
+
       const conversation = await ChatHistoryAPI.getChatConversation(convId);
       console.log("Conversation loaded from API:", conversation);
 
@@ -248,13 +257,17 @@ const ChatPage = () => {
       });
     } catch (error: any) {
       console.log("Error loading conversation:", error);
-      
+
       // Check if it's a 404 error (conversation doesn't exist)
-      if (error.message?.includes("404") || 
-          error.status === 404 || 
-          error.response?.status === 404 ||
-          error.message?.includes("HTTP error! status: 404")) {
-        console.log("Conversation not found (404), starting fresh conversation");
+      if (
+        error.message?.includes("404") ||
+        error.status === 404 ||
+        error.response?.status === 404 ||
+        error.message?.includes("HTTP error! status: 404")
+      ) {
+        console.log(
+          "Conversation not found (404), starting fresh conversation"
+        );
         setMessages([]);
         setConversationId(convId);
         localStorage.setItem("currentConversationId", convId);
@@ -262,7 +275,7 @@ const ChatPage = () => {
         setIsHistoryOpen(false);
         return;
       }
-      
+
       // For other errors, log them but don't crash the app
       console.error("Unexpected error loading conversation:", error);
       setMessages([]);
@@ -270,6 +283,8 @@ const ChatPage = () => {
       localStorage.setItem("currentConversationId", convId);
       setHasStartedConversation(false);
       setIsHistoryOpen(false);
+    } finally {
+      setLoadingConversationId(null);
     }
   };
 
@@ -466,7 +481,12 @@ const ChatPage = () => {
       // Analytics logging - fire and forget (non-blocking)
       Promise.resolve().then(async () => {
         try {
-          logToTrubrics(newMessage.text, receivedText, fullname, conversationId);
+          logToTrubrics(
+            newMessage.text,
+            receivedText,
+            fullname,
+            conversationId
+          );
         } catch (error) {
           console.warn("Trubrics logging failed (non-critical):", error);
         }
@@ -490,7 +510,12 @@ const ChatPage = () => {
       console.error("Error:", error);
       setMessages((prevMessages) =>
         prevMessages.map((msg) =>
-          msg.id === botMessage.id ? { ...msg, text: "Sorry, I encountered an error. Please try again." } : msg
+          msg.id === botMessage.id
+            ? {
+                ...msg,
+                text: "Sorry, I encountered an error. Please try again.",
+              }
+            : msg
         )
       );
     } finally {
@@ -510,15 +535,15 @@ const ChatPage = () => {
       console.error("Failed to copy:", error);
       // Fallback for older browsers
       try {
-        const textArea = document.createElement('textarea');
+        const textArea = document.createElement("textarea");
         textArea.value = text;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-999999px';
-        textArea.style.top = '-999999px';
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-        document.execCommand('copy');
+        document.execCommand("copy");
         textArea.remove();
         setCopiedMessageId(messageId);
         setTimeout(() => {
@@ -656,7 +681,7 @@ const ChatPage = () => {
           animation: fadeIn 0.3s ease-out forwards;
         }
       `}</style>
-      <div className="flex h-[calc(100vh-2rem)] w-full max-w-none mx-auto p-4">
+      <div className="flex h-[calc(100vh-2rem)] w-full max-w-none mx-auto px-4">
         {/* Main Chat Area */}
         <Card
           className="w-full flex flex-col shadow-lg border-0 overflow-hidden"
@@ -770,24 +795,34 @@ const ChatPage = () => {
                             "group relative rounded-lg p-3 cursor-pointer transition-all duration-200 border",
                             conversation.conversation_id === conversationId
                               ? "bg-orange-50 border-orange-200 shadow-sm"
-                              : "border-transparent hover:bg-gray-50 hover:border-gray-200"
+                              : "border-transparent hover:bg-gray-50 hover:border-gray-200",
+                            loadingConversationId ===
+                              conversation.conversation_id &&
+                              "opacity-60 cursor-wait"
                           )}
-                          onClick={() =>
-                            loadChatConversation(conversation.conversation_id)
-                          }
+                          onClick={() => {
+                            if (loadingConversationId) return; // Prevent clicks while loading
+                            loadChatConversation(conversation.conversation_id);
+                          }}
                         >
                           {/* Conversation Content */}
                           <div className="pr-8">
-                            <h3 className="text-sm font-medium text-gray-900 line-clamp-2 mb-1">
-                              {conversation.first_user_message
-                                ? conversation.first_user_message.length > 60
-                                  ? `${conversation.first_user_message.substring(
-                                      0,
-                                      60
-                                    )}...`
-                                  : conversation.first_user_message
-                                : "New Chat"}
-                            </h3>
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="text-sm font-medium text-gray-900 line-clamp-2 flex-1">
+                                {conversation.first_user_message
+                                  ? conversation.first_user_message.length > 60
+                                    ? `${conversation.first_user_message.substring(
+                                        0,
+                                        60
+                                      )}...`
+                                    : conversation.first_user_message
+                                  : "New Chat"}
+                              </h3>
+                              {loadingConversationId ===
+                                conversation.conversation_id && (
+                                <Loader2 className="h-4 w-4 animate-spin text-orange-500 flex-shrink-0" />
+                              )}
+                            </div>
                             <div className="flex items-center justify-between">
                               <p className="text-xs text-muted-foreground">
                                 {new Date(
@@ -806,27 +841,32 @@ const ChatPage = () => {
                           </div>
 
                           {/* Delete Button */}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 hover:bg-red-50 hover:text-red-600 transition-all"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openDeleteDialog(
-                                conversation.conversation_id,
-                                conversation.first_user_message
-                                  ? conversation.first_user_message.length > 30
-                                    ? `${conversation.first_user_message.substring(
-                                        0,
-                                        30
-                                      )}...`
-                                    : conversation.first_user_message
-                                  : "New Chat"
-                              );
-                            }}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
+                          {/* Delete Button */}
+                          {loadingConversationId !==
+                            conversation.conversation_id && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 hover:bg-red-50 hover:text-red-600 transition-all"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openDeleteDialog(
+                                  conversation.conversation_id,
+                                  conversation.first_user_message
+                                    ? conversation.first_user_message.length >
+                                      30
+                                      ? `${conversation.first_user_message.substring(
+                                          0,
+                                          30
+                                        )}...`
+                                      : conversation.first_user_message
+                                    : "New Chat"
+                                );
+                              }}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -850,8 +890,8 @@ const ChatPage = () => {
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={closeDeleteDialog}
                   disabled={isDeleting}
                 >
@@ -1020,27 +1060,33 @@ const ChatPage = () => {
                           )}
                         >
                           <span>{message.timestamp}</span>
-                          {message.sender === "bot" && message.text && message.text !== "Thinking..." && (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => copyToClipboard(message.text, message.id)}
-                                  className="h-5 w-5 p-0 transition-colors opacity-60 hover:opacity-100 text-muted-foreground hover:text-foreground"
-                                >
-                                  {copiedMessageId === message.id ? (
-                                    <Check className="h-3 w-3 text-green-500" />
-                                  ) : (
-                                    <Copy className="h-3 w-3" />
-                                  )}
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                {copiedMessageId === message.id ? "Copied!" : "Copy message"}
-                              </TooltipContent>
-                            </Tooltip>
-                          )}
+                          {message.sender === "bot" &&
+                            message.text &&
+                            message.text !== "Thinking..." && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                      copyToClipboard(message.text, message.id)
+                                    }
+                                    className="h-5 w-5 p-0 transition-colors opacity-60 hover:opacity-100 text-muted-foreground hover:text-foreground"
+                                  >
+                                    {copiedMessageId === message.id ? (
+                                      <Check className="h-3 w-3 text-green-500" />
+                                    ) : (
+                                      <Copy className="h-3 w-3" />
+                                    )}
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  {copiedMessageId === message.id
+                                    ? "Copied!"
+                                    : "Copy message"}
+                                </TooltipContent>
+                              </Tooltip>
+                            )}
                         </div>
                       </div>
                     </div>
