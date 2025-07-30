@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MultiSelect } from "@/components/ui/multi-select";
-import { Filter, X } from "lucide-react";
+import { Filter, X, BarChart3, TrendingUp, Users, MapPin, AlertCircle } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const DashboardCharts = dynamic(
@@ -279,28 +279,42 @@ export default function SuperuserPredictionsPage() {
   if (error) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Predictions Dashboard
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400">
-            Manage and analyze prediction data with advanced filtering and
-            export capabilities.
-          </p>
+        {/* Header */}
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-xl">
+              <BarChart3 className="h-8 w-8 text-orange-600 dark:text-orange-400" />
+            </div>
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                Predictions Dashboard
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 text-lg">
+                Advanced prediction analytics with intelligent filtering and comprehensive visualizations
+              </p>
+            </div>
+          </div>
         </div>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-center">
-              <div className="text-red-500 text-lg font-medium mb-2">
-                Unable to load data
+        {/* Error Card */}
+        <Card className="border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/10">
+          <CardContent className="p-8">
+            <div className="text-center max-w-md mx-auto">
+              <div className="p-3 bg-orange-100 dark:bg-orange-900/20 rounded-full w-fit mx-auto mb-4">
+                <AlertCircle className="h-8 w-8 text-orange-600 dark:text-orange-400" />
               </div>
-              <p className="text-gray-600 mb-4">{error}</p>
+              <h3 className="text-xl font-semibold text-orange-900 dark:text-orange-100 mb-2">
+                Unable to Load Data
+              </h3>
+              <p className="text-orange-700 dark:text-orange-300 mb-6 leading-relaxed">
+                {error}
+              </p>
               <Button
                 onClick={() => fetchData()}
-                className="bg-orange-600 hover:bg-orange-700"
+                className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2"
+                disabled={isLoadingAllData}
               >
-                Retry
+                {isLoadingAllData ? "Retrying..." : "Try Again"}
               </Button>
             </div>
           </CardContent>
@@ -312,32 +326,55 @@ export default function SuperuserPredictionsPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div>
-          <Skeleton className="h-8 w-64 mb-2" />
-          <Skeleton className="h-4 w-96" />
+        {/* Header Skeleton */}
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm">
+          <div className="flex items-start gap-4">
+            <Skeleton className="h-14 w-14 rounded-xl" />
+            <div className="flex-1 space-y-3">
+              <Skeleton className="h-8 w-80" />
+              <Skeleton className="h-5 w-96" />
+              <div className="flex gap-6">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-4 w-36" />
+              </div>
+            </div>
+          </div>
         </div>
 
-        <Card>
+        {/* Dashboard Charts Skeleton */}
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+          <Skeleton className="h-96 w-full" />
+        </div>
+
+        {/* Filters Skeleton */}
+        <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
           <CardHeader>
-            <Skeleton className="h-6 w-32" />
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-9 w-9 rounded-lg" />
+              <Skeleton className="h-6 w-32" />
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex gap-4">
-              <Skeleton className="h-10 w-64" />
-              <Skeleton className="h-10 w-32" />
-              <Skeleton className="h-10 w-32" />
-            </div>
-            <div className="flex gap-2">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <Skeleton key={i} className="h-6 w-20" />
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="space-y-2">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
               ))}
             </div>
           </CardContent>
         </Card>
 
-        <div className="grid gap-6">
-          <Skeleton className="h-96 w-full" />
-          <Skeleton className="h-64 w-full" />
+        {/* Charts Skeleton */}
+        <div className="space-y-6">
+          <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+            <Skeleton className="h-64 w-full" />
+          </div>
+          <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+            <Skeleton className="h-64 w-full" />
+          </div>
         </div>
       </div>
     );
@@ -346,40 +383,72 @@ export default function SuperuserPredictionsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          Predictions Dashboard
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400">
-          Manage and analyze prediction data with advanced filtering and export
-          capabilities.
-        </p>
+      <div className="bg-white dark:bg-slate-900 rounded-xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className="flex items-start gap-4">
+          <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+            <BarChart3 className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+          </div>
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Predictions Dashboard
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 text-lg mb-4">
+              Advanced prediction analytics with intelligent filtering and comprehensive visualizations
+            </p>
+            <div className="flex items-center gap-6 text-sm">
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <TrendingUp className="h-4 w-4" />
+                <span>Real-time Analytics</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <Users className="h-4 w-4" />
+                <span>{totalCount.toLocaleString()} Records</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <MapPin className="h-4 w-4" />
+                <span>Multi-Region Coverage</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Interactive Dashboard Charts */}
       <DashboardCharts data={predictions} totalCount={totalCount} />
 
       {/* Filters */}
-      <Card>
-        <CardHeader>
+      <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
+        <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Filter className="h-5 w-5" />
-              Filters
-              {activeFiltersCount > 0 && (
-                <Badge variant="secondary">{activeFiltersCount}</Badge>
-              )}
+            <CardTitle className="flex items-center gap-3">
+              <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                <Filter className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+              </div>
+              <div>
+                <span className="text-xl font-semibold text-gray-900 dark:text-white">Smart Filters</span>
+                {activeFiltersCount > 0 && (
+                  <Badge className="ml-2 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
+                    {activeFiltersCount} active
+                  </Badge>
+                )}
+              </div>
             </CardTitle>
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setShowFilters(!showFilters)}
+                className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
                 {showFilters ? "Hide" : "Show"} Filters
               </Button>
               {activeFiltersCount > 0 && (
-                <Button variant="outline" size="sm" onClick={clearFilters}>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={clearFilters}
+                  className="text-red-600 border-red-200 hover:bg-red-50 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/20 transition-colors"
+                >
                   Clear All
                 </Button>
               )}
@@ -387,10 +456,10 @@ export default function SuperuserPredictionsPage() {
           </div>
         </CardHeader>
         {showFilters && (
-          <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
+          <CardContent className="space-y-6 pt-2">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
               <div className="space-y-2">
-                <Label>Region</Label>
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Region</Label>
                 <MultiSelect
                   options={regionOptions}
                   selected={selectedRegions}
@@ -401,7 +470,7 @@ export default function SuperuserPredictionsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>District</Label>
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">District</Label>
                 <MultiSelect
                   options={districtOptions}
                   selected={selectedDistricts}
@@ -412,7 +481,7 @@ export default function SuperuserPredictionsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>Cluster</Label>
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cluster</Label>
                 <MultiSelect
                   options={clusterOptions}
                   selected={selectedClusters}
@@ -423,7 +492,7 @@ export default function SuperuserPredictionsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>Cohort</Label>
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cohort</Label>
                 <MultiSelect
                   options={cohortOptions}
                   selected={selectedCohorts}
@@ -434,7 +503,7 @@ export default function SuperuserPredictionsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>Cycle</Label>
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cycle</Label>
                 <MultiSelect
                   options={cycleOptions}
                   selected={selectedCycles}
@@ -445,7 +514,7 @@ export default function SuperuserPredictionsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>Evaluation Month</Label>
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Evaluation Month</Label>
                 <MultiSelect
                   options={monthOptions}
                   selected={selectedMonths}
@@ -458,12 +527,14 @@ export default function SuperuserPredictionsPage() {
 
             {/* Active Filters */}
             {activeFiltersCount > 0 && (
-              <div className="flex flex-wrap gap-2">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Active Filters</h4>
+                <div className="flex flex-wrap gap-2">
                 {selectedRegions.map((region) => (
-                  <Badge key={region} variant="secondary">
+                  <Badge key={region} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
                     Region: {region}
                     <X
-                      className="ml-1 h-3 w-3 cursor-pointer"
+                      className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
                       onClick={() =>
                         setSelectedRegions((prev) =>
                           prev.filter((r) => r !== region)
@@ -473,10 +544,10 @@ export default function SuperuserPredictionsPage() {
                   </Badge>
                 ))}
                 {selectedDistricts.map((district) => (
-                  <Badge key={district} variant="secondary">
+                  <Badge key={district} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
                     District: {district}
                     <X
-                      className="ml-1 h-3 w-3 cursor-pointer"
+                      className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
                       onClick={() =>
                         setSelectedDistricts((prev) =>
                           prev.filter((d) => d !== district)
@@ -486,10 +557,10 @@ export default function SuperuserPredictionsPage() {
                   </Badge>
                 ))}
                 {selectedClusters.map((cluster) => (
-                  <Badge key={cluster} variant="secondary">
+                  <Badge key={cluster} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
                     Cluster: {cluster}
                     <X
-                      className="ml-1 h-3 w-3 cursor-pointer"
+                      className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
                       onClick={() =>
                         setSelectedClusters((prev) =>
                           prev.filter((c) => c !== cluster)
@@ -499,10 +570,10 @@ export default function SuperuserPredictionsPage() {
                   </Badge>
                 ))}
                 {selectedCohorts.map((cohort) => (
-                  <Badge key={cohort} variant="secondary">
+                  <Badge key={cohort} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
                     Cohort: {cohort}
                     <X
-                      className="ml-1 h-3 w-3 cursor-pointer"
+                      className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
                       onClick={() =>
                         setSelectedCohorts((prev) =>
                           prev.filter((c) => c !== cohort)
@@ -512,10 +583,10 @@ export default function SuperuserPredictionsPage() {
                   </Badge>
                 ))}
                 {selectedCycles.map((cycle) => (
-                  <Badge key={cycle} variant="secondary">
+                  <Badge key={cycle} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
                     Cycle: {cycle}
                     <X
-                      className="ml-1 h-3 w-3 cursor-pointer"
+                      className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
                       onClick={() =>
                         setSelectedCycles((prev) =>
                           prev.filter((c) => c !== cycle)
@@ -525,10 +596,10 @@ export default function SuperuserPredictionsPage() {
                   </Badge>
                 ))}
                 {selectedMonths.map((month) => (
-                  <Badge key={month} variant="secondary">
+                  <Badge key={month} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
                     Month: {month}
                     <X
-                      className="ml-1 h-3 w-3 cursor-pointer"
+                      className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
                       onClick={() =>
                         setSelectedMonths((prev) =>
                           prev.filter((m) => m !== month)
@@ -537,6 +608,7 @@ export default function SuperuserPredictionsPage() {
                     />
                   </Badge>
                 ))}
+                </div>
               </div>
             )}
           </CardContent>
@@ -550,14 +622,31 @@ export default function SuperuserPredictionsPage() {
       </div>
 
       {/* Data Information */}
-      <div className="flex justify-center mt-4">
-        <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            📊 Showing all available data ({predictions.length} records). Charts
-            and analysis include complete dataset.
-          </p>
-        </div>
-      </div>
+      <Card className="bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-800">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-4">
+            <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
+              <BarChart3 className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+            </div>
+            <div className="flex-1">
+              <h4 className="font-semibold text-orange-900 dark:text-orange-100 mb-1">
+                Complete Dataset Loaded
+              </h4>
+              <p className="text-sm text-orange-700 dark:text-orange-300">
+                Displaying all {predictions.length.toLocaleString()} prediction records with real-time analytics and interactive visualizations.
+              </p>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                {predictions.length.toLocaleString()}
+              </div>
+              <div className="text-xs text-orange-600 dark:text-orange-400 uppercase tracking-wide">
+                Records
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
