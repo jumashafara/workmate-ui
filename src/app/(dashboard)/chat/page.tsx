@@ -53,7 +53,7 @@ const THEME_COLORS = {
 };
 import { getUserData } from "@/utils/ccokie";
 import logToTrubrics from "@/utils/Trubrics";
-import logToDATAIDEA from "@/utils/Dataidea";
+// import logToDATAIDEA from "@/utils/Dataidea"; // Temporarily disabled due to fetch errors
 import ChatHistoryAPI, { ChatConversation } from "@/utils/ChatHistory";
 
 interface Message {
@@ -99,6 +99,7 @@ const ChatPage = () => {
             Math.random().toString(36).substring(2, 15);
 
       localStorage.setItem("currentConversationId", newId);
+      localStorage.setItem(`isNewConversation_${newId}`, "true"); // Mark as new
       setConversationId(newId);
     }
   }, []);
@@ -110,23 +111,19 @@ const ChatPage = () => {
     setFullname(userData.full_name || "Unknown User");
 
     if (userData.full_name && conversationId) {
-      loadChatConversation(conversationId).catch((error) => {
-        // 404 errors are expected for new conversations - don't log as errors
-        if (
-          error.message.includes("404") ||
-          error.message.includes("not found")
-        ) {
-          console.log(
-            "No conversation found in backend for conversationId:",
-            conversationId,
-            "- starting fresh conversation"
-          );
-        } else {
-          console.error("Error loading conversation:", error);
-        }
+      // Check if this is a brand new conversation
+      const isNewConversation = localStorage.getItem(`isNewConversation_${conversationId}`);
+      
+      if (isNewConversation === "true") {
+        console.log("New conversation detected, skipping API load:", conversationId);
         setMessages([]);
         setHasStartedConversation(false);
-      });
+        // Remove the flag since we've handled it
+        localStorage.removeItem(`isNewConversation_${conversationId}`);
+      } else {
+        console.log("Loading existing conversation:", conversationId);
+        loadChatConversation(conversationId);
+      }
     }
 
     inputRef.current?.focus();
@@ -184,6 +181,7 @@ const ChatPage = () => {
     setMessages([]);
     setConversationId(newId);
     localStorage.setItem("currentConversationId", newId);
+    localStorage.setItem(`isNewConversation_${newId}`, "true"); // Mark as new
     setHasStartedConversation(false);
     setIsHistoryOpen(false);
   };
@@ -191,11 +189,20 @@ const ChatPage = () => {
   const loadChatConversation = async (convId: string) => {
     try {
       console.log("Loading conversation from backend:", convId);
+      // Remove new conversation flag since we're loading an existing one
+      localStorage.removeItem(`isNewConversation_${convId}`);
+      
       const conversation = await ChatHistoryAPI.getChatConversation(convId);
       console.log("Conversation loaded from API:", conversation);
 
       if (!conversation) {
-        throw new Error("Conversation not found (404)");
+        console.log("No conversation found, starting fresh");
+        setMessages([]);
+        setConversationId(convId);
+        localStorage.setItem("currentConversationId", convId);
+        setHasStartedConversation(false);
+        setIsHistoryOpen(false);
+        return;
       }
 
       const convertedMessages: Message[] =
@@ -239,9 +246,30 @@ const ChatPage = () => {
           ];
         }
       });
-    } catch (error) {
-      console.error("Failed to load conversation from backend:", error);
-      throw error;
+    } catch (error: any) {
+      console.log("Error loading conversation:", error);
+      
+      // Check if it's a 404 error (conversation doesn't exist)
+      if (error.message?.includes("404") || 
+          error.status === 404 || 
+          error.response?.status === 404 ||
+          error.message?.includes("HTTP error! status: 404")) {
+        console.log("Conversation not found (404), starting fresh conversation");
+        setMessages([]);
+        setConversationId(convId);
+        localStorage.setItem("currentConversationId", convId);
+        setHasStartedConversation(false);
+        setIsHistoryOpen(false);
+        return;
+      }
+      
+      // For other errors, log them but don't crash the app
+      console.error("Unexpected error loading conversation:", error);
+      setMessages([]);
+      setConversationId(convId);
+      localStorage.setItem("currentConversationId", convId);
+      setHasStartedConversation(false);
+      setIsHistoryOpen(false);
     }
   };
 
@@ -435,18 +463,23 @@ const ChatPage = () => {
         );
       }
 
-      // Analytics logging - don't let failures break the chat
-      try {
-        logToTrubrics(newMessage.text, receivedText, fullname, conversationId);
-      } catch (error) {
-        console.error("Trubrics logging failed:", error);
-      }
+      // Analytics logging - fire and forget (non-blocking)
+      Promise.resolve().then(async () => {
+        try {
+          logToTrubrics(newMessage.text, receivedText, fullname, conversationId);
+        } catch (error) {
+          console.warn("Trubrics logging failed (non-critical):", error);
+        }
+      });
 
-      try {
-        logToDATAIDEA(newMessage.text, receivedText, fullname, conversationId);
-      } catch (error) {
-        console.error("DATAIDEA logging failed:", error);
-      }
+      // Temporarily disabled DATAIDEA logging due to fetch errors
+      // Promise.resolve().then(async () => {
+      //   try {
+      //     await logToDATAIDEA(newMessage.text, receivedText, fullname, conversationId);
+      //   } catch (error) {
+      //     console.warn("DATAIDEA logging failed (non-critical):", error);
+      //   }
+      // });
 
       try {
         await saveMessageToBackend(receivedText, "bot");
@@ -987,19 +1020,14 @@ const ChatPage = () => {
                           )}
                         >
                           <span>{message.timestamp}</span>
-                          {message.text && (
+                          {message.sender === "bot" && message.text && message.text !== "Thinking..." && (
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => copyToClipboard(message.text, message.id)}
-                                  className={cn(
-                                    "h-5 w-5 p-0 transition-colors opacity-60 hover:opacity-100",
-                                    message.sender === "user"
-                                      ? "text-white/70 hover:text-white"
-                                      : "text-muted-foreground hover:text-foreground"
-                                  )}
+                                  className="h-5 w-5 p-0 transition-colors opacity-60 hover:opacity-100 text-muted-foreground hover:text-foreground"
                                 >
                                   {copiedMessageId === message.id ? (
                                     <Check className="h-3 w-3 text-green-500" />
