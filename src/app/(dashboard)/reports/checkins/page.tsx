@@ -1,16 +1,11 @@
 import React from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const CheckinsPage: React.FC = () => {
   const checkinData: any[] = []; // Replace this with your actual data fetching logic
 
   return (
-    <div className="p-6">
+    <div>
       {checkinData.length === 0 ? (
         <Card className="text-center">
           <CardHeader>
@@ -23,9 +18,7 @@ const CheckinsPage: React.FC = () => {
           </CardContent>
         </Card>
       ) : (
-        <div>
-          {/* Your existing check-in data rendering logic */}
-        </div>
+        <div>{/* Your existing check-in data rendering logic */}</div>
       )}
     </div>
   );

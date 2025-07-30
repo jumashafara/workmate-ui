@@ -85,15 +85,6 @@ const getNavigationData = (userRole: string, isSuperuser: boolean) => {
     icon: MessageCircle,
   });
 
-  // Settings section (commented out in frontend, but included for completeness)
-  // if (isSuperuser) {
-  //   navItems.push({
-  //     title: "Settings",
-  //     url: "/settings",
-  //     icon: SettingsIcon,
-  //   });
-  // }
-
   return {
     teams: [
       {
