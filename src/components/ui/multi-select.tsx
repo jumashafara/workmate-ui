@@ -107,7 +107,7 @@ export function MultiSelect({
           </span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0 popover-content-width-same-as-its-trigger">
+      <PopoverContent className="w-full p-0 popover-content-width-same-as-its-trigger z-[10000]">
         <Command>
           <CommandInput placeholder="Search options..." />
           <CommandList>

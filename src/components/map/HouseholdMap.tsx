@@ -130,7 +130,7 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({
             className="bg-blue-600 text-white px-3 py-1.5 rounded-md shadow-lg hover:bg-blue-700 text-sm"
             disabled={showAllMarkers && totalCount > 1000} // Prevent showing too many
           >
-            {showAllMarkers ? `Showing All (${displayedCount})` : `Show All (${totalCount})`}
+            {showAllMarkers ? `All ${displayedCount} Shown` : `Load All ${totalCount}`}
           </button>
         )}
         <button
@@ -159,9 +159,9 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution="&copy; OpenStreetMap contributors"
           />
-          {validHouseholds.map((h) => (
+          {validHouseholds.map((h, index) => (
             <CircleMarker
-              key={h.household_id}
+              key={`${h.household_id}-${index}`}
               center={[h.latitude, h.longitude]}
               radius={6}
               pathOptions={{

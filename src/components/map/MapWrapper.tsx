@@ -57,19 +57,15 @@ const MapWrapper: React.FC<MapWrapperProps> = ({ households }) => {
     };
   }, []);
 
-  // Auto-load map when in view, but only if data is reasonable size
+  // Auto-load map when in view and has data
   useEffect(() => {
-    if (isInView && households?.length > 0 && households.length < 1000 && !shouldLoadMap) {
+    if (isInView && households?.length > 0 && !shouldLoadMap) {
       const timer = setTimeout(() => {
         setShouldLoadMap(true);
-      }, 500); // Small delay to ensure smooth scrolling
+      }, 300); // Small delay to ensure smooth scrolling
       return () => clearTimeout(timer);
     }
   }, [isInView, households?.length, shouldLoadMap]);
-
-  const handleLoadMap = () => {
-    setShouldLoadMap(true);
-  };
 
   // Don't render anything if no households
   if (!households?.length) {
@@ -101,25 +97,14 @@ const MapWrapper: React.FC<MapWrapperProps> = ({ households }) => {
       {shouldLoadMap ? (
         <HouseholdMap households={households} />
       ) : (
-        <div className="bg-white rounded-md shadow-md p-6 mb-6 h-[500px] flex flex-col items-center justify-center">
+        <div className="bg-white rounded-md shadow-md p-6 mb-6 h-[500px] flex items-center justify-center">
           <div className="text-center">
-            <div className="text-gray-600 mb-4">
-              📍 Map with {validCount} household locations
+            <div className="animate-pulse">
+              <div className="text-gray-500 mb-2">Loading map...</div>
+              <div className="text-sm text-gray-400">
+                📍 {validCount} household locations
+              </div>
             </div>
-            <div className="text-sm text-gray-500 mb-4">
-              {validCount > 500 && (
-                <div className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-md mb-2">
-                  Large dataset detected - map will show first 200 markers
-                </div>
-              )}
-              Click to load interactive map
-            </div>
-            <button
-              onClick={handleLoadMap}
-              className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors"
-            >
-              Load Map
-            </button>
           </div>
         </div>
       )}
