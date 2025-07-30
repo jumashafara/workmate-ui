@@ -1,8 +1,14 @@
 import React, { useEffect, useState } from "react";
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 
-const Plot = dynamic(() => import('react-plotly.js'), { ssr: false });
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { useTheme } from "next-themes";
 
 interface FeatureContributionsChartProps {
@@ -57,34 +63,34 @@ const FeatureContributionsChart: React.FC<FeatureContributionsChartProps> = ({
 
     // Create colors array based on positive/negative values
     const colors = featureValues.map((value) =>
-      value >= 0 ? '#EA580C' : '#374151'
+      value >= 0 ? "#EA580C" : "#374151"
     );
 
     // Set up the plot data
     setPlotData([
       {
-        type: 'bar',
-        orientation: 'h',
+        type: "bar",
+        orientation: "h",
         x: featureValues,
         y: featureNames,
         marker: {
-          color: colors
+          color: colors,
         },
-        text: featureValues.map(val => val.toFixed(2)),
-        textposition: 'auto',
-        hoverinfo: 'x+y',
-        name: 'Feature Contribution'
-      }
+        text: featureValues.map((val) => val.toFixed(2)),
+        textposition: "auto",
+        hoverinfo: "x+y",
+        name: "Feature Contribution",
+      },
     ]);
 
     // Set up the layout
     setLayout({
       title: {
-        text: '',
+        text: "",
         font: {
-          family: 'system-ui, -apple-system, sans-serif',
-          size: 18
-        }
+          family: "system-ui, -apple-system, sans-serif",
+          size: 18,
+        },
       },
       autosize: true,
       height: 500,
@@ -92,31 +98,32 @@ const FeatureContributionsChart: React.FC<FeatureContributionsChartProps> = ({
         l: 150, // Increased left margin for feature names
         r: 30,
         t: 30,
-        b: 80
+        b: 80,
       },
       xaxis: {
         title: {
-          text: 'Contribution Score',
+          text: "Contribution Score",
           font: {
-            family: 'system-ui, -apple-system, sans-serif',
-            size: 14
-          }
+            family: "system-ui, -apple-system, sans-serif",
+            size: 14,
+          },
         },
-        gridcolor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
+        gridcolor:
+          theme === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
       },
       yaxis: {
         automargin: true,
         tickfont: {
-          family: 'system-ui, -apple-system, sans-serif',
-          size: 12
-        }
+          family: "system-ui, -apple-system, sans-serif",
+          size: 12,
+        },
       },
-      plot_bgcolor: theme === 'dark' ? '#1C2434' : '#FFFFFF',
-      paper_bgcolor: theme === 'dark' ? '#1C2434' : '#FFFFFF',
+      plot_bgcolor: theme === "dark" ? "#1C2434" : "#FFFFFF",
+      paper_bgcolor: theme === "dark" ? "#1C2434" : "#FFFFFF",
       font: {
-        family: 'system-ui, -apple-system, sans-serif',
-        color: theme === 'dark' ? '#FFFFFF' : '#000000'
-      }
+        family: "system-ui, -apple-system, sans-serif",
+        color: theme === "dark" ? "#FFFFFF" : "#000000",
+      },
     });
   }, [contributions, theme]);
 
@@ -126,7 +133,9 @@ const FeatureContributionsChart: React.FC<FeatureContributionsChartProps> = ({
       <Card className="w-full shadow-sm mb-3">
         <CardHeader className="bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
           <CardTitle>Feature Contributions</CardTitle>
-          <CardDescription>How has each feature contributed to the prediction?</CardDescription>
+          <CardDescription>
+            How has each feature contributed to the prediction?
+          </CardDescription>
         </CardHeader>
         <CardContent className="py-10">
           <p className="text-center text-muted-foreground">
@@ -139,9 +148,11 @@ const FeatureContributionsChart: React.FC<FeatureContributionsChartProps> = ({
 
   return (
     <Card className="w-full shadow-sm mb-3">
-      <CardHeader className="bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
+      <CardHeader>
         <CardTitle>Feature Contributions</CardTitle>
-        <CardDescription>How has each feature contributed to the prediction?</CardDescription>
+        <CardDescription>
+          How has each feature contributed to the prediction?
+        </CardDescription>
       </CardHeader>
       <CardContent className="pt-6">
         <div className="h-[500px] w-full">
@@ -151,9 +162,9 @@ const FeatureContributionsChart: React.FC<FeatureContributionsChartProps> = ({
             config={{
               displayModeBar: true,
               responsive: true,
-              modeBarButtonsToRemove: ['lasso2d', 'select2d']
+              modeBarButtonsToRemove: ["lasso2d", "select2d"],
             }}
-            style={{ width: '100%', height: '100%' }}
+            style={{ width: "100%", height: "100%" }}
           />
         </div>
       </CardContent>

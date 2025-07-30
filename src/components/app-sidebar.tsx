@@ -150,8 +150,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               src="/RTV_Logo.png"
               alt="RTV Logo"
               className="object-contain"
-              width={50}
-              height={50}
+              width={64}
+              height={64}
             />
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">

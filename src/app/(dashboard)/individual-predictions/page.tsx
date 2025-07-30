@@ -1,12 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,15 +14,21 @@ import dynamic from "next/dynamic";
 import { API_ENDPOINT } from "@/utils/endpoints";
 
 // Dynamically import components
-const PredictionDisplay = dynamic(() => import("@/components/prediction/PredictionDisplay"), { 
-  ssr: false,
-  loading: () => <Skeleton className="h-64 w-full" />
-});
+const PredictionDisplay = dynamic(
+  () => import("@/components/prediction/PredictionDisplay"),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-64 w-full" />,
+  }
+);
 
-const FeatureContributionsChart = dynamic(() => import("@/components/charts/ContributionsPlot"), { 
-  ssr: false,
-  loading: () => <Skeleton className="h-96 w-full" />
-});
+const FeatureContributionsChart = dynamic(
+  () => import("@/components/charts/ContributionsPlot"),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-96 w-full" />,
+  }
+);
 
 interface Features {
   district: string;
@@ -39,7 +40,7 @@ interface Features {
   region: string;
   standard_evaluation: boolean[];
   checkin_evaluation: boolean[];
-  
+
   // Numeric fields
   Land_size_for_Crop_Agriculture_Acres: number[];
   farm_implements_owned: number[];
@@ -49,7 +50,7 @@ interface Features {
   hh_water_collection_Minutes: number[];
   composts_num: number[];
   education_level_encoded: number[];
-  
+
   // Categorical fields
   vsla_participation: boolean[];
   ground_nuts: boolean[];
@@ -72,8 +73,8 @@ interface Features {
 // Mock prediction API function
 const getPrediction = async (data: Features) => {
   // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 2000));
-  
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
   // Return mock prediction result
   return {
     prediction: Math.random() > 0.5 ? 1 : 0,
@@ -86,8 +87,8 @@ const getPrediction = async (data: Features) => {
       "Farm Implements": Math.random() * 0.1,
       "Education Level": Math.random() * 0.08,
       "Distance to OPD": Math.random() * 0.07,
-      "Other": Math.random() * 0.1
-    }
+      Other: Math.random() * 0.1,
+    },
   };
 };
 
@@ -99,7 +100,8 @@ export default function IndividualPredictionPage() {
   // Prediction results
   const [prediction, setPrediction] = useState<number>(0.5);
   const [probabilities, setProbabilities] = useState<Array<number>>([0.5, 0.5]);
-  const [predictedIncomeProduction, setPredictedIncomeProduction] = useState<number>(0);
+  const [predictedIncomeProduction, setPredictedIncomeProduction] =
+    useState<number>(0);
   const [contributions, setContributions] = useState({});
 
   // Form data
@@ -113,7 +115,7 @@ export default function IndividualPredictionPage() {
     region: "",
     standard_evaluation: [false],
     checkin_evaluation: [false],
-    
+
     // Numeric fields with defaults
     Land_size_for_Crop_Agriculture_Acres: [1.0],
     farm_implements_owned: [1],
@@ -123,7 +125,7 @@ export default function IndividualPredictionPage() {
     hh_water_collection_Minutes: [30],
     composts_num: [0],
     education_level_encoded: [0],
-    
+
     // Categorical fields
     vsla_participation: [true],
     ground_nuts: [false],
@@ -168,24 +170,27 @@ export default function IndividualPredictionPage() {
       setValidationError("Region is required");
       return false;
     }
-    
+
     setValidationError("");
     return true;
   };
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
-    
+
     setLoading(true);
     setPredictionMade(false);
-    
+
     try {
       const response = await getPrediction(formData);
-      
+
       setPrediction(Number(response.prediction));
       setContributions(response.contributions);
       setPredictedIncomeProduction(response.predicted_income_production);
-      setProbabilities([Number(response.probability), 1 - Number(response.probability)]);
+      setProbabilities([
+        Number(response.probability),
+        1 - Number(response.probability),
+      ]);
       setPredictionMade(true);
     } catch (error) {
       console.error("Prediction failed:", error);
@@ -196,32 +201,40 @@ export default function IndividualPredictionPage() {
   };
 
   const updateFormField = (field: keyof Features, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
-  const updateNumericArray = (field: keyof Features, value: number, index: number = 0) => {
-    setFormData(prev => {
+  const updateNumericArray = (
+    field: keyof Features,
+    value: number,
+    index: number = 0
+  ) => {
+    setFormData((prev) => {
       const currentArray = prev[field] as number[];
       const newArray = [...currentArray];
       newArray[index] = value;
       return {
         ...prev,
-        [field]: newArray
+        [field]: newArray,
       };
     });
   };
 
-  const updateBooleanArray = (field: keyof Features, value: boolean, index: number = 0) => {
-    setFormData(prev => {
+  const updateBooleanArray = (
+    field: keyof Features,
+    value: boolean,
+    index: number = 0
+  ) => {
+    setFormData((prev) => {
       const currentArray = prev[field] as boolean[];
       const newArray = [...currentArray];
       newArray[index] = value;
       return {
         ...prev,
-        [field]: newArray
+        [field]: newArray,
       };
     });
   };
@@ -234,7 +247,8 @@ export default function IndividualPredictionPage() {
           Individual Prediction
         </h1>
         <p className="text-gray-500 dark:text-gray-400">
-          Generate predictions for individual households by entering their characteristics.
+          Generate predictions for individual households by entering their
+          characteristics.
         </p>
       </div>
 
@@ -242,9 +256,7 @@ export default function IndividualPredictionPage() {
       {validationError && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            {validationError}
-          </AlertDescription>
+          <AlertDescription>{validationError}</AlertDescription>
         </Alert>
       )}
 
@@ -265,7 +277,7 @@ export default function IndividualPredictionPage() {
                 placeholder="Enter region"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="district">District *</Label>
               <Input
@@ -275,7 +287,7 @@ export default function IndividualPredictionPage() {
                 placeholder="Enter district"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="village">Village *</Label>
               <Input
@@ -285,7 +297,7 @@ export default function IndividualPredictionPage() {
                 placeholder="Enter village"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="cluster">Cluster *</Label>
               <Input
@@ -295,7 +307,7 @@ export default function IndividualPredictionPage() {
                 placeholder="Enter cluster"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="cohort">Cohort *</Label>
               <Input
@@ -305,7 +317,7 @@ export default function IndividualPredictionPage() {
                 placeholder="Enter cohort"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="cycle">Cycle *</Label>
               <Input
@@ -315,14 +327,19 @@ export default function IndividualPredictionPage() {
                 placeholder="Enter cycle"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="evaluation_month">Evaluation Month</Label>
               <Input
                 id="evaluation_month"
                 type="number"
                 value={formData.evaluation_month}
-                onChange={(e) => updateFormField("evaluation_month", parseInt(e.target.value) || 1)}
+                onChange={(e) =>
+                  updateFormField(
+                    "evaluation_month",
+                    parseInt(e.target.value) || 1
+                  )
+                }
                 min="1"
                 max="24"
               />
@@ -332,97 +349,138 @@ export default function IndividualPredictionPage() {
           {/* Numeric Features */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Household Characteristics</h3>
-            
+
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label>Land Size (Acres): {formData.Land_size_for_Crop_Agriculture_Acres[0]}</Label>
+                <Label>
+                  Land Size (Acres):{" "}
+                  {formData.Land_size_for_Crop_Agriculture_Acres[0]}
+                </Label>
                 <Slider
                   value={[formData.Land_size_for_Crop_Agriculture_Acres[0]]}
-                  onValueChange={(value) => updateNumericArray("Land_size_for_Crop_Agriculture_Acres", value[0])}
+                  onValueChange={(value) =>
+                    updateNumericArray(
+                      "Land_size_for_Crop_Agriculture_Acres",
+                      value[0]
+                    )
+                  }
                   max={10}
                   min={0.1}
                   step={0.1}
                   className="w-full"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Household Members: {formData.tot_hhmembers[0]}</Label>
                 <Slider
                   value={[formData.tot_hhmembers[0]]}
-                  onValueChange={(value) => updateNumericArray("tot_hhmembers", value[0])}
+                  onValueChange={(value) =>
+                    updateNumericArray("tot_hhmembers", value[0])
+                  }
                   max={15}
                   min={1}
                   step={1}
                   className="w-full"
                 />
               </div>
-              
+
               <div className="space-y-2">
-                <Label>Farm Implements: {formData.farm_implements_owned[0]}</Label>
+                <Label>
+                  Farm Implements: {formData.farm_implements_owned[0]}
+                </Label>
                 <Slider
                   value={[formData.farm_implements_owned[0]]}
-                  onValueChange={(value) => updateNumericArray("farm_implements_owned", value[0])}
+                  onValueChange={(value) =>
+                    updateNumericArray("farm_implements_owned", value[0])
+                  }
                   max={10}
                   min={0}
                   step={1}
                   className="w-full"
                 />
               </div>
-              
+
               <div className="space-y-2">
-                <Label>Distance to OPD (km): {formData.Distance_travelled_one_way_OPD_treatment[0]}</Label>
+                <Label>
+                  Distance to OPD (km):{" "}
+                  {formData.Distance_travelled_one_way_OPD_treatment[0]}
+                </Label>
                 <Slider
                   value={[formData.Distance_travelled_one_way_OPD_treatment[0]]}
-                  onValueChange={(value) => updateNumericArray("Distance_travelled_one_way_OPD_treatment", value[0])}
+                  onValueChange={(value) =>
+                    updateNumericArray(
+                      "Distance_travelled_one_way_OPD_treatment",
+                      value[0]
+                    )
+                  }
                   max={50}
                   min={0}
                   step={1}
                   className="w-full"
                 />
               </div>
-              
+
               <div className="space-y-2">
-                <Label>Water Collection Time (min): {formData.hh_water_collection_Minutes[0]}</Label>
+                <Label>
+                  Water Collection Time (min):{" "}
+                  {formData.hh_water_collection_Minutes[0]}
+                </Label>
                 <Slider
                   value={[formData.hh_water_collection_Minutes[0]]}
-                  onValueChange={(value) => updateNumericArray("hh_water_collection_Minutes", value[0])}
+                  onValueChange={(value) =>
+                    updateNumericArray("hh_water_collection_Minutes", value[0])
+                  }
                   max={180}
                   min={5}
                   step={5}
                   className="w-full"
                 />
               </div>
-              
+
               <div className="space-y-2">
-                <Label>Education Level: {formData.education_level_encoded[0]}</Label>
+                <Label>
+                  Education Level: {formData.education_level_encoded[0]}
+                </Label>
                 <Slider
                   value={[formData.education_level_encoded[0]]}
-                  onValueChange={(value) => updateNumericArray("education_level_encoded", value[0])}
+                  onValueChange={(value) =>
+                    updateNumericArray("education_level_encoded", value[0])
+                  }
                   max={4}
                   min={0}
                   step={1}
                   className="w-full"
                 />
               </div>
-              
+
               <div className="space-y-2">
-                <Label>Average Water Consumed Per Day (L): {formData.Average_Water_Consumed_Per_Day[0]}</Label>
+                <Label>
+                  Average Water Consumed Per Day (L):{" "}
+                  {formData.Average_Water_Consumed_Per_Day[0]}
+                </Label>
                 <Slider
                   value={[formData.Average_Water_Consumed_Per_Day[0]]}
-                  onValueChange={(value) => updateNumericArray("Average_Water_Consumed_Per_Day", value[0])}
+                  onValueChange={(value) =>
+                    updateNumericArray(
+                      "Average_Water_Consumed_Per_Day",
+                      value[0]
+                    )
+                  }
                   max={100}
                   min={5}
                   step={5}
                   className="w-full"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Composts Number: {formData.composts_num[0]}</Label>
                 <Slider
                   value={[formData.composts_num[0]]}
-                  onValueChange={(value) => updateNumericArray("composts_num", value[0])}
+                  onValueChange={(value) =>
+                    updateNumericArray("composts_num", value[0])
+                  }
                   max={10}
                   min={0}
                   step={1}
@@ -434,167 +492,218 @@ export default function IndividualPredictionPage() {
 
           {/* Boolean Features */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Agricultural & Social Participation</h3>
-            
+            <h3 className="text-lg font-semibold">
+              Agricultural & Social Participation
+            </h3>
+
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               <div className="flex items-center space-x-2">
                 <Switch
                   id="vsla_participation"
                   checked={formData.vsla_participation[0]}
-                  onCheckedChange={(checked) => updateBooleanArray("vsla_participation", checked)}
+                  onCheckedChange={(checked) =>
+                    updateBooleanArray("vsla_participation", checked)
+                  }
                 />
                 <Label htmlFor="vsla_participation">VSLA Participation</Label>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Switch
                   id="business_participation"
                   checked={formData.business_participation[0]}
-                  onCheckedChange={(checked) => updateBooleanArray("business_participation", checked)}
+                  onCheckedChange={(checked) =>
+                    updateBooleanArray("business_participation", checked)
+                  }
                 />
-                <Label htmlFor="business_participation">Business Participation</Label>
+                <Label htmlFor="business_participation">
+                  Business Participation
+                </Label>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Switch
                   id="maize"
                   checked={formData.maize[0]}
-                  onCheckedChange={(checked) => updateBooleanArray("maize", checked)}
+                  onCheckedChange={(checked) =>
+                    updateBooleanArray("maize", checked)
+                  }
                 />
                 <Label htmlFor="maize">Grows Maize</Label>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Switch
                   id="ground_nuts"
                   checked={formData.ground_nuts[0]}
-                  onCheckedChange={(checked) => updateBooleanArray("ground_nuts", checked)}
+                  onCheckedChange={(checked) =>
+                    updateBooleanArray("ground_nuts", checked)
+                  }
                 />
                 <Label htmlFor="ground_nuts">Grows Ground Nuts</Label>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Switch
                   id="sweet_potatoes"
                   checked={formData.sweet_potatoes[0]}
-                  onCheckedChange={(checked) => updateBooleanArray("sweet_potatoes", checked)}
+                  onCheckedChange={(checked) =>
+                    updateBooleanArray("sweet_potatoes", checked)
+                  }
                 />
                 <Label htmlFor="sweet_potatoes">Grows Sweet Potatoes</Label>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Switch
                   id="cassava"
                   checked={formData.cassava[0]}
-                  onCheckedChange={(checked) => updateBooleanArray("cassava", checked)}
+                  onCheckedChange={(checked) =>
+                    updateBooleanArray("cassava", checked)
+                  }
                 />
                 <Label htmlFor="cassava">Grows Cassava</Label>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Switch
                   id="tippy_tap_present"
                   checked={formData.tippy_tap_present[0]}
-                  onCheckedChange={(checked) => updateBooleanArray("tippy_tap_present", checked)}
+                  onCheckedChange={(checked) =>
+                    updateBooleanArray("tippy_tap_present", checked)
+                  }
                 />
                 <Label htmlFor="tippy_tap_present">Has Tippy Tap</Label>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Switch
                   id="hh_produce_organics"
                   checked={formData.hh_produce_organics[0]}
-                  onCheckedChange={(checked) => updateBooleanArray("hh_produce_organics", checked)}
+                  onCheckedChange={(checked) =>
+                    updateBooleanArray("hh_produce_organics", checked)
+                  }
                 />
                 <Label htmlFor="hh_produce_organics">Produces Organics</Label>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Switch
                   id="hhh_sex"
                   checked={formData.hhh_sex[0]}
-                  onCheckedChange={(checked) => updateBooleanArray("hhh_sex", checked)}
+                  onCheckedChange={(checked) =>
+                    updateBooleanArray("hhh_sex", checked)
+                  }
                 />
                 <Label htmlFor="hhh_sex">Head of Household (Female)</Label>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Switch
                   id="perennial_crops_grown_food_banana"
                   checked={formData.perennial_crops_grown_food_banana[0]}
-                  onCheckedChange={(checked) => updateBooleanArray("perennial_crops_grown_food_banana", checked)}
+                  onCheckedChange={(checked) =>
+                    updateBooleanArray(
+                      "perennial_crops_grown_food_banana",
+                      checked
+                    )
+                  }
                 />
-                <Label htmlFor="perennial_crops_grown_food_banana">Grows Food Banana</Label>
+                <Label htmlFor="perennial_crops_grown_food_banana">
+                  Grows Food Banana
+                </Label>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Switch
                   id="perennial_crops_grown_coffee"
                   checked={formData.perennial_crops_grown_coffee[0]}
-                  onCheckedChange={(checked) => updateBooleanArray("perennial_crops_grown_coffee", checked)}
+                  onCheckedChange={(checked) =>
+                    updateBooleanArray("perennial_crops_grown_coffee", checked)
+                  }
                 />
-                <Label htmlFor="perennial_crops_grown_coffee">Grows Coffee</Label>
+                <Label htmlFor="perennial_crops_grown_coffee">
+                  Grows Coffee
+                </Label>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Switch
                   id="irish_potatoes"
                   checked={formData.irish_potatoes[0]}
-                  onCheckedChange={(checked) => updateBooleanArray("irish_potatoes", checked)}
+                  onCheckedChange={(checked) =>
+                    updateBooleanArray("irish_potatoes", checked)
+                  }
                 />
                 <Label htmlFor="irish_potatoes">Grows Irish Potatoes</Label>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Switch
                   id="sorghum"
                   checked={formData.sorghum[0]}
-                  onCheckedChange={(checked) => updateBooleanArray("sorghum", checked)}
+                  onCheckedChange={(checked) =>
+                    updateBooleanArray("sorghum", checked)
+                  }
                 />
                 <Label htmlFor="sorghum">Grows Sorghum</Label>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Switch
                   id="hh_produce_lq_manure"
                   checked={formData.hh_produce_lq_manure[0]}
-                  onCheckedChange={(checked) => updateBooleanArray("hh_produce_lq_manure", checked)}
+                  onCheckedChange={(checked) =>
+                    updateBooleanArray("hh_produce_lq_manure", checked)
+                  }
                 />
-                <Label htmlFor="hh_produce_lq_manure">Produces Liquid Manure</Label>
+                <Label htmlFor="hh_produce_lq_manure">
+                  Produces Liquid Manure
+                </Label>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Switch
                   id="non_bio_waste_mgt_present"
                   checked={formData.non_bio_waste_mgt_present[0]}
-                  onCheckedChange={(checked) => updateBooleanArray("non_bio_waste_mgt_present", checked)}
+                  onCheckedChange={(checked) =>
+                    updateBooleanArray("non_bio_waste_mgt_present", checked)
+                  }
                 />
-                <Label htmlFor="non_bio_waste_mgt_present">Non-Bio Waste Management</Label>
+                <Label htmlFor="non_bio_waste_mgt_present">
+                  Non-Bio Waste Management
+                </Label>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Switch
                   id="soap_ash_present"
                   checked={formData.soap_ash_present[0]}
-                  onCheckedChange={(checked) => updateBooleanArray("soap_ash_present", checked)}
+                  onCheckedChange={(checked) =>
+                    updateBooleanArray("soap_ash_present", checked)
+                  }
                 />
                 <Label htmlFor="soap_ash_present">Soap Ash Present</Label>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Switch
                   id="standard_evaluation"
                   checked={formData.standard_evaluation[0]}
-                  onCheckedChange={(checked) => updateBooleanArray("standard_evaluation", checked)}
+                  onCheckedChange={(checked) =>
+                    updateBooleanArray("standard_evaluation", checked)
+                  }
                 />
                 <Label htmlFor="standard_evaluation">Standard Evaluation</Label>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Switch
                   id="checkin_evaluation"
                   checked={formData.checkin_evaluation[0]}
-                  onCheckedChange={(checked) => updateBooleanArray("checkin_evaluation", checked)}
+                  onCheckedChange={(checked) =>
+                    updateBooleanArray("checkin_evaluation", checked)
+                  }
                 />
                 <Label htmlFor="checkin_evaluation">Check-in Evaluation</Label>
               </div>
@@ -603,7 +712,7 @@ export default function IndividualPredictionPage() {
 
           {/* Submit Button */}
           <div className="flex justify-center pt-4">
-            <Button 
+            <Button
               onClick={handleSubmit}
               disabled={loading}
               size="lg"
@@ -630,26 +739,22 @@ export default function IndividualPredictionPage() {
             prediction={prediction}
             predicted_income_production={predictedIncomeProduction}
           />
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Feature Contributions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="w-full h-[400px]">
-                <FeatureContributionsChart contributions={contributions} />
-              </div>
-            </CardContent>
-          </Card>
+
+          <FeatureContributionsChart contributions={contributions} />
         </div>
       )}
-      
+
       {!predictionMade && !loading && (
         <Card>
           <CardContent className="text-center py-12">
             <div className="text-gray-500">
-              <h3 className="text-lg font-medium mb-2">Ready to Generate Prediction</h3>
-              <p>Fill in the form above and click "Generate Prediction" to see results</p>
+              <h3 className="text-lg font-medium mb-2">
+                Ready to Generate Prediction
+              </h3>
+              <p>
+                Fill in the form above and click "Generate Prediction" to see
+                results
+              </p>
             </div>
           </CardContent>
         </Card>
