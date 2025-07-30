@@ -34,7 +34,7 @@ const getNavigationData = (userRole: string, isSuperuser: boolean) => {
   if (isSuperuser) {
     navItems = [
       {
-        title: "Dashboard",
+        title: "Risk Assessment",
         url: "#",
         icon: BarChart3,
         isActive: true,
@@ -77,7 +77,7 @@ const getNavigationData = (userRole: string, isSuperuser: boolean) => {
   } else if (userRole === "area_manager") {
     navItems = [
       {
-        title: "Dashboard",
+        title: "Risk Assessment",
         url: "#",
         icon: BarChart3,
         isActive: true,
