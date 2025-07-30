@@ -1,5 +1,6 @@
 import React from "react";
 import dynamic from "next/dynamic";
+import { Activity } from "lucide-react";
 
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 import {
@@ -67,8 +68,8 @@ const ROCCurve: React.FC<ROCCurveProps> = ({
     margin: {
       l: 60,
       r: 30,
-      b: 60,
-      t: 80,
+      b: 70,
+      t: 60,
     },
     hovermode: "closest",
     plot_bgcolor: "white",
@@ -83,10 +84,19 @@ const ROCCurve: React.FC<ROCCurveProps> = ({
   return (
     <Card className="w-full shadow-sm">
       <CardHeader>
-        <CardTitle className="text-lg text-center">ROC Curve</CardTitle>
-        <CardDescription className="text-center">
-          What is the model's ability to distinguish between classes?
-        </CardDescription>
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+            <Activity className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+          </div>
+          <div>
+            <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+              ROC Curve
+            </CardTitle>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Receiver Operating Characteristic analysis
+            </p>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="w-full h-[500px]">

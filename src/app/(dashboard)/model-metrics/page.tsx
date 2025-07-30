@@ -11,6 +11,15 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import {
+  Brain,
+  BarChart3,
+  Settings,
+  TrendingUp,
+  Target,
+  Activity,
+} from "lucide-react";
 import dynamic from "next/dynamic";
 import { API_ENDPOINT } from "@/utils/endpoints";
 
@@ -213,55 +222,122 @@ export default function ModelMetricsPage() {
   };
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6 pb-80">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Model Metrics</h1>
-          <p className="text-gray-500 dark:text-gray-400">
-            Evaluate model performance with detailed metrics and visualizations.
-          </p>
-        </div>
-
-        {/* Model Selector */}
-        <div className="space-y-2">
-          <Label htmlFor="model-select">Select Model</Label>
-          <Select
-            value={modelOptions.find((m) => m.value === model.name)?.id}
-            onValueChange={handleModelChange}
-          >
-            <SelectTrigger className="w-[250px]">
-              <SelectValue placeholder="Select a model" />
-            </SelectTrigger>
-            <SelectContent>
-              {modelOptions.map((option) => (
-                <SelectItem key={option.id} value={option.id}>
-                  {option.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      <div className="bg-white dark:bg-slate-900 rounded-xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className="flex items-start gap-4">
+          <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-xl">
+            <Brain className="h-8 w-8 text-orange-600 dark:text-orange-400" />
+          </div>
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Model Metrics
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 text-lg mb-4">
+              Comprehensive model performance evaluation with advanced metrics
+              and interactive visualizations
+            </p>
+            <div className="flex items-center gap-6 text-sm">
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <BarChart3 className="h-4 w-4" />
+                <span>Performance Metrics</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <Target className="h-4 w-4" />
+                <span>Model Accuracy</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <Activity className="h-4 w-4" />
+                <span>Real-time Evaluation</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Model Statistics Table */}
+      <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                <TrendingUp className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+              </div>
+              <div>
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Model Performance Summary
+                </CardTitle>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  Key metrics and statistics for the selected {model.type} model
+                </p>
+              </div>
+            </div>
 
-      {loading ? (
-        <Skeleton className="h-32 w-full" />
-      ) : model.type === "classification" ? (
-        <ClassificationModelStatsTable
-          model_metrics={classificationModelMetrics?.model || null}
-        />
-      ) : (
-        <RegressionModelStatsTable model_metrics={regressionModelMetrics} />
-      )}
+            {/* Model Selector */}
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 min-w-[280px]">
+              <div className="flex items-center gap-2 mb-3">
+                <Settings className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                <Label
+                  htmlFor="model-select"
+                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Active Model
+                </Label>
+              </div>
+              <Select
+                value={modelOptions.find((m) => m.value === model.name)?.id}
+                onValueChange={handleModelChange}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a model" />
+                </SelectTrigger>
+                <SelectContent>
+                  {modelOptions.map((option) => (
+                    <SelectItem key={option.id} value={option.id}>
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          className={`text-xs ${
+                            option.type === "classification"
+                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                              : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                          }`}
+                        >
+                          {option.type}
+                        </Badge>
+                        {option.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                Current:{" "}
+                <span className="text-orange-600 dark:text-orange-400 font-medium">
+                  {modelOptions.find((m) => m.value === model.name)?.name}
+                </span>
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <Skeleton className="h-32 w-full" />
+          ) : model.type === "classification" ? (
+            <ClassificationModelStatsTable
+              model_metrics={classificationModelMetrics?.model || null}
+            />
+          ) : (
+            <RegressionModelStatsTable model_metrics={regressionModelMetrics} />
+          )}
+        </CardContent>
+      </Card>
 
       {/* Classification-specific visualizations */}
       {model.type === "classification" && (
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Confusion Matrix */}
 
-          <div className="w-full h-[500px] mb-20">
+          <div className="w-full h-[400px]">
             {loading ? (
               <Skeleton className="h-full w-full" />
             ) : (
@@ -286,7 +362,7 @@ export default function ModelMetricsPage() {
 
           {/* ROC Curve */}
 
-          <div className="w-full h-[500px] mb-20">
+          <div className="w-full h-[400px]">
             {loading ? (
               <Skeleton className="h-full w-full" />
             ) : (
@@ -298,31 +374,71 @@ export default function ModelMetricsPage() {
         </div>
       )}
 
-      {/* Regression-specific visualizations can be added here */}
+      {/* Regression-specific visualizations */}
       {model.type === "regression" && (
         <div className="grid gap-6 lg:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Residual Plot</CardTitle>
+          <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
+            <CardHeader className="pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                  <BarChart3 className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                    Residual Plot
+                  </CardTitle>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Analysis of prediction residuals
+                  </p>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="w-full h-[400px] flex items-center justify-center bg-gray-50 rounded-lg">
-                <p className="text-gray-500">
-                  Residual plot visualization would go here
-                </p>
+              <div className="w-full h-[400px] flex items-center justify-center bg-orange-50 dark:bg-orange-900/10 rounded-lg border border-orange-200 dark:border-orange-800">
+                <div className="text-center">
+                  <div className="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-full w-fit mx-auto mb-3">
+                    <BarChart3 className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+                  </div>
+                  <p className="text-orange-700 dark:text-orange-300 font-medium">
+                    Residual Plot Visualization
+                  </p>
+                  <p className="text-sm text-orange-600 dark:text-orange-400 mt-1">
+                    Chart implementation in progress
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Feature Importance</CardTitle>
+          <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
+            <CardHeader className="pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                  <TrendingUp className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                    Feature Importance
+                  </CardTitle>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Impact of features on model predictions
+                  </p>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="w-full h-[400px] flex items-center justify-center bg-gray-50 rounded-lg">
-                <p className="text-gray-500">
-                  Feature importance chart would go here
-                </p>
+              <div className="w-full h-[400px] flex items-center justify-center bg-orange-50 dark:bg-orange-900/10 rounded-lg border border-orange-200 dark:border-orange-800">
+                <div className="text-center">
+                  <div className="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-full w-fit mx-auto mb-3">
+                    <TrendingUp className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+                  </div>
+                  <p className="text-orange-700 dark:text-orange-300 font-medium">
+                    Feature Importance Chart
+                  </p>
+                  <p className="text-sm text-orange-600 dark:text-orange-400 mt-1">
+                    Chart implementation in progress
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>

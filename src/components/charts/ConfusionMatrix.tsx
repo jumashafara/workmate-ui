@@ -9,6 +9,7 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import { Target } from "lucide-react";
 
 interface ConfusionMatrixProps {
   confusion_matrix_data:
@@ -100,8 +101,8 @@ const ConfusionMatrix: React.FC<ConfusionMatrixProps> = ({
     margin: {
       l: 80,
       r: 30,
-      b: 80,
-      t: 80,
+      b: 70,
+      t: 60,
     },
     plot_bgcolor: "white",
     paper_bgcolor: "white",
@@ -115,10 +116,19 @@ const ConfusionMatrix: React.FC<ConfusionMatrixProps> = ({
   return (
     <Card className="w-full shadow-sm">
       <CardHeader>
-        <CardTitle className="text-lg text-center">Confusion Matrix</CardTitle>
-        <CardDescription className="text-center">
-          How many false positives and false negatives?
-        </CardDescription>
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+            <Target className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+          </div>
+          <div>
+            <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+              Confusion Matrix
+            </CardTitle>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              How many false positives and false negatives?
+            </p>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="w-full h-[500px]">
