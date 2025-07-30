@@ -94,7 +94,7 @@ const ChatPage = () => {
           ? crypto.randomUUID()
           : Math.random().toString(36).substring(2, 15) +
             Math.random().toString(36).substring(2, 15);
-      
+
       localStorage.setItem("currentConversationId", newId);
       setConversationId(newId);
     }
@@ -102,14 +102,17 @@ const ChatPage = () => {
 
   useEffect(() => {
     if (!conversationId) return; // Wait for conversationId to be initialized
-    
+
     const userData = getUserData();
     setFullname(userData.full_name || "Unknown User");
 
     if (userData.full_name && conversationId) {
       loadChatConversation(conversationId).catch((error) => {
         // 404 errors are expected for new conversations - don't log as errors
-        if (error.message.includes('404') || error.message.includes('not found')) {
+        if (
+          error.message.includes("404") ||
+          error.message.includes("not found")
+        ) {
           console.log(
             "No conversation found in backend for conversationId:",
             conversationId,
@@ -422,13 +425,13 @@ const ChatPage = () => {
       try {
         logToTrubrics(newMessage.text, receivedText, fullname, conversationId);
       } catch (error) {
-        console.error('Trubrics logging failed:', error);
+        console.error("Trubrics logging failed:", error);
       }
-      
+
       try {
         logToDATAIDEA(newMessage.text, receivedText, fullname, conversationId);
       } catch (error) {
-        console.error('DATAIDEA logging failed:', error);
+        console.error("DATAIDEA logging failed:", error);
       }
 
       try {
@@ -451,7 +454,6 @@ const ChatPage = () => {
       console.error("Failed to copy:", error);
     }
   };
-
 
   const handleLoadMore = () => {
     setMessageLimit((prev) => prev + 6);
@@ -581,9 +583,15 @@ const ChatPage = () => {
       `}</style>
       <div className="flex h-[calc(100vh-2rem)] w-full max-w-none mx-auto p-4">
         {/* Main Chat Area */}
-        <Card className="w-full flex flex-col shadow-lg border-0 overflow-hidden" style={{ minHeight: 'calc(100vh - 4rem)', height: 'calc(100vh - 4rem)' }}>
+        <Card
+          className="w-full flex flex-col shadow-lg border-0 overflow-hidden"
+          style={{
+            minHeight: "calc(100vh - 4rem)",
+            height: "calc(100vh - 4rem)",
+          }}
+        >
           <CardHeader
-            className="p-0"
+            className="p-0 rounded-t-sm"
             style={{
               backgroundColor: THEME_COLORS.primary.main,
               color: THEME_COLORS.primary.contrastText,
@@ -782,7 +790,7 @@ const ChatPage = () => {
           </Dialog>
 
           <CardContent className="flex-1 flex flex-col p-0 min-h-0">
-            <ScrollArea className="flex-1 px-6" style={{ minHeight: '400px' }}>
+            <ScrollArea className="flex-1 px-6" style={{ minHeight: "400px" }}>
               {messages.length === 0 && !hasStartedConversation ? (
                 <div className="flex flex-col items-center justify-center h-full text-center space-y-6">
                   <div className="space-y-2">
@@ -852,7 +860,9 @@ const ChatPage = () => {
                       key={message.id}
                       className={cn(
                         "flex mb-4 animate-fadeIn w-full items-start gap-3",
-                        message.sender === "user" ? "flex-row-reverse" : "flex-row"
+                        message.sender === "user"
+                          ? "flex-row-reverse"
+                          : "flex-row"
                       )}
                     >
                       {/* Avatar */}
@@ -860,7 +870,10 @@ const ChatPage = () => {
                         <AvatarFallback
                           className="text-white text-xs font-medium"
                           style={{
-                            backgroundColor: message.sender === "user" ? THEME_COLORS.primary.main : '#6B7280'
+                            backgroundColor:
+                              message.sender === "user"
+                                ? THEME_COLORS.primary.main
+                                : "#6B7280",
                           }}
                         >
                           {message.sender === "user" ? (
@@ -880,7 +893,10 @@ const ChatPage = () => {
                             : "rounded-tl-sm bg-gray-100 dark:bg-gray-800"
                         )}
                         style={{
-                          backgroundColor: message.sender === "user" ? THEME_COLORS.primary.main : undefined
+                          backgroundColor:
+                            message.sender === "user"
+                              ? THEME_COLORS.primary.main
+                              : undefined,
                         }}
                       >
                         <div className="break-words">
@@ -894,10 +910,14 @@ const ChatPage = () => {
                             </div>
                           )}
                         </div>
-                        <div className={cn(
-                          "text-xs mt-2 text-right",
-                          message.sender === "user" ? "text-white/70" : "text-muted-foreground"
-                        )}>
+                        <div
+                          className={cn(
+                            "text-xs mt-2 text-right",
+                            message.sender === "user"
+                              ? "text-white/70"
+                              : "text-muted-foreground"
+                          )}
+                        >
                           {message.timestamp}
                         </div>
                         {message.sender === "bot" && message.text && (
@@ -926,7 +946,10 @@ const ChatPage = () => {
                       {/* Loading Bubble */}
                       <div className="max-w-[85%] md:max-w-[70%] rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm bg-gray-100 dark:bg-gray-800">
                         <div className="flex items-center space-x-2">
-                          <Loader2 className="h-4 w-4 animate-spin" style={{ color: THEME_COLORS.primary.main }} />
+                          <Loader2
+                            className="h-4 w-4 animate-spin"
+                            style={{ color: THEME_COLORS.primary.main }}
+                          />
                           <span className="text-sm text-muted-foreground">
                             Thinking...
                           </span>
@@ -975,7 +998,6 @@ const ChatPage = () => {
                   )}
                 </Button>
               </div>
-
             </div>
           </CardContent>
         </Card>

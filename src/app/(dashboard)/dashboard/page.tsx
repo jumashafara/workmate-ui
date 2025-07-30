@@ -15,7 +15,7 @@ export default function DashboardRedirector() {
     if (isSuperuser) {
       router.replace("/superuser/predictions");
     } else if (userRole === "area_manager") {
-      router.replace("/area_manager/predictions");
+      router.replace("/area-manager/predictions");
     } else {
       router.replace("/chat");
     }
