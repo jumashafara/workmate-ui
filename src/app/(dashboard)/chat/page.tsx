@@ -8,6 +8,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sheet,
   SheetContent,
+  SheetHeader,
+  SheetTitle,
 } from "@/components/ui/sheet";
 import {
   Dialog,
@@ -67,19 +69,7 @@ const ChatPage = () => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [chatHistory, setChatHistory] = useState<ChatConversation[]>([]);
-  const [conversationId, setConversationId] = useState<string>(() => {
-    const storedId = localStorage.getItem("currentConversationId");
-    if (storedId) return storedId;
-
-    const newId =
-      typeof crypto.randomUUID === "function"
-        ? crypto.randomUUID()
-        : Math.random().toString(36).substring(2, 15) +
-          Math.random().toString(36).substring(2, 15);
-
-    localStorage.setItem("currentConversationId", newId);
-    return newId;
-  });
+  const [conversationId, setConversationId] = useState<string>("");
   const [fullname, setFullname] = useState<string>("");
   const [hasStartedConversation, setHasStartedConversation] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -93,7 +83,26 @@ const ChatPage = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Initialize conversation ID on client side only
   useEffect(() => {
+    const storedId = localStorage.getItem("currentConversationId");
+    if (storedId) {
+      setConversationId(storedId);
+    } else {
+      const newId =
+        typeof crypto.randomUUID === "function"
+          ? crypto.randomUUID()
+          : Math.random().toString(36).substring(2, 15) +
+            Math.random().toString(36).substring(2, 15);
+      
+      localStorage.setItem("currentConversationId", newId);
+      setConversationId(newId);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!conversationId) return; // Wait for conversationId to be initialized
+    
     const userData = getUserData();
     setFullname(userData.full_name || "Unknown User");
 
@@ -404,8 +413,18 @@ const ChatPage = () => {
         );
       }
 
-      logToTrubrics(newMessage.text, receivedText, fullname, conversationId);
-      logToDATAIDEA(newMessage.text, receivedText, fullname, conversationId);
+      // Analytics logging - don't let failures break the chat
+      try {
+        logToTrubrics(newMessage.text, receivedText, fullname, conversationId);
+      } catch (error) {
+        console.error('Trubrics logging failed:', error);
+      }
+      
+      try {
+        logToDATAIDEA(newMessage.text, receivedText, fullname, conversationId);
+      } catch (error) {
+        console.error('DATAIDEA logging failed:', error);
+      }
 
       try {
         await saveMessageToBackend(receivedText, "bot");
@@ -613,14 +632,13 @@ const ChatPage = () => {
 
           <Sheet open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
             <SheetContent side="left" className="w-80 p-0">
-              {/* Header Section */}
-              <div className="border-b border-gray-200 px-6 py-4">
-                <h2
-                  className="text-lg font-semibold mb-4"
+              <SheetHeader className="border-b border-gray-200 px-6 py-4">
+                <SheetTitle
+                  className="text-lg font-semibold mb-4 text-left"
                   style={{ color: THEME_COLORS.primary.main }}
                 >
                   Chat History
-                </h2>
+                </SheetTitle>
 
                 {/* New Chat Button */}
                 <Button
@@ -634,7 +652,7 @@ const ChatPage = () => {
                   <Plus className="h-4 w-4" />
                   New Chat
                 </Button>
-              </div>
+              </SheetHeader>
 
               {/* Chat History List */}
               <div className="flex-1 overflow-hidden">
