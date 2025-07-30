@@ -20,70 +20,84 @@ import {
 
 // Navigation data generator based on user role
 const getNavigationData = (userRole: string, isSuperuser: boolean) => {
-  const navItems = [];
+  let navItems: any[] = [];
 
-  // Dashboard section - accessible to all authenticated users
-  const dashboardItems = [];
+  // Staff items are visible to all roles.
+  const staffItems = [
+    {
+      title: "Chat",
+      url: "/chat",
+      icon: MessageCircle,
+    },
+  ];
 
-  // Predictions Dashboard - all roles get access
-  dashboardItems.push({
-    title: "Predictions Dashboard",
-    url: "/dashboard",
-  });
-
-  // Predictions Trends - Superuser and Area Manager only
-  if (isSuperuser || userRole === "area_manager") {
-    dashboardItems.push({
-      title: "Predictions Trends",
-      url: "/cluster-trends",
-    });
-  }
-
-  // Check-in Evaluations - Superuser only
   if (isSuperuser) {
-    dashboardItems.push({
-      title: "Check-in Evaluations",
-      url: "/reports/checkins",
-    });
+    navItems = [
+      {
+        title: "Dashboard",
+        url: "#",
+        icon: BarChart3,
+        isActive: true,
+        items: [
+          {
+            title: "Predictions Dashboard",
+            url: "/superuser/predictions",
+          },
+          {
+            title: "Predictions Trends",
+            url: "/superuser/trends",
+          },
+          {
+            title: "Check-in Evaluations",
+            url: "/reports/checkins",
+          },
+        ],
+      },
+      {
+        title: "Model Interpretability",
+        url: "/model-metrics",
+        icon: Brain,
+        items: [
+          {
+            title: "Model Metrics",
+            url: "/model-metrics",
+          },
+          {
+            title: "Feature Importance",
+            url: "/feature-importance",
+          },
+          {
+            title: "Individual Predictions",
+            url: "/individual-predictions",
+          },
+        ],
+      },
+      ...staffItems,
+    ];
+  } else if (userRole === "area_manager") {
+    navItems = [
+      {
+        title: "Dashboard",
+        url: "#",
+        icon: BarChart3,
+        isActive: true,
+        items: [
+          {
+            title: "Predictions Dashboard",
+            url: "/area_manager/predictions",
+          },
+          {
+            title: "Predictions Trends",
+            url: "/area_manager/trends",
+          },
+        ],
+      },
+      ...staffItems,
+    ];
+  } else {
+    // For staff or any other role
+    navItems = staffItems;
   }
-
-  navItems.push({
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: BarChart3,
-    isActive: true,
-    items: dashboardItems,
-  });
-
-  // Model Interpretability section - Superuser only
-  if (isSuperuser) {
-    navItems.push({
-      title: "Model Interpretability",
-      url: "/model-metrics",
-      icon: Brain,
-      items: [
-        {
-          title: "Model Metrics",
-          url: "/model-metrics",
-        },
-        {
-          title: "Feature Importance",
-          url: "/feature-importance",
-        },
-        {
-          title: "Individual Predictions",
-          url: "/individual-predictions",
-        },
-      ],
-    });
-  }
-
-  // Chat section - accessible to all authenticated users
-  navItems.push({
-    title: "Chat",
-    url: "/chat",
-    icon: MessageCircle,
-  });
 
   return {
     teams: [
