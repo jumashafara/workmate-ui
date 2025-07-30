@@ -2,15 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Settings,
-  Sparkles,
-} from "lucide-react";
+import { ChevronsUpDown, LogOut, Settings } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -89,7 +81,8 @@ export function NavUser() {
                 <span className="truncate font-medium">{user.name}</span>
                 {user.role && (
                   <span className="truncate text-xs text-muted-foreground">
-                    {user.role} {user.region && `• ${user.region}`}
+                    {user.role}
+                    {user.region ? ` • ${user.region}` : ""}
                   </span>
                 )}
               </div>
@@ -119,7 +112,8 @@ export function NavUser() {
                   <span className="truncate font-medium">{user.name}</span>
                   {user.role && (
                     <span className="truncate text-xs text-muted-foreground">
-                      {user.role} {user.region && `• ${user.region}`}
+                      {user.role}
+                      {user.region ? ` • ${user.region}` : ""}
                     </span>
                   )}
                 </div>

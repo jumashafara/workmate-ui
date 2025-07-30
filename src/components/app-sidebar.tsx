@@ -84,11 +84,11 @@ const getNavigationData = (userRole: string, isSuperuser: boolean) => {
         items: [
           {
             title: "Predictions Dashboard",
-            url: "/area_manager/predictions",
+            url: "/area-manager/predictions",
           },
           {
             title: "Predictions Trends",
-            url: "/area_manager/trends",
+            url: "/area-manager/trends",
           },
         ],
       },
@@ -131,8 +131,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   useEffect(() => {
     const userData = getUserData();
     const userRole = userData.role || "";
-    const isSuperuser =
-      userData.superuser === true || userData.superuser === "true";
+    const isSuperuser = userData.superuser === true;
 
     // Generate navigation based on user role
     const navData = getNavigationData(userRole, isSuperuser);
