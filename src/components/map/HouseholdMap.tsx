@@ -6,6 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Maximize2, Minimize2, MapPin } from "lucide-react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
 // Define household interface
 interface Household {
@@ -44,8 +47,105 @@ interface HouseholdMapProps {
   households: Household[];
 }
 
+// Custom colored marker icons
+const createIcon = (color: string) => {
+  const markerHtml = `
+    <svg viewBox="0 0 24 24" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="${color}" stroke="white" stroke-width="0.5"/>
+    </svg>`;
+  return L.divIcon({
+    html: markerHtml,
+    className: "bg-transparent border-0",
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32],
+  });
+};
+
+const greenIcon = createIcon("#22c55e"); // tailwind green-500
+const redIcon = createIcon("#ef4444"); // tailwind red-500
+
+// Component to auto-fit map bounds to markers
+const FitBounds: React.FC<{ households: Household[] }> = ({ households }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (households.length > 0) {
+      const bounds = L.latLngBounds(
+        households.map((h) => [h.latitude, h.longitude])
+      );
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+      }
+    }
+  }, [households, map]);
+
+  return null;
+};
+
+// The actual map component implementation
+const LeafletMap: React.FC<{ households: Household[]; isFullScreen: boolean }> = ({
+  households,
+}) => {
+  const center: L.LatLngExpression =
+    households.length > 0
+      ? [households[0].latitude, households[0].longitude]
+      : [1.3733, 32.2903]; // Default to Uganda center
+
+  return (
+    <MapContainer
+      center={center}
+      zoom={7}
+      style={{ height: "100%", width: "100%", borderRadius: "inherit" }}
+      className="z-0"
+    >
+      <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+      {households.map((h) => (
+        <Marker
+          key={h.household_id}
+          position={[h.latitude, h.longitude]}
+          icon={h.prediction === 1 ? greenIcon : redIcon}
+        >
+          <Popup>
+            <div className="font-sans">
+              <h4 className="font-bold text-base mb-1">
+                ID: {h.household_id}
+              </h4>
+              <p>
+                <strong>Status:</strong>{" "}
+                <span
+                  className={
+                    h.prediction === 1 ? "text-green-600" : "text-red-600"
+                  }
+                >
+                  {h.prediction === 1 ? "Achieved" : "Not Achieved"}
+                </span>
+              </p>
+              <p>
+                <strong>Predicted Income:</strong> $
+                {h.predicted_income?.toFixed(0)}
+              </p>
+              <p>
+                <strong>Village:</strong> {h.village}
+              </p>
+              <p>
+                <strong>Coordinates:</strong> {h.latitude.toFixed(4)},{" "}
+                {h.longitude.toFixed(4)}
+              </p>
+            </div>
+          </Popup>
+        </Marker>
+      ))}
+      <FitBounds households={households} />
+    </MapContainer>
+  );
+};
+
 // Dynamic map component to avoid SSR issues
-const MapComponent = dynamic(() => import("./MapComponent"), {
+const MapComponent = dynamic(() => Promise.resolve(LeafletMap), {
   ssr: false,
   loading: () => (
     <div className="flex items-center justify-center h-full">
