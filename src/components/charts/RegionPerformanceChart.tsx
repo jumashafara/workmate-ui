@@ -1,8 +1,14 @@
-import React, { useMemo } from 'react';
-import dynamic from 'next/dynamic';
+import React, { useMemo } from "react";
+import dynamic from "next/dynamic";
 
-const Plot = dynamic(() => import('react-plotly.js'), { ssr: false });
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 
 interface PredictionData {
   id: number;
@@ -36,31 +42,31 @@ interface RegionStats {
   achieved_count: number;
 }
 
-const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({ 
-  data, 
-  height = 400 
+const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
+  data,
+  height = 400,
 }) => {
   // Process data to aggregate by region
   const regionStats = useMemo(() => {
     if (!data || data.length === 0) return [];
 
     const grouped = data.reduce((acc, item) => {
-      const region = item.region || 'Unknown';
-      
+      const region = item.region || "Unknown";
+
       if (!acc[region]) {
         acc[region] = {
           total: 0,
           achieved: 0,
           income_sum: 0,
-          probability_sum: 0
+          probability_sum: 0,
         };
       }
-      
+
       acc[region].total++;
       acc[region].achieved += item.prediction;
       acc[region].income_sum += item.predicted_income || 0;
       acc[region].probability_sum += item.probability || 0;
-      
+
       return acc;
     }, {} as Record<string, any>);
 
@@ -71,7 +77,7 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
         avg_income: stats.income_sum / stats.total,
         total_households: stats.total,
         avg_probability: stats.probability_sum / stats.total,
-        achieved_count: stats.achieved
+        achieved_count: stats.achieved,
       }))
       .sort((a, b) => b.achievement_rate - a.achievement_rate);
   }, [data]);
@@ -79,60 +85,70 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
   // Prepare data for Plotly
   const plotData = [
     {
-      x: regionStats.map(stat => stat.region),
-      y: regionStats.map(stat => stat.achievement_rate),
-      type: 'bar' as const,
-      name: 'Achievement Rate (%)',
+      x: regionStats.map((stat) => stat.region),
+      y: regionStats.map((stat) => stat.achievement_rate),
+      type: "bar" as const,
+      name: "Achievement Rate (%)",
       marker: {
-        color: regionStats.map(stat => 
-          stat.achievement_rate >= 70 ? '#4CAF50' : 
-          stat.achievement_rate >= 50 ? '#EA580C' : '#1c2434'
+        color: regionStats.map((stat) =>
+          stat.achievement_rate >= 70
+            ? "#4CAF50"
+            : stat.achievement_rate >= 50
+            ? "#EA580C"
+            : "#1c2434"
         ),
         opacity: 0.8,
         line: {
-          color: '#2E7D32',
-          width: 1
-        }
+          color: "#2E7D32",
+          width: 1,
+        },
       },
-      text: regionStats.map(stat => 
-        `${stat.achievement_rate.toFixed(1)}%<br>` +
-        `${stat.achieved_count}/${stat.total_households} households`
+      text: regionStats.map(
+        (stat) =>
+          `${stat.achievement_rate.toFixed(1)}%<br>` +
+          `${stat.achieved_count}/${stat.total_households} households`
       ),
-      textposition: 'outside' as const,
-      hovertemplate: 
-        '<b>%{x}</b><br>' +
-        'Achievement Rate: %{y:.1f}%<br>' +
-        'Achieved: %{customdata[0]} households<br>' +
-        'Total Households: %{customdata[1]}<br>' +
-        'Average Income + Production: $%{customdata[2]:.0f}<br>' +
-        'Average Probability: %{customdata[3]:.3f}' +
-        '<extra></extra>',
-      customdata: regionStats.map(stat => [
+      textposition: "outside" as const,
+      hovertemplate:
+        "<b>%{x}</b><br>" +
+        "Achievement Rate: %{y:.1f}%<br>" +
+        "Achieved: %{customdata[0]} households<br>" +
+        "Total Households: %{customdata[1]}<br>" +
+        "Average Income + Production: $%{customdata[2]:.0f}<br>" +
+        "Average Probability: %{customdata[3]:.3f}" +
+        "<extra></extra>",
+      customdata: regionStats.map((stat) => [
         stat.achieved_count,
         stat.total_households,
         stat.avg_income,
-        stat.avg_probability
-      ])
-    }
+        stat.avg_probability,
+      ]),
+    },
   ];
 
   const layout = {
     title: {
-      text: 'Regional Performance Analysis',
-      font: { size: 16, family: 'Arial, sans-serif', color: '#1c2434' },
+      text: "Regional Performance Analysis",
+      font: { size: 16, family: "Arial, sans-serif", color: "#1c2434" },
       x: 0.5,
-      xanchor: 'center'
+      xanchor: "center" as const,
     },
     xaxis: {
-      title: { text: 'Region', font: { color: '#1c2434' } },
+      title: { text: "Region", font: { color: "#1c2434" } },
       tickangle: -45,
       automargin: true,
-      tickfont: { color: '#1c2434' }
+      tickfont: { color: "#1c2434" },
     },
     yaxis: {
-      title: { text: 'Achievement Rate (%)', font: { color: '#1c2434' } },
-      range: [0, Math.max(100, Math.max(...regionStats.map(s => s.achievement_rate)) + 10)],
-      tickfont: { color: '#1c2434' }
+      title: { text: "Achievement Rate (%)", font: { color: "#1c2434" } },
+      range: [
+        0,
+        Math.max(
+          100,
+          Math.max(...regionStats.map((s) => s.achievement_rate)) + 10
+        ),
+      ],
+      tickfont: { color: "#1c2434" },
     },
     showlegend: false,
     autosize: true,
@@ -140,25 +156,25 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
       l: 60,
       r: 60,
       t: 80,
-      b: 100
+      b: 100,
     },
-    hovermode: 'closest' as const,
-    plot_bgcolor: '#fafafa',
-    paper_bgcolor: 'white'
+    hovermode: "closest" as const,
+    plot_bgcolor: "#fafafa",
+    paper_bgcolor: "white",
   };
 
   const config = {
     displayModeBar: true,
-    modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d'] as any,
+    modeBarButtonsToRemove: ["pan2d", "lasso2d", "select2d"] as any,
     displaylogo: false,
     responsive: true,
     toImageButtonOptions: {
-      format: 'png' as const,
-      filename: 'region-performance',
+      format: "png" as const,
+      filename: "region-performance",
       height: 500,
       width: 800,
-      scale: 1
-    }
+      scale: 1,
+    },
   };
 
   if (!data || data.length === 0) {
@@ -174,9 +190,17 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
   }
 
   // Calculate summary statistics
-  const overallAchievementRate = (regionStats.reduce((sum, s) => sum + s.achievement_rate, 0) / regionStats.length) || 0;
-  const totalHouseholds = regionStats.reduce((sum, s) => sum + s.total_households, 0);
-  const totalAchieved = regionStats.reduce((sum, s) => sum + s.achieved_count, 0);
+  const overallAchievementRate =
+    regionStats.reduce((sum, s) => sum + s.achievement_rate, 0) /
+      regionStats.length || 0;
+  const totalHouseholds = regionStats.reduce(
+    (sum, s) => sum + s.total_households,
+    0
+  );
+  const totalAchieved = regionStats.reduce(
+    (sum, s) => sum + s.achieved_count,
+    0
+  );
   const bestPerformingRegion = regionStats[0];
   const worstPerformingRegion = regionStats[regionStats.length - 1];
 
@@ -189,13 +213,16 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="p-6">
-        <div className="w-full mb-4 flex items-center justify-center" style={{ height: height }}>
+        <div
+          className="w-full mb-4 flex items-center justify-center"
+          style={{ height: height }}
+        >
           <div className="w-full h-full">
             <Plot
               data={plotData}
               layout={layout}
               config={config}
-              style={{ width: '100%', height: '100%' }}
+              style={{ width: "100%", height: "100%" }}
               useResizeHandler={true}
             />
           </div>
@@ -205,4 +232,4 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
   );
 };
 
-export default RegionPerformanceChart; 
+export default RegionPerformanceChart;
