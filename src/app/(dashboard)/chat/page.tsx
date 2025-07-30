@@ -37,6 +37,7 @@ import {
   RefreshCw,
   MessageSquare,
   Loader2,
+  Check,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
@@ -80,6 +81,8 @@ const ChatPage = () => {
   >(null);
   const [conversationToDeleteTitle, setConversationToDeleteTitle] =
     useState<string>("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [copiedMessageId, setCopiedMessageId] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -252,10 +255,13 @@ const ChatPage = () => {
     setDeleteDialogOpen(false);
     setConversationToDelete(null);
     setConversationToDeleteTitle("");
+    setIsDeleting(false);
   };
 
   const confirmDeleteChatConversation = async () => {
-    if (!conversationToDelete) return;
+    if (!conversationToDelete || isDeleting) return;
+
+    setIsDeleting(true);
 
     try {
       await ChatHistoryAPI.deleteChatConversation(conversationToDelete);
@@ -272,7 +278,8 @@ const ChatPage = () => {
       closeDeleteDialog();
     } catch (error) {
       console.error("Failed to delete conversation:", error);
-      closeDeleteDialog();
+      setIsDeleting(false);
+      // Don't close dialog on error so user can retry
     }
   };
 
@@ -458,11 +465,35 @@ const ChatPage = () => {
     }
   };
 
-  const copyToClipboard = async (text: string) => {
+  const copyToClipboard = async (text: string, messageId: number) => {
     try {
       await navigator.clipboard.writeText(text);
+      setCopiedMessageId(messageId);
+      // Reset the copied state after 2 seconds
+      setTimeout(() => {
+        setCopiedMessageId(null);
+      }, 2000);
     } catch (error) {
       console.error("Failed to copy:", error);
+      // Fallback for older browsers
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        textArea.remove();
+        setCopiedMessageId(messageId);
+        setTimeout(() => {
+          setCopiedMessageId(null);
+        }, 2000);
+      } catch (fallbackError) {
+        console.error("Fallback copy failed:", fallbackError);
+      }
     }
   };
 
@@ -786,15 +817,29 @@ const ChatPage = () => {
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
-                <Button variant="outline" onClick={closeDeleteDialog}>
+                <Button 
+                  variant="outline" 
+                  onClick={closeDeleteDialog}
+                  disabled={isDeleting}
+                >
                   Cancel
                 </Button>
                 <Button
                   variant="destructive"
                   onClick={confirmDeleteChatConversation}
+                  disabled={isDeleting}
                 >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Delete
+                  {isDeleting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Deleting...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete
+                    </>
+                  )}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -935,24 +980,40 @@ const ChatPage = () => {
                         </div>
                         <div
                           className={cn(
-                            "text-xs mt-2 text-right",
+                            "text-xs mt-2 text-right flex items-center justify-end gap-2",
                             message.sender === "user"
                               ? "text-white/70"
                               : "text-muted-foreground"
                           )}
                         >
-                          {message.timestamp}
+                          <span>{message.timestamp}</span>
+                          {message.text && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => copyToClipboard(message.text, message.id)}
+                                  className={cn(
+                                    "h-5 w-5 p-0 transition-colors opacity-60 hover:opacity-100",
+                                    message.sender === "user"
+                                      ? "text-white/70 hover:text-white"
+                                      : "text-muted-foreground hover:text-foreground"
+                                  )}
+                                >
+                                  {copiedMessageId === message.id ? (
+                                    <Check className="h-3 w-3 text-green-500" />
+                                  ) : (
+                                    <Copy className="h-3 w-3" />
+                                  )}
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {copiedMessageId === message.id ? "Copied!" : "Copy message"}
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
                         </div>
-                        {message.sender === "bot" && message.text && message.text !== "Thinking..." && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => copyToClipboard(message.text)}
-                            className="h-6 px-2 mt-2 text-muted-foreground hover:text-foreground"
-                          >
-                            <Copy className="h-3 w-3" />
-                          </Button>
-                        )}
                       </div>
                     </div>
                   ))}
