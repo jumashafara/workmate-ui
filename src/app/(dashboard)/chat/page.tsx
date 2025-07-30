@@ -106,12 +106,18 @@ const ChatPage = () => {
     const userData = getUserData();
     setFullname(userData.full_name || "Unknown User");
 
-    if (userData.full_name) {
-      loadChatConversation(conversationId).catch(() => {
-        console.log(
-          "No conversation found in backend for conversationId:",
-          conversationId
-        );
+    if (userData.full_name && conversationId) {
+      loadChatConversation(conversationId).catch((error) => {
+        // 404 errors are expected for new conversations - don't log as errors
+        if (error.message.includes('404') || error.message.includes('not found')) {
+          console.log(
+            "No conversation found in backend for conversationId:",
+            conversationId,
+            "- starting fresh conversation"
+          );
+        } else {
+          console.error("Error loading conversation:", error);
+        }
         setMessages([]);
         setHasStartedConversation(false);
       });
@@ -183,8 +189,7 @@ const ChatPage = () => {
       console.log("Conversation loaded from API:", conversation);
 
       if (!conversation) {
-        console.log("Conversation not found in backend");
-        throw new Error("Conversation not found");
+        throw new Error("Conversation not found (404)");
       }
 
       const convertedMessages: Message[] =
@@ -447,10 +452,6 @@ const ChatPage = () => {
     }
   };
 
-  const clearCurrentChat = () => {
-    setMessages([]);
-    setHasStartedConversation(false);
-  };
 
   const handleLoadMore = () => {
     setMessageLimit((prev) => prev + 6);
