@@ -2,11 +2,7 @@
 
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { 
-  MessageCircle, 
-  BarChart3, 
-  Brain
-} from "lucide-react";
+import { MessageCircle, BarChart3, Brain } from "lucide-react";
 import Image from "next/image";
 import { getUserData } from "@/utils/ccokie";
 
@@ -28,21 +24,21 @@ const getNavigationData = (userRole: string, isSuperuser: boolean) => {
 
   // Dashboard section - accessible to all authenticated users
   const dashboardItems = [];
-  
+
   // Predictions Dashboard - all roles get access
   dashboardItems.push({
     title: "Predictions Dashboard",
     url: "/dashboard",
   });
-  
+
   // Predictions Trends - Superuser and Area Manager only
   if (isSuperuser || userRole === "area_manager") {
     dashboardItems.push({
-      title: "Predictions Trends", 
+      title: "Predictions Trends",
       url: "/cluster-trends",
     });
   }
-  
+
   // Check-in Evaluations - Superuser only
   if (isSuperuser) {
     dashboardItems.push({
@@ -50,7 +46,7 @@ const getNavigationData = (userRole: string, isSuperuser: boolean) => {
       url: "/checkin-evaluations",
     });
   }
-  
+
   navItems.push({
     title: "Dashboard",
     url: "/dashboard",
@@ -58,7 +54,7 @@ const getNavigationData = (userRole: string, isSuperuser: boolean) => {
     isActive: true,
     items: dashboardItems,
   });
-  
+
   // Model Interpretability section - Superuser only
   if (isSuperuser) {
     navItems.push({
@@ -81,14 +77,14 @@ const getNavigationData = (userRole: string, isSuperuser: boolean) => {
       ],
     });
   }
-  
+
   // Chat section - accessible to all authenticated users
   navItems.push({
     title: "Chat",
     url: "/chat",
     icon: MessageCircle,
   });
-  
+
   // Settings section (commented out in frontend, but included for completeness)
   // if (isSuperuser) {
   //   navItems.push({
@@ -97,7 +93,7 @@ const getNavigationData = (userRole: string, isSuperuser: boolean) => {
   //     icon: SettingsIcon,
   //   });
   // }
-  
+
   return {
     teams: [
       {
@@ -126,17 +122,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     navMain: any[];
     projects: any[];
   }>({ teams: [], navMain: [], projects: [] });
-  
+
   useEffect(() => {
     const userData = getUserData();
     const userRole = userData.role || "";
-    const isSuperuser = Boolean(userData.superuser) || userData.superuser === "true";
-    
+    const isSuperuser =
+      userData.superuser === true || userData.superuser === "true";
+
     // Generate navigation based on user role
     const navData = getNavigationData(userRole, isSuperuser);
     setNavigationData(navData);
   }, []);
-  
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>

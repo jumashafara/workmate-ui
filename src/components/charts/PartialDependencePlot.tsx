@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 
-const Plot = dynamic(() => import('react-plotly.js'), { ssr: false });
+const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 import {
   Card,
   CardHeader,
@@ -253,7 +253,7 @@ const PartialDependencePlot: React.FC = () => {
 
   return (
     <Card className="w-full shadow-sm">
-      <CardHeader className="bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
+      <CardHeader>
         <CardTitle>Partial Dependence</CardTitle>
         <CardDescription>
           How does the prediction change if you change one feature?

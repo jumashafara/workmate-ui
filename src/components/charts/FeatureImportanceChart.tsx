@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 
-const Plot = dynamic(() => import('react-plotly.js'), { ssr: false });
+const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 import {
   Card,
   CardHeader,
@@ -185,8 +185,8 @@ const FeatureImportanceChart: React.FC<FeatureImportanceChartProps> = ({
   };
 
   return (
-    <Card className="w-full shadow-sm">
-      <CardHeader className="bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
+    <Card className="w-full shadow-sm ">
+      <CardHeader>
         <div className="flex justify-between items-start">
           <div>
             <CardTitle>Feature Importance Chart</CardTitle>

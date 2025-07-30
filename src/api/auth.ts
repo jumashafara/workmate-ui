@@ -26,11 +26,11 @@ interface AuthResponse {
   };
 }
 
-import { API_ENDPOINT } from "@/utils/endpoints";
+import { ACCOUNTS_ENDPOINT } from "@/utils/endpoints";
 import { getAuthToken } from "@/utils/ccokie";
 
 export const register = async (data: RegisterData) => {
-  const response = await fetch(API_ENDPOINT + "/accounts/register/", {
+  const response = await fetch(ACCOUNTS_ENDPOINT + "/register/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -48,7 +48,7 @@ export const register = async (data: RegisterData) => {
 };
 
 export const login = async (data: LoginData): Promise<AuthResponse> => {
-  const response = await fetch(API_ENDPOINT + "/accounts/login/", {
+  const response = await fetch(ACCOUNTS_ENDPOINT + "/login/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -66,7 +66,7 @@ export const login = async (data: LoginData): Promise<AuthResponse> => {
 };
 
 export const logout = async () => {
-  const response = await fetch(API_ENDPOINT + "/accounts/logout/", {
+  const response = await fetch(ACCOUNTS_ENDPOINT + "/logout/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -86,7 +86,7 @@ export const updatePasswordAPI = async (
   currentPassword: string,
   newPassword: string
 ) => {
-  const response = await fetch(API_ENDPOINT + "/accounts/change-password/", {
+  const response = await fetch(ACCOUNTS_ENDPOINT + "/change-password/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -98,7 +98,7 @@ export const updatePasswordAPI = async (
 };
 
 export const requestPasswordResetAPI = async (email: string) => {
-  const response = await fetch(API_ENDPOINT + "/accounts/request-password-reset/", {
+  const response = await fetch(ACCOUNTS_ENDPOINT + "/request-password-reset/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -110,21 +110,21 @@ export const requestPasswordResetAPI = async (email: string) => {
 
 export const validateResetTokenAPI = async (uid: string, token: string) => {
   console.log('validateResetTokenAPI called with:', { uid, token });
-  
+
   try {
-    const response = await fetch(API_ENDPOINT + "/accounts/validate-reset-token/", {
+    const response = await fetch(ACCOUNTS_ENDPOINT + "/validate-reset-token/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ uid, token }),
     });
-    
+
     console.log('validateResetTokenAPI response status:', response.status);
-    
+
     const data = await response.json();
     console.log('validateResetTokenAPI response data:', data);
-    
+
     return data;
   } catch (error) {
     console.error('Error in validateResetTokenAPI:', error);
@@ -133,7 +133,7 @@ export const validateResetTokenAPI = async (uid: string, token: string) => {
 };
 
 export const resetPasswordAPI = async (uid: string, token: string, newPassword: string) => {
-  const response = await fetch(API_ENDPOINT + "/accounts/reset-password/", {
+  const response = await fetch(ACCOUNTS_ENDPOINT + "/reset-password/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -144,7 +144,7 @@ export const resetPasswordAPI = async (uid: string, token: string, newPassword: 
 };
 
 export const getUser = async () => {
-  const response = await fetch(API_ENDPOINT + "/accounts/user/", {
+  const response = await fetch(ACCOUNTS_ENDPOINT + "/user/", {
     headers: {
       Authorization: `Bearer ${getAuthToken()}`,
     },
@@ -158,7 +158,7 @@ export const getUser = async () => {
 
 // Google Authentication methods
 export const getGoogleAuthUrl = async (): Promise<string> => {
-  const response = await fetch(API_ENDPOINT + "/accounts/google/login/", {
+  const response = await fetch(ACCOUNTS_ENDPOINT + "/google/login/", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -177,10 +177,10 @@ export const getGoogleAuthUrl = async (): Promise<string> => {
 export const googleAuthenticate = async (code: string): Promise<AuthResponse> => {
   // URL decode the code if it's encoded
   const decodedCode = decodeURIComponent(code);
-  
+
   console.log('Authenticating with Google code:', decodedCode);
-  
-  const response = await fetch(API_ENDPOINT + "/accounts/google/callback/", {
+
+  const response = await fetch(ACCOUNTS_ENDPOINT + "/google/callback/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
