@@ -975,23 +975,6 @@ const ChatPage = () => {
                 </Button>
               </div>
 
-              {messages.length > 0 && (
-                <div className="flex justify-center">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={clearCurrentChat}
-                    className="gap-2"
-                    style={{ color: THEME_COLORS.primary.main }}
-                  >
-                    <Trash2
-                      className="h-3 w-3"
-                      style={{ color: THEME_COLORS.primary.main }}
-                    />
-                    Clear chat
-                  </Button>
-                </div>
-              )}
             </div>
           </CardContent>
         </Card>
