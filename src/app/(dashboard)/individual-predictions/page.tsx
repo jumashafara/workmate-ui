@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, User, BarChart3, Settings, TrendingUp } from "lucide-react";
 import dynamic from "next/dynamic";
 import { API_ENDPOINT } from "@/utils/endpoints";
 
@@ -242,34 +242,61 @@ export default function IndividualPredictionPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          Individual Prediction
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400">
-          Generate predictions for individual households by entering their
-          characteristics.
-        </p>
+      <div className="bg-white dark:bg-slate-900 rounded-xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className="flex items-start gap-4">
+          <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-xl">
+            <User className="h-8 w-8 text-orange-600 dark:text-orange-400" />
+          </div>
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Individual Prediction
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 text-lg mb-4">
+              Generate AI-powered predictions for individual households by entering their characteristics and features
+            </p>
+            <div className="flex items-center gap-6 text-sm">
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <BarChart3 className="h-4 w-4" />
+                <span>ML Predictions</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <TrendingUp className="h-4 w-4" />
+                <span>Real-time Analysis</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <Settings className="h-4 w-4" />
+                <span>Customizable Features</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Validation Error */}
       {validationError && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{validationError}</AlertDescription>
+        <Alert className="border-orange-200 bg-orange-50 text-orange-800 dark:border-orange-800 dark:bg-orange-900/10 dark:text-orange-200">
+          <AlertCircle className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+          <AlertDescription className="text-orange-700 dark:text-orange-300">{validationError}</AlertDescription>
         </Alert>
       )}
 
       {/* Input Form */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Household Information</CardTitle>
+      <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
+        <CardHeader className="pb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+              <Settings className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+            </div>
+            <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">Household Information</CardTitle>
+          </div>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Basic Information */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Location & Context</h4>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="region">Region *</Label>
+              <Label htmlFor="region" className="text-sm font-medium text-gray-700 dark:text-gray-300">Region *</Label>
               <Input
                 id="region"
                 value={formData.region}
@@ -279,7 +306,7 @@ export default function IndividualPredictionPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="district">District *</Label>
+              <Label htmlFor="district" className="text-sm font-medium text-gray-700 dark:text-gray-300">District *</Label>
               <Input
                 id="district"
                 value={formData.district}
@@ -289,7 +316,7 @@ export default function IndividualPredictionPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="village">Village *</Label>
+              <Label htmlFor="village" className="text-sm font-medium text-gray-700 dark:text-gray-300">Village *</Label>
               <Input
                 id="village"
                 value={formData.village}
@@ -299,7 +326,7 @@ export default function IndividualPredictionPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cluster">Cluster *</Label>
+              <Label htmlFor="cluster" className="text-sm font-medium text-gray-700 dark:text-gray-300">Cluster *</Label>
               <Input
                 id="cluster"
                 value={formData.cluster}
@@ -309,7 +336,7 @@ export default function IndividualPredictionPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cohort">Cohort *</Label>
+              <Label htmlFor="cohort" className="text-sm font-medium text-gray-700 dark:text-gray-300">Cohort *</Label>
               <Input
                 id="cohort"
                 value={formData.cohort}
@@ -319,7 +346,7 @@ export default function IndividualPredictionPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cycle">Cycle *</Label>
+              <Label htmlFor="cycle" className="text-sm font-medium text-gray-700 dark:text-gray-300">Cycle *</Label>
               <Input
                 id="cycle"
                 value={formData.cycle}
@@ -329,7 +356,7 @@ export default function IndividualPredictionPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="evaluation_month">Evaluation Month</Label>
+              <Label htmlFor="evaluation_month" className="text-sm font-medium text-gray-700 dark:text-gray-300">Evaluation Month</Label>
               <Input
                 id="evaluation_month"
                 type="number"
@@ -344,17 +371,17 @@ export default function IndividualPredictionPage() {
                 max="24"
               />
             </div>
+            </div>
           </div>
 
           {/* Numeric Features */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Household Characteristics</h3>
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Numeric Characteristics</h3>
 
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-6 md:grid-cols-2">
               <div className="space-y-2">
-                <Label>
-                  Land Size (Acres):{" "}
-                  {formData.Land_size_for_Crop_Agriculture_Acres[0]}
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Land Size (Acres): <span className="text-orange-600 dark:text-orange-400 font-semibold">{formData.Land_size_for_Crop_Agriculture_Acres[0]}</span>
                 </Label>
                 <Slider
                   value={[formData.Land_size_for_Crop_Agriculture_Acres[0]]}
@@ -372,7 +399,7 @@ export default function IndividualPredictionPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>Household Members: {formData.tot_hhmembers[0]}</Label>
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Household Members: <span className="text-orange-600 dark:text-orange-400 font-semibold">{formData.tot_hhmembers[0]}</span></Label>
                 <Slider
                   value={[formData.tot_hhmembers[0]]}
                   onValueChange={(value) =>
@@ -386,8 +413,8 @@ export default function IndividualPredictionPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>
-                  Farm Implements: {formData.farm_implements_owned[0]}
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Farm Implements: <span className="text-orange-600 dark:text-orange-400 font-semibold">{formData.farm_implements_owned[0]}</span>
                 </Label>
                 <Slider
                   value={[formData.farm_implements_owned[0]]}
@@ -402,9 +429,8 @@ export default function IndividualPredictionPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>
-                  Distance to OPD (km):{" "}
-                  {formData.Distance_travelled_one_way_OPD_treatment[0]}
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Distance to OPD (km): <span className="text-orange-600 dark:text-orange-400 font-semibold">{formData.Distance_travelled_one_way_OPD_treatment[0]}</span>
                 </Label>
                 <Slider
                   value={[formData.Distance_travelled_one_way_OPD_treatment[0]]}
@@ -422,9 +448,8 @@ export default function IndividualPredictionPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>
-                  Water Collection Time (min):{" "}
-                  {formData.hh_water_collection_Minutes[0]}
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Water Collection Time (min): <span className="text-orange-600 dark:text-orange-400 font-semibold">{formData.hh_water_collection_Minutes[0]}</span>
                 </Label>
                 <Slider
                   value={[formData.hh_water_collection_Minutes[0]]}
@@ -439,8 +464,8 @@ export default function IndividualPredictionPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>
-                  Education Level: {formData.education_level_encoded[0]}
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Education Level: <span className="text-orange-600 dark:text-orange-400 font-semibold">{formData.education_level_encoded[0]}</span>
                 </Label>
                 <Slider
                   value={[formData.education_level_encoded[0]]}
@@ -455,9 +480,8 @@ export default function IndividualPredictionPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>
-                  Average Water Consumed Per Day (L):{" "}
-                  {formData.Average_Water_Consumed_Per_Day[0]}
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Average Water Consumed Per Day (L): <span className="text-orange-600 dark:text-orange-400 font-semibold">{formData.Average_Water_Consumed_Per_Day[0]}</span>
                 </Label>
                 <Slider
                   value={[formData.Average_Water_Consumed_Per_Day[0]]}
@@ -475,7 +499,7 @@ export default function IndividualPredictionPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>Composts Number: {formData.composts_num[0]}</Label>
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Composts Number: <span className="text-orange-600 dark:text-orange-400 font-semibold">{formData.composts_num[0]}</span></Label>
                 <Slider
                   value={[formData.composts_num[0]]}
                   onValueChange={(value) =>
@@ -491,8 +515,8 @@ export default function IndividualPredictionPage() {
           </div>
 
           {/* Boolean Features */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
               Agricultural & Social Participation
             </h3>
 
@@ -505,7 +529,7 @@ export default function IndividualPredictionPage() {
                     updateBooleanArray("vsla_participation", checked)
                   }
                 />
-                <Label htmlFor="vsla_participation">VSLA Participation</Label>
+                <Label htmlFor="vsla_participation" className="text-sm font-medium text-gray-700 dark:text-gray-300">VSLA Participation</Label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -516,7 +540,7 @@ export default function IndividualPredictionPage() {
                     updateBooleanArray("business_participation", checked)
                   }
                 />
-                <Label htmlFor="business_participation">
+                <Label htmlFor="business_participation" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Business Participation
                 </Label>
               </div>
@@ -529,7 +553,7 @@ export default function IndividualPredictionPage() {
                     updateBooleanArray("maize", checked)
                   }
                 />
-                <Label htmlFor="maize">Grows Maize</Label>
+                <Label htmlFor="maize" className="text-sm font-medium text-gray-700 dark:text-gray-300">Grows Maize</Label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -540,7 +564,7 @@ export default function IndividualPredictionPage() {
                     updateBooleanArray("ground_nuts", checked)
                   }
                 />
-                <Label htmlFor="ground_nuts">Grows Ground Nuts</Label>
+                <Label htmlFor="ground_nuts" className="text-sm font-medium text-gray-700 dark:text-gray-300">Grows Ground Nuts</Label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -551,7 +575,7 @@ export default function IndividualPredictionPage() {
                     updateBooleanArray("sweet_potatoes", checked)
                   }
                 />
-                <Label htmlFor="sweet_potatoes">Grows Sweet Potatoes</Label>
+                <Label htmlFor="sweet_potatoes" className="text-sm font-medium text-gray-700 dark:text-gray-300">Grows Sweet Potatoes</Label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -562,7 +586,7 @@ export default function IndividualPredictionPage() {
                     updateBooleanArray("cassava", checked)
                   }
                 />
-                <Label htmlFor="cassava">Grows Cassava</Label>
+                <Label htmlFor="cassava" className="text-sm font-medium text-gray-700 dark:text-gray-300">Grows Cassava</Label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -573,7 +597,7 @@ export default function IndividualPredictionPage() {
                     updateBooleanArray("tippy_tap_present", checked)
                   }
                 />
-                <Label htmlFor="tippy_tap_present">Has Tippy Tap</Label>
+                <Label htmlFor="tippy_tap_present" className="text-sm font-medium text-gray-700 dark:text-gray-300">Has Tippy Tap</Label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -584,7 +608,7 @@ export default function IndividualPredictionPage() {
                     updateBooleanArray("hh_produce_organics", checked)
                   }
                 />
-                <Label htmlFor="hh_produce_organics">Produces Organics</Label>
+                <Label htmlFor="hh_produce_organics" className="text-sm font-medium text-gray-700 dark:text-gray-300">Produces Organics</Label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -595,7 +619,7 @@ export default function IndividualPredictionPage() {
                     updateBooleanArray("hhh_sex", checked)
                   }
                 />
-                <Label htmlFor="hhh_sex">Head of Household (Female)</Label>
+                <Label htmlFor="hhh_sex" className="text-sm font-medium text-gray-700 dark:text-gray-300">Head of Household (Female)</Label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -609,7 +633,7 @@ export default function IndividualPredictionPage() {
                     )
                   }
                 />
-                <Label htmlFor="perennial_crops_grown_food_banana">
+                <Label htmlFor="perennial_crops_grown_food_banana" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Grows Food Banana
                 </Label>
               </div>
@@ -622,7 +646,7 @@ export default function IndividualPredictionPage() {
                     updateBooleanArray("perennial_crops_grown_coffee", checked)
                   }
                 />
-                <Label htmlFor="perennial_crops_grown_coffee">
+                <Label htmlFor="perennial_crops_grown_coffee" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Grows Coffee
                 </Label>
               </div>
@@ -635,7 +659,7 @@ export default function IndividualPredictionPage() {
                     updateBooleanArray("irish_potatoes", checked)
                   }
                 />
-                <Label htmlFor="irish_potatoes">Grows Irish Potatoes</Label>
+                <Label htmlFor="irish_potatoes" className="text-sm font-medium text-gray-700 dark:text-gray-300">Grows Irish Potatoes</Label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -646,7 +670,7 @@ export default function IndividualPredictionPage() {
                     updateBooleanArray("sorghum", checked)
                   }
                 />
-                <Label htmlFor="sorghum">Grows Sorghum</Label>
+                <Label htmlFor="sorghum" className="text-sm font-medium text-gray-700 dark:text-gray-300">Grows Sorghum</Label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -657,7 +681,7 @@ export default function IndividualPredictionPage() {
                     updateBooleanArray("hh_produce_lq_manure", checked)
                   }
                 />
-                <Label htmlFor="hh_produce_lq_manure">
+                <Label htmlFor="hh_produce_lq_manure" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Produces Liquid Manure
                 </Label>
               </div>
@@ -670,7 +694,7 @@ export default function IndividualPredictionPage() {
                     updateBooleanArray("non_bio_waste_mgt_present", checked)
                   }
                 />
-                <Label htmlFor="non_bio_waste_mgt_present">
+                <Label htmlFor="non_bio_waste_mgt_present" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Non-Bio Waste Management
                 </Label>
               </div>
@@ -683,7 +707,7 @@ export default function IndividualPredictionPage() {
                     updateBooleanArray("soap_ash_present", checked)
                   }
                 />
-                <Label htmlFor="soap_ash_present">Soap Ash Present</Label>
+                <Label htmlFor="soap_ash_present" className="text-sm font-medium text-gray-700 dark:text-gray-300">Soap Ash Present</Label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -694,7 +718,7 @@ export default function IndividualPredictionPage() {
                     updateBooleanArray("standard_evaluation", checked)
                   }
                 />
-                <Label htmlFor="standard_evaluation">Standard Evaluation</Label>
+                <Label htmlFor="standard_evaluation" className="text-sm font-medium text-gray-700 dark:text-gray-300">Standard Evaluation</Label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -705,7 +729,7 @@ export default function IndividualPredictionPage() {
                     updateBooleanArray("checkin_evaluation", checked)
                   }
                 />
-                <Label htmlFor="checkin_evaluation">Check-in Evaluation</Label>
+                <Label htmlFor="checkin_evaluation" className="text-sm font-medium text-gray-700 dark:text-gray-300">Check-in Evaluation</Label>
               </div>
             </div>
           </div>
@@ -745,17 +769,17 @@ export default function IndividualPredictionPage() {
       )}
 
       {!predictionMade && !loading && (
-        <Card>
+        <Card className="bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-800">
           <CardContent className="text-center py-12">
-            <div className="text-gray-500">
-              <h3 className="text-lg font-medium mb-2">
-                Ready to Generate Prediction
-              </h3>
-              <p>
-                Fill in the form above and click "Generate Prediction" to see
-                results
-              </p>
+            <div className="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-full w-fit mx-auto mb-4">
+              <BarChart3 className="h-8 w-8 text-orange-600 dark:text-orange-400" />
             </div>
+            <h3 className="text-lg font-semibold text-orange-900 dark:text-orange-100 mb-2">
+              Ready to Generate Prediction
+            </h3>
+            <p className="text-orange-700 dark:text-orange-300">
+              Fill in the form above and click "Generate Prediction" to see AI-powered results and feature contributions
+            </p>
           </CardContent>
         </Card>
       )}
