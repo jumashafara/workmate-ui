@@ -499,8 +499,8 @@ export default function SuperuserTrendsPage() {
       {/* Header */}
       <div className="bg-white dark:bg-slate-900 rounded-xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="flex items-start gap-4">
-          <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-xl">
-            <TrendingUp className="h-8 w-8 text-green-600 dark:text-green-400" />
+          <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-xl">
+            <TrendingUp className="h-8 w-8 text-orange-600 dark:text-orange-400" />
           </div>
           <div className="flex-1">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -532,13 +532,13 @@ export default function SuperuserTrendsPage() {
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-3">
-              <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                <Filter className="h-5 w-5 text-green-600 dark:text-green-400" />
+              <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                <Filter className="h-5 w-5 text-orange-600 dark:text-orange-400" />
               </div>
               <div>
                 <span className="text-xl font-semibold text-gray-900 dark:text-white">Trend Filters</span>
                 {activeFiltersCount > 0 && (
-                  <Badge className="ml-2 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                  <Badge className="ml-2 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
                     {activeFiltersCount} active
                   </Badge>
                 )}
@@ -610,7 +610,7 @@ export default function SuperuserTrendsPage() {
               <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Active Filters</h4>
               <div className="flex flex-wrap gap-2">
               {selectedRegions.map((region) => (
-                <Badge key={region} className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors">
+                <Badge key={region} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
                   Region: {region}
                   <X
                     className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
@@ -623,7 +623,7 @@ export default function SuperuserTrendsPage() {
                 </Badge>
               ))}
               {selectedDistricts.map((district) => (
-                <Badge key={district} className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-800 transition-colors">
+                <Badge key={district} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
                   District: {district}
                   <X
                     className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
@@ -636,7 +636,7 @@ export default function SuperuserTrendsPage() {
                 </Badge>
               ))}
               {selectedClusters.map((cluster) => (
-                <Badge key={cluster} className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors">
+                <Badge key={cluster} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
                   Cluster: {cluster}
                   <X
                     className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
@@ -673,8 +673,8 @@ export default function SuperuserTrendsPage() {
         <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
           <CardHeader className="pb-4">
             <div className="flex items-start gap-3">
-              <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
+              <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                <TrendingUp className="h-5 w-5 text-orange-600 dark:text-orange-400" />
               </div>
               <div>
                 <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">Average Income + Production Trends by Cluster</CardTitle>
@@ -724,8 +724,8 @@ export default function SuperuserTrendsPage() {
         <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
           <CardHeader className="pb-4">
             <div className="flex items-start gap-3">
-              <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                <BarChart3 className="h-5 w-5 text-orange-600 dark:text-orange-400" />
               </div>
               <div>
                 <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">Income + Production vs Achievement Rate</CardTitle>
@@ -758,40 +758,40 @@ export default function SuperuserTrendsPage() {
       </div>
 
       {/* Summary Statistics */}
-      <Card className="bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800">
+      <Card className="bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-800">
         <CardHeader className="pb-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-              <Activity className="h-5 w-5 text-green-600 dark:text-green-400" />
+            <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
+              <Activity className="h-5 w-5 text-orange-600 dark:text-orange-400" />
             </div>
-            <CardTitle className="text-xl font-semibold text-green-900 dark:text-green-100">Summary Statistics</CardTitle>
+            <CardTitle className="text-xl font-semibold text-orange-900 dark:text-orange-100">Summary Statistics</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
           <div className="grid gap-6 md:grid-cols-4">
-            <div className="bg-white dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
-              <Label className="text-sm font-medium text-green-700 dark:text-green-300">Total Clusters</Label>
-              <div className="text-3xl font-bold text-green-600 dark:text-green-400 mt-2">
+            <div className="bg-white dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
+              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">Total Clusters</Label>
+              <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mt-2">
                 {summaryStats.totalClusters}
               </div>
             </div>
-            <div className="bg-white dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
-              <Label className="text-sm font-medium text-green-700 dark:text-green-300">Evaluation Months</Label>
-              <div className="text-3xl font-bold text-green-600 dark:text-green-400 mt-2">
+            <div className="bg-white dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
+              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">Evaluation Months</Label>
+              <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mt-2">
                 {summaryStats.evaluationMonths}
               </div>
             </div>
-            <div className="bg-white dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
-              <Label className="text-sm font-medium text-green-700 dark:text-green-300">
+            <div className="bg-white dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
+              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">
                 Avg Income + Production
               </Label>
-              <div className="text-2xl font-bold text-green-600 dark:text-green-400 mt-2">
+              <div className="text-2xl font-bold text-orange-600 dark:text-orange-400 mt-2">
                 ${summaryStats.avgIncome.toFixed(0)}
               </div>
             </div>
-            <div className="bg-white dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
-              <Label className="text-sm font-medium text-green-700 dark:text-green-300">Total Households</Label>
-              <div className="text-2xl font-bold text-green-600 dark:text-green-400 mt-2">
+            <div className="bg-white dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
+              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">Total Households</Label>
+              <div className="text-2xl font-bold text-orange-600 dark:text-orange-400 mt-2">
                 {summaryStats.totalHouseholds.toLocaleString()}
               </div>
             </div>
