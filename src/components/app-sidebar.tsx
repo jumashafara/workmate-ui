@@ -43,7 +43,7 @@ const getNavigationData = (userRole: string, isSuperuser: boolean) => {
   if (isSuperuser) {
     dashboardItems.push({
       title: "Check-in Evaluations",
-      url: "/checkin-evaluations",
+      url: "/reports/checkins",
     });
   }
 

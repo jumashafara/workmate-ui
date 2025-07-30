@@ -147,7 +147,6 @@ const fetchRegressionModelMetrics = async (
 export default function ModelMetricsPage() {
   const [classificationModelMetrics, setClassificationModelMetrics] =
     useState<ClassificationMetrics | null>(null);
-  const [confusionMatrixData, setConfusionMatrixData] = useState<any>(null);
   const [regressionModelMetrics, setRegressionModelMetrics] =
     useState<RegressionMetrics | null>(null);
   const [loading, setLoading] = useState(false);
@@ -189,13 +188,11 @@ export default function ModelMetricsPage() {
       if (type === "classification") {
         const data = await fetchClassificationModelMetrics(name);
         setClassificationModelMetrics(data);
-        setConfusionMatrixData(data.confusion_matrix);
         setRegressionModelMetrics(null);
       } else {
         const metrics = await fetchRegressionModelMetrics(name);
         setRegressionModelMetrics(metrics);
         setClassificationModelMetrics(null);
-        setConfusionMatrixData(null);
       }
     } catch (error) {
       console.error("Failed to fetch model metrics:", error);
@@ -216,7 +213,7 @@ export default function ModelMetricsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-20">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -248,66 +245,56 @@ export default function ModelMetricsPage() {
       </div>
 
       {/* Model Statistics Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            {model.type === "classification" ? "Classification" : "Regression"}{" "}
-            Model Performance
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <Skeleton className="h-32 w-full" />
-          ) : model.type === "classification" ? (
-            <ClassificationModelStatsTable
-              model_metrics={classificationModelMetrics?.model || null}
-            />
-          ) : (
-            <RegressionModelStatsTable model_metrics={regressionModelMetrics} />
-          )}
-        </CardContent>
-      </Card>
+
+      {loading ? (
+        <Skeleton className="h-32 w-full" />
+      ) : model.type === "classification" ? (
+        <ClassificationModelStatsTable
+          model_metrics={classificationModelMetrics?.model || null}
+        />
+      ) : (
+        <RegressionModelStatsTable model_metrics={regressionModelMetrics} />
+      )}
 
       {/* Classification-specific visualizations */}
       {model.type === "classification" && (
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Confusion Matrix */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Confusion Matrix</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="w-full h-[400px]">
-                {loading ? (
-                  <Skeleton className="h-full w-full" />
-                ) : (
-                  <ConfusionMatrix
-                    confusion_matrix_data={confusionMatrixData}
-                  />
-                )}
-              </div>
-            </CardContent>
-          </Card>
+
+          <div className="w-full h-[500px] mb-20">
+            {loading ? (
+              <Skeleton className="h-full w-full" />
+            ) : (
+              <ConfusionMatrix
+                confusion_matrix_data={
+                  classificationModelMetrics?.model
+                    ? {
+                        true_positives:
+                          classificationModelMetrics.model.true_positive,
+                        false_positives:
+                          classificationModelMetrics.model.false_positive,
+                        true_negatives:
+                          classificationModelMetrics.model.true_negative,
+                        false_negatives:
+                          classificationModelMetrics.model.false_negative,
+                      }
+                    : undefined
+                }
+              />
+            )}
+          </div>
 
           {/* ROC Curve */}
-          <Card>
-            <CardHeader>
-              <CardTitle>ROC Curve</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="w-full h-[400px]">
-                {loading ? (
-                  <Skeleton className="h-full w-full" />
-                ) : (
-                  <ROCCurve
-                    aucScore={
-                      classificationModelMetrics?.model?.achieved_roc_auc
-                    }
-                  />
-                )}
-              </div>
-            </CardContent>
-          </Card>
+
+          <div className="w-full h-[500px] mb-20">
+            {loading ? (
+              <Skeleton className="h-full w-full" />
+            ) : (
+              <ROCCurve
+                aucScore={classificationModelMetrics?.model?.achieved_roc_auc}
+              />
+            )}
+          </div>
         </div>
       )}
 
@@ -341,87 +328,6 @@ export default function ModelMetricsPage() {
           </Card>
         </div>
       )}
-
-      {/* Performance Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Performance Summary</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {model.type === "classification" && classificationModelMetrics ? (
-              <>
-                <div className="text-center p-4 bg-orange-50 rounded-lg">
-                  <div className="text-2xl font-bold text-orange-600">
-                    {(classificationModelMetrics.model.accuracy * 100).toFixed(
-                      1
-                    )}
-                    %
-                  </div>
-                  <div className="text-sm text-gray-600">Accuracy</div>
-                </div>
-                <div className="text-center p-4 bg-blue-50 rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600">
-                    {(
-                      classificationModelMetrics.model.achieved_precision * 100
-                    ).toFixed(1)}
-                    %
-                  </div>
-                  <div className="text-sm text-gray-600">Precision</div>
-                </div>
-                <div className="text-center p-4 bg-green-50 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">
-                    {(
-                      classificationModelMetrics.model.achieved_recall * 100
-                    ).toFixed(1)}
-                    %
-                  </div>
-                  <div className="text-sm text-gray-600">Recall</div>
-                </div>
-                <div className="text-center p-4 bg-purple-50 rounded-lg">
-                  <div className="text-2xl font-bold text-purple-600">
-                    {classificationModelMetrics.model.achieved_roc_auc.toFixed(
-                      3
-                    )}
-                  </div>
-                  <div className="text-sm text-gray-600">ROC AUC</div>
-                </div>
-              </>
-            ) : (
-              regressionModelMetrics && (
-                <>
-                  <div className="text-center p-4 bg-orange-50 rounded-lg">
-                    <div className="text-2xl font-bold text-orange-600">
-                      {regressionModelMetrics.r_squared.toFixed(3)}
-                    </div>
-                    <div className="text-sm text-gray-600">R² Score</div>
-                  </div>
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">
-                      {Math.sqrt(
-                        regressionModelMetrics.mean_squared_error
-                      ).toFixed(3)}
-                    </div>
-                    <div className="text-sm text-gray-600">RMSE</div>
-                  </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">
-                      {regressionModelMetrics.correlation.toFixed(3)}
-                    </div>
-                    <div className="text-sm text-gray-600">Correlation</div>
-                  </div>
-                  <div className="text-center p-4 bg-purple-50 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-600">
-                      {regressionModelMetrics.mean_squared_error.toFixed(3)}
-                    </div>
-                    <div className="text-sm text-gray-600">MSE</div>
-                  </div>
-                </>
-              )
-            )}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

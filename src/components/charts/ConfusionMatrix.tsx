@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 
-const Plot = dynamic(() => import('react-plotly.js'), { ssr: false });
+const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 import {
   Card,
   CardHeader,
@@ -114,13 +114,13 @@ const ConfusionMatrix: React.FC<ConfusionMatrixProps> = ({
 
   return (
     <Card className="w-full shadow-sm">
-      <CardHeader className="bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
+      <CardHeader>
         <CardTitle className="text-lg text-center">Confusion Matrix</CardTitle>
         <CardDescription className="text-center">
           How many false positives and false negatives?
         </CardDescription>
       </CardHeader>
-      <CardContent className="pt-6">
+      <CardContent>
         <div className="w-full h-[500px]">
           {/* @ts-ignore */}
           <Plot
