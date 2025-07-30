@@ -1,21 +1,12 @@
 "use client";
 
 import * as React from "react";
-import {
-  BarChart3,
-  TrendingUp,
-  Users,
-  Settings,
-  Home,
-  ChevronsUpDown,
-  MessageCircle,
-} from "lucide-react";
+import { MessageCircle, Shield } from "lucide-react";
 import Image from "next/image";
 
 import { NavMain } from "@/components/nav-main";
-import { NavProjects } from "@/components/nav-projects";
 import { NavUser } from "@/components/nav-user";
-import { TeamSwitcher } from "@/components/team-switcher";
+
 import {
   Sidebar,
   SidebarContent,
@@ -44,9 +35,9 @@ const data = {
   ],
   navMain: [
     {
-      title: "Dashboard",
+      title: "Risk assessment",
       url: "/dashboard",
-      icon: Home,
+      icon: Shield, // use a string if your icon system supports it, or import a better icon below
       isActive: true,
       items: [
         {
