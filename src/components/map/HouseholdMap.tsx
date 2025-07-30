@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
-import type { LatLngTuple } from 'leaflet';
-import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
+import type { LatLngTuple, Map } from 'leaflet';
+import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
 interface Household {
@@ -26,12 +26,26 @@ const DEFAULT_CENTER: LatLngTuple = [1.3, 32];
 const DEFAULT_ZOOM = 7;
 const MAX_MARKERS_DEFAULT = 200; // Limit to prevent performance issues
 
+// Component to get map instance and handle fullscreen resize
+const MapInstanceHandler: React.FC<{ onMapReady: (map: Map) => void }> = ({ onMapReady }) => {
+  const map = useMap();
+  
+  useEffect(() => {
+    if (map) {
+      onMapReady(map);
+    }
+  }, [map, onMapReady]);
+  
+  return null;
+};
+
 const HouseholdMap: React.FC<HouseholdMapProps> = ({ 
   households, 
   maxMarkers = MAX_MARKERS_DEFAULT 
 }) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [showAllMarkers, setShowAllMarkers] = useState(false);
+  const [mapInstance, setMapInstance] = useState<Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
   // Memoize processed data with performance optimization
@@ -86,12 +100,32 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({
   // Fullscreen functionality
   useEffect(() => {
     const handleFullScreenChange = () => {
-      setIsFullScreen(!!document.fullscreenElement);
+      const newFullscreenState = !!document.fullscreenElement;
+      setIsFullScreen(newFullscreenState);
+      
+      // Trigger map resize after a short delay to ensure DOM has updated
+      if (mapInstance) {
+        setTimeout(() => {
+          mapInstance.invalidateSize();
+        }, 150);
+      }
     };
 
     document.addEventListener('fullscreenchange', handleFullScreenChange);
     return () => document.removeEventListener('fullscreenchange', handleFullScreenChange);
-  }, []);
+  }, [mapInstance]);
+
+  // Additional effect to handle map resize when fullscreen state changes
+  useEffect(() => {
+    if (mapInstance) {
+      // Trigger resize when fullscreen state changes
+      const timer = setTimeout(() => {
+        mapInstance.invalidateSize();
+      }, 200);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isFullScreen, mapInstance]);
 
   const toggleFullScreen = useCallback(() => {
     if (!mapContainerRef.current) return;
@@ -109,6 +143,10 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({
     setShowAllMarkers(prev => !prev);
   }, []);
 
+  const handleMapReady = useCallback((map: Map) => {
+    setMapInstance(map);
+  }, []);
+
   if (!hasData) {
     return (
       <div className="bg-white rounded-md shadow-md p-6 mb-6 h-[500px] flex items-center justify-center text-gray-500">
@@ -120,7 +158,7 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({
   return (
     <div 
       ref={mapContainerRef}
-      className={`bg-white rounded-md shadow-md mb-6 relative ${isFullScreen ? 'fixed inset-0 z-[9999] p-0 rounded-none' : 'h-[500px] p-6'}`}
+      className={`bg-white rounded-md shadow-md mb-6 relative ${isFullScreen ? 'fixed inset-0 z-[9999] p-0 rounded-none h-screen w-screen' : 'h-[500px] p-6'}`}
     >
       {/* Control buttons */}
       <div className="absolute top-8 right-8 z-[1000] flex gap-2">
@@ -148,13 +186,14 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({
         </div>
       )}
       
-      <div style={{ height: '100%', width: '100%' }}>
+      <div className={isFullScreen ? 'h-screen w-full' : 'h-full w-full'}>
         <MapContainer
           center={mapCenter}
           zoom={DEFAULT_ZOOM}
           scrollWheelZoom={true}
           style={{ height: '100%', width: '100%' }}
         >
+          <MapInstanceHandler onMapReady={handleMapReady} />
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution="&copy; OpenStreetMap contributors"
