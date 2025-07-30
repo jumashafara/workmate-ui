@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Label } from "@/components/ui/label";
 import { MultiSelect } from "@/components/ui/multi-select";
-import { Filter, X } from "lucide-react";
+import { Filter, X, TrendingUp, BarChart3, Users, Activity, MapPin } from "lucide-react";
 import dynamic from "next/dynamic";
 import { API_ENDPOINT } from "@/utils/endpoints";
 
@@ -434,39 +434,98 @@ export default function AreaManagerTrendsPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div>
-          <Skeleton className="h-8 w-64 mb-2" />
-          <Skeleton className="h-4 w-96" />
+        {/* Header Skeleton */}
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm">
+          <div className="flex items-start gap-4">
+            <Skeleton className="h-14 w-14 rounded-xl" />
+            <div className="flex-1 space-y-3">
+              <Skeleton className="h-8 w-96" />
+              <Skeleton className="h-5 w-full max-w-2xl" />
+              <div className="flex gap-6">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-4 w-36" />
+              </div>
+            </div>
+          </div>
         </div>
 
-        <Card>
+        {/* Region Context Skeleton */}
+        <Card className="border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/10">
+          <CardContent className="py-4">
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-9 w-9 rounded-lg" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-6 w-32" />
+                <Skeleton className="h-4 w-48" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Filters Skeleton */}
+        <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
           <CardHeader>
-            <Skeleton className="h-6 w-32" />
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-9 w-9 rounded-lg" />
+              <Skeleton className="h-6 w-32" />
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-3">
               {Array.from({ length: 3 }).map((_, i) => (
-                <Skeleton key={i} className="h-10 w-full" />
+                <div key={i} className="space-y-2">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
               ))}
             </div>
           </CardContent>
         </Card>
 
+        {/* Charts Skeleton */}
         <div className="grid gap-6 lg:grid-cols-1">
-          <Card>
+          <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
+            <CardHeader>
+              <div className="space-y-2">
+                <Skeleton className="h-6 w-80" />
+                <Skeleton className="h-4 w-96" />
+              </div>
+            </CardHeader>
             <CardContent className="p-6">
-              <Skeleton className="h-6 w-48 mb-4" />
-              <Skeleton className="h-96 w-full" />
+              <Skeleton className="h-[500px] w-full" />
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
+            <CardHeader>
+              <div className="space-y-2">
+                <Skeleton className="h-6 w-72" />
+                <Skeleton className="h-4 w-80" />
+              </div>
+            </CardHeader>
             <CardContent className="p-6">
-              <Skeleton className="h-6 w-48 mb-4" />
-              <Skeleton className="h-96 w-full" />
+              <Skeleton className="h-[500px] w-full" />
             </CardContent>
           </Card>
         </div>
+
+        {/* Summary Stats Skeleton */}
+        <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
+          <CardHeader>
+            <Skeleton className="h-6 w-48" />
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="space-y-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-8 w-16" />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -474,53 +533,89 @@ export default function AreaManagerTrendsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          Area Manager - Cluster Trends Analysis
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400">
-          Analyze cluster performance trends in your region ({region}) over
-          evaluation months with predictive insights.
-        </p>
+      <div className="bg-white dark:bg-slate-900 rounded-xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className="flex items-start gap-4">
+          <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-xl">
+            <TrendingUp className="h-8 w-8 text-orange-600 dark:text-orange-400" />
+          </div>
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Area Manager - Cluster Trends Analysis
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 text-lg mb-4">
+              Advanced trend analysis with predictive modeling for your region ({region})
+            </p>
+            <div className="flex items-center gap-6 text-sm">
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <BarChart3 className="h-4 w-4" />
+                <span>Interactive Charts</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <Activity className="h-4 w-4" />
+                <span>{summaryStats.totalClusters} Clusters</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <Users className="h-4 w-4" />
+                <span>{summaryStats.totalHouseholds.toLocaleString()} Households</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Region Context Card */}
-      <Card className="border-orange-200 bg-orange-50">
+      <Card className="border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/10">
         <CardContent className="py-4">
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="bg-orange-100 text-orange-800">
-              Your Region: {region}
-            </Badge>
-            <span className="text-sm text-gray-600">
-              Data is automatically filtered to show only your region
-            </span>
+          <div className="flex items-center gap-4">
+            <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
+              <MapPin className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+            </div>
+            <div className="flex-1">
+              <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 mb-1">
+                Your Region: {region}
+              </Badge>
+              <p className="text-sm text-orange-700 dark:text-orange-300">
+                Data is automatically filtered to show only your region
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Filters */}
-      <Card>
-        <CardHeader>
+      <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
+        <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Filter className="h-5 w-5" />
-              Filters
-              {activeFiltersCount > 0 && (
-                <Badge variant="secondary">{activeFiltersCount}</Badge>
-              )}
+            <CardTitle className="flex items-center gap-3">
+              <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                <Filter className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+              </div>
+              <div>
+                <span className="text-xl font-semibold text-gray-900 dark:text-white">Regional Trend Filters</span>
+                {activeFiltersCount > 0 && (
+                  <Badge className="ml-2 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
+                    {activeFiltersCount} active
+                  </Badge>
+                )}
+              </div>
             </CardTitle>
             {activeFiltersCount > 0 && (
-              <Button variant="outline" size="sm" onClick={clearFilters}>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={clearFilters}
+                className="text-red-600 border-red-200 hover:bg-red-50 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/20 transition-colors"
+              >
                 Clear All
               </Button>
             )}
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6 pt-2">
           {/* Filter Controls */}
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-3">
             <div className="space-y-2">
-              <Label>District</Label>
+              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">District</Label>
               <MultiSelect
                 options={districtOptions}
                 selected={selectedDistricts}
@@ -531,7 +626,7 @@ export default function AreaManagerTrendsPage() {
             </div>
 
             <div className="space-y-2">
-              <Label>Cluster</Label>
+              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cluster</Label>
               <MultiSelect
                 options={clusterOptions}
                 selected={selectedClusters}
@@ -542,7 +637,7 @@ export default function AreaManagerTrendsPage() {
             </div>
 
             <div className="space-y-2">
-              <Label>Evaluation Month</Label>
+              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Evaluation Month</Label>
               <MultiSelect
                 options={monthOptions}
                 selected={selectedMonths}
@@ -555,12 +650,14 @@ export default function AreaManagerTrendsPage() {
 
           {/* Active Filters */}
           {activeFiltersCount > 0 && (
-            <div className="flex flex-wrap gap-2">
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Active Filters</h4>
+              <div className="flex flex-wrap gap-2">
               {selectedDistricts.map((district) => (
-                <Badge key={district} variant="secondary">
+                <Badge key={district} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
                   District: {district}
                   <X
-                    className="ml-1 h-3 w-3 cursor-pointer"
+                    className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
                     onClick={() =>
                       setSelectedDistricts((prev) =>
                         prev.filter((d) => d !== district)
@@ -570,10 +667,10 @@ export default function AreaManagerTrendsPage() {
                 </Badge>
               ))}
               {selectedClusters.map((cluster) => (
-                <Badge key={cluster} variant="secondary">
+                <Badge key={cluster} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
                   Cluster: {cluster}
                   <X
-                    className="ml-1 h-3 w-3 cursor-pointer"
+                    className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
                     onClick={() =>
                       setSelectedClusters((prev) =>
                         prev.filter((c) => c !== cluster)
@@ -583,10 +680,10 @@ export default function AreaManagerTrendsPage() {
                 </Badge>
               ))}
               {selectedMonths.map((month) => (
-                <Badge key={month} variant="secondary">
+                <Badge key={month} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
                   Month: {month}
                   <X
-                    className="ml-1 h-3 w-3 cursor-pointer"
+                    className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
                     onClick={() =>
                       setSelectedMonths((prev) =>
                         prev.filter((m) => m !== month)
@@ -595,6 +692,7 @@ export default function AreaManagerTrendsPage() {
                   />
                 </Badge>
               ))}
+              </div>
             </div>
           )}
         </CardContent>
@@ -603,14 +701,21 @@ export default function AreaManagerTrendsPage() {
       {/* Charts */}
       <div className="grid gap-6 lg:grid-cols-1">
         {/* Line Chart - Income Trends */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Average Income + Production Trends by Cluster</CardTitle>
-            <CardDescription>
-              Solid lines show actual data, dotted lines show predictions.
-              Orange dashed line shows overall trend across all selected
-              clusters.
-            </CardDescription>
+        <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
+          <CardHeader className="pb-4">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                <TrendingUp className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+              </div>
+              <div>
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">Average Income + Production Trends by Cluster</CardTitle>
+                <CardDescription className="text-gray-600 dark:text-gray-400 mt-1">
+                  Solid lines show actual data, dotted lines show predictions.
+                  Orange dashed line shows overall trend across all selected
+                  clusters.
+                </CardDescription>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="w-full h-[500px]">
@@ -647,13 +752,20 @@ export default function AreaManagerTrendsPage() {
         </Card>
 
         {/* Scatter Plot */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Income + Production vs Achievement Rate</CardTitle>
-            <CardDescription>
-              Bubble size represents number of households. Color represents
-              evaluation month.
-            </CardDescription>
+        <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
+          <CardHeader className="pb-4">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                <BarChart3 className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+              </div>
+              <div>
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">Income + Production vs Achievement Rate</CardTitle>
+                <CardDescription className="text-gray-600 dark:text-gray-400 mt-1">
+                  Bubble size represents number of households. Color represents
+                  evaluation month.
+                </CardDescription>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="w-full h-[500px]">
@@ -677,35 +789,40 @@ export default function AreaManagerTrendsPage() {
       </div>
 
       {/* Summary Statistics */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Summary Statistics</CardTitle>
+      <Card className="bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-800">
+        <CardHeader className="pb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
+              <Activity className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+            </div>
+            <CardTitle className="text-xl font-semibold text-orange-900 dark:text-orange-100">Regional Summary Statistics</CardTitle>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-4">
-            <div>
-              <Label className="text-sm text-gray-500">Total Clusters</Label>
-              <div className="text-2xl font-bold text-orange-600">
+          <div className="grid gap-6 md:grid-cols-4">
+            <div className="bg-white dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
+              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">Total Clusters</Label>
+              <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mt-2">
                 {summaryStats.totalClusters}
               </div>
             </div>
-            <div>
-              <Label className="text-sm text-gray-500">Evaluation Months</Label>
-              <div className="text-2xl font-bold text-orange-600">
+            <div className="bg-white dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
+              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">Evaluation Months</Label>
+              <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mt-2">
                 {summaryStats.evaluationMonths}
               </div>
             </div>
-            <div>
-              <Label className="text-sm text-gray-500">
-                Avg Income + Production (Overall)
+            <div className="bg-white dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
+              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">
+                Avg Income + Production
               </Label>
-              <div className="text-2xl font-bold text-orange-600">
+              <div className="text-2xl font-bold text-orange-600 dark:text-orange-400 mt-2">
                 ${summaryStats.avgIncome.toFixed(0)}
               </div>
             </div>
-            <div>
-              <Label className="text-sm text-gray-500">Total Households</Label>
-              <div className="text-2xl font-bold text-orange-600">
+            <div className="bg-white dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
+              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">Total Households</Label>
+              <div className="text-2xl font-bold text-orange-600 dark:text-orange-400 mt-2">
                 {summaryStats.totalHouseholds.toLocaleString()}
               </div>
             </div>
