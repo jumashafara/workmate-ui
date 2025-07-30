@@ -1,8 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { MessageCircle, Shield } from "lucide-react";
+import { useState, useEffect } from "react";
+import { 
+  MessageCircle, 
+  BarChart3, 
+  Brain
+} from "lucide-react";
 import Image from "next/image";
+import { getUserData } from "@/utils/ccokie";
 
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -16,50 +22,121 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-const data = {
-  teams: [
-    {
-      name: "Workmate",
-      logo: () => (
-        <div className="relative h-8 w-8">
-          <Image
-            src="/RTV_Logo.png"
-            alt="RTV Logo"
-            fill
-            className="object-contain"
-          />
-        </div>
-      ),
-      plan: "Analytics",
-    },
-  ],
-  navMain: [
-    {
-      title: "Risk assessment",
-      url: "/dashboard",
-      icon: Shield, // use a string if your icon system supports it, or import a better icon below
-      isActive: true,
+// Navigation data generator based on user role
+const getNavigationData = (userRole: string, isSuperuser: boolean) => {
+  const navItems = [];
+
+  // Dashboard section - accessible to all authenticated users
+  const dashboardItems = [];
+  
+  // Predictions Dashboard - all roles get access
+  dashboardItems.push({
+    title: "Predictions Dashboard",
+    url: "/dashboard",
+  });
+  
+  // Predictions Trends - Superuser and Area Manager only
+  if (isSuperuser || userRole === "area_manager") {
+    dashboardItems.push({
+      title: "Predictions Trends", 
+      url: "/cluster-trends",
+    });
+  }
+  
+  // Check-in Evaluations - Superuser only
+  if (isSuperuser) {
+    dashboardItems.push({
+      title: "Check-in Evaluations",
+      url: "/checkin-evaluations",
+    });
+  }
+  
+  navItems.push({
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: BarChart3,
+    isActive: true,
+    items: dashboardItems,
+  });
+  
+  // Model Interpretability section - Superuser only
+  if (isSuperuser) {
+    navItems.push({
+      title: "Model Interpretability",
+      url: "/model-metrics",
+      icon: Brain,
       items: [
         {
-          title: "Predictions Dashboard",
-          url: "/superuser/predictions",
+          title: "Model Metrics",
+          url: "/model-metrics",
         },
         {
-          title: "Cluster Trends",
-          url: "/superuser/trends",
+          title: "Feature Importance",
+          url: "/feature-importance",
+        },
+        {
+          title: "Individual Predictions",
+          url: "/individual-predictions",
         },
       ],
-    },
-    {
-      title: "Chat",
-      url: "/chat",
-      icon: MessageCircle,
-    },
-  ],
-  projects: [],
+    });
+  }
+  
+  // Chat section - accessible to all authenticated users
+  navItems.push({
+    title: "Chat",
+    url: "/chat",
+    icon: MessageCircle,
+  });
+  
+  // Settings section (commented out in frontend, but included for completeness)
+  // if (isSuperuser) {
+  //   navItems.push({
+  //     title: "Settings",
+  //     url: "/settings",
+  //     icon: SettingsIcon,
+  //   });
+  // }
+  
+  return {
+    teams: [
+      {
+        name: "Workmate",
+        logo: () => (
+          <div className="relative h-8 w-8">
+            <Image
+              src="/RTV_Logo.png"
+              alt="RTV Logo"
+              fill
+              className="object-contain"
+            />
+          </div>
+        ),
+        plan: "Analytics",
+      },
+    ],
+    navMain: navItems,
+    projects: [],
+  };
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [navigationData, setNavigationData] = useState<{
+    teams: any[];
+    navMain: any[];
+    projects: any[];
+  }>({ teams: [], navMain: [], projects: [] });
+  
+  useEffect(() => {
+    const userData = getUserData();
+    const userRole = userData.role || "";
+    const isSuperuser = Boolean(userData.superuser) || userData.superuser === "true";
+    
+    // Generate navigation based on user role
+    const navData = getNavigationData(userRole, isSuperuser);
+    setNavigationData(navData);
+  }, []);
+  
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -83,7 +160,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenuButton>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={navigationData.navMain} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />

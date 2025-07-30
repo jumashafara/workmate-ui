@@ -1,14 +1,26 @@
 // this component is used to display the two way partial dependence heat map using plotly
 
-import React, { useEffect, useState } from 'react';
-import dynamic from 'next/dynamic';
+import React, { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 
-const Plot = dynamic(() => import('react-plotly.js'), { ssr: false });
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2 } from 'lucide-react';
-import { fetch2DPartialDependence } from '../../api/ModelMetrics';
+const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2 } from "lucide-react";
+import { fetch2DPartialDependence } from "@/utils/ModelMetrics";
 
 interface TwoWayPartialDependenceHeatMapProps {
   defaultModel?: string;
@@ -16,10 +28,12 @@ interface TwoWayPartialDependenceHeatMapProps {
   defaultFeature2?: string;
 }
 
-const TwoWayPartialDependenceHeatMap: React.FC<TwoWayPartialDependenceHeatMapProps> = ({
+const TwoWayPartialDependenceHeatMap: React.FC<
+  TwoWayPartialDependenceHeatMapProps
+> = ({
   defaultModel = "year1_classification",
   defaultFeature1 = "farm_implements_owned",
-  defaultFeature2 = "tot_hhmembers"
+  defaultFeature2 = "tot_hhmembers",
 }) => {
   const [model, setModel] = useState<string>(defaultModel);
   const [feature1, setFeature1] = useState<string>(defaultFeature1);
@@ -32,7 +46,10 @@ const TwoWayPartialDependenceHeatMap: React.FC<TwoWayPartialDependenceHeatMapPro
     // ["Land_size_for_Crop_Agriculture_Acres", "Agriculture land size (acres)"],
     ["farm_implements_owned", "Farm implements owned"],
     ["tot_hhmembers", "Household members"],
-    ["Distance_travelled_one_way_OPD_treatment", "Distance travelled to OPD treatment (one way)"],
+    [
+      "Distance_travelled_one_way_OPD_treatment",
+      "Distance travelled to OPD treatment (one way)",
+    ],
     ["Average_Water_Consumed_Per_Day", "Average water consumed per day"],
     ["hh_water_collection_Minutes", "Water collection time (minutes)"],
     ["composts_num", "Number of composts"],
@@ -58,10 +75,12 @@ const TwoWayPartialDependenceHeatMap: React.FC<TwoWayPartialDependenceHeatMapPro
         setError(null);
         const data = await fetch2DPartialDependence(model, feature1, feature2);
         setPdpData(data);
-        console.log('pdp data x', data.z);
+        console.log("pdp data x", data.z);
       } catch (error) {
         console.error("Error loading 2D PDP data:", error);
-        setError(error instanceof Error ? error.message : "Failed to load 2D PDP data");
+        setError(
+          error instanceof Error ? error.message : "Failed to load 2D PDP data"
+        );
       } finally {
         setLoading(false);
       }
@@ -93,62 +112,68 @@ const TwoWayPartialDependenceHeatMap: React.FC<TwoWayPartialDependenceHeatMapPro
       return (
         <div className="p-4">
           <Alert>
-            <AlertDescription>No 2D partial dependence data available for these features.</AlertDescription>
+            <AlertDescription>
+              No 2D partial dependence data available for these features.
+            </AlertDescription>
           </Alert>
         </div>
       );
     }
 
     // Get feature display names
-    const feature1Display = featureList.find(f => f[0] === feature1)?.[1] || feature1;
-    const feature2Display = featureList.find(f => f[0] === feature2)?.[1] || feature2;
+    const feature1Display =
+      featureList.find((f) => f[0] === feature1)?.[1] || feature1;
+    const feature2Display =
+      featureList.find((f) => f[0] === feature2)?.[1] || feature2;
 
     return (
       <Plot
         data={[
           {
-            type: 'heatmap',
+            type: "heatmap",
             x: pdpData.x,
             y: pdpData.y,
             z: pdpData.z,
-            text: pdpData.z.map((row: number[]) => row.map(val => val.toFixed(3))),
+            text: pdpData.z.map((row: number[]) =>
+              row.map((val) => val.toFixed(3))
+            ),
             texttemplate: "%{text}",
-            hoverinfo: 'x+y+z',
-            colorscale: 'YlOrRd',
+            hoverinfo: "x+y+z",
+            colorscale: "YlOrRd",
             colorbar: {
-              title: 'Predicted Value',
-              titleside: 'right',
+              title: "Predicted Value",
+              titleside: "right",
             },
-          }
+          },
         ]}
         layout={{
-          title: '',
+          title: "",
           autosize: true,
           margin: {
             l: 70,
             r: 70,
             t: 30,
-            b: 70
+            b: 70,
           },
           xaxis: {
             title: { text: feature1Display },
-            automargin: true
+            automargin: true,
           },
           yaxis: {
             title: { text: feature2Display },
-            automargin: true
+            automargin: true,
           },
           font: {
-            family: 'Arial, sans-serif'
-          }
+            family: "Arial, sans-serif",
+          },
         }}
         config={{
           responsive: true,
           displayModeBar: true,
           displaylogo: false,
-          modeBarButtonsToRemove: ['lasso2d', 'select2d']
+          modeBarButtonsToRemove: ["lasso2d", "select2d"],
         }}
-        style={{ width: '100%', height: '400px' }}
+        style={{ width: "100%", height: "400px" }}
       />
     );
   };
@@ -157,7 +182,9 @@ const TwoWayPartialDependenceHeatMap: React.FC<TwoWayPartialDependenceHeatMapPro
     <Card className="w-full shadow-sm">
       <CardHeader className="bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
         <CardTitle>Two-Way Partial Dependence</CardTitle>
-        <CardDescription>How does the prediction change when two features interact?</CardDescription>
+        <CardDescription>
+          How does the prediction change when two features interact?
+        </CardDescription>
       </CardHeader>
       <CardContent className="pt-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -168,8 +195,12 @@ const TwoWayPartialDependenceHeatMap: React.FC<TwoWayPartialDependenceHeatMapPro
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="year1_classification">Year 1 Classification</SelectItem>
-                <SelectItem value="year2_classification">Year 2 Classification</SelectItem>
+                <SelectItem value="year1_classification">
+                  Year 1 Classification
+                </SelectItem>
+                <SelectItem value="year2_classification">
+                  Year 2 Classification
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -181,7 +212,9 @@ const TwoWayPartialDependenceHeatMap: React.FC<TwoWayPartialDependenceHeatMapPro
               </SelectTrigger>
               <SelectContent>
                 {featureList.map(([value, label]) => (
-                  <SelectItem key={value} value={value}>{label}</SelectItem>
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -194,16 +227,16 @@ const TwoWayPartialDependenceHeatMap: React.FC<TwoWayPartialDependenceHeatMapPro
               </SelectTrigger>
               <SelectContent>
                 {featureList.map(([value, label]) => (
-                  <SelectItem key={value} value={value}>{label}</SelectItem>
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
         </div>
-        
-        <div className="w-full h-[400px] pb-12">
-          {renderContent()}
-        </div>
+
+        <div className="w-full h-[400px] pb-12">{renderContent()}</div>
       </CardContent>
     </Card>
   );
