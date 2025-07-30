@@ -1,26 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MultiSelect } from "@/components/ui/multi-select";
-import {
-  Filter,
-  X,
-} from "lucide-react";
-import dynamic from 'next/dynamic';
+import { Filter, X } from "lucide-react";
+import dynamic from "next/dynamic";
 
-const DashboardCharts = dynamic(() => import("@/components/charts/DashboardCharts"), { ssr: false });
-const RegionPerformanceChart = dynamic(() => import("@/components/charts/RegionPerformanceChart"), { ssr: false });
-const HouseholdMap = dynamic(() => import("@/components/map/HouseholdMap"), { ssr: false });
+const DashboardCharts = dynamic(
+  () => import("@/components/charts/DashboardCharts"),
+  { ssr: false }
+);
+const RegionPerformanceChart = dynamic(
+  () => import("@/components/charts/RegionPerformanceChart"),
+  { ssr: false }
+);
+const HouseholdMap = dynamic(() => import("@/components/map/MapWrapper"), {
+  ssr: false,
+});
 import { API_ENDPOINT } from "@/utils/endpoints";
 
 interface PredictionData {
@@ -105,9 +105,13 @@ export default function SuperuserPredictionsPage() {
         );
         if (!response.ok) {
           if (response.status === 0 || !navigator.onLine) {
-            throw new Error('Network error: Please check your internet connection');
+            throw new Error(
+              "Network error: Please check your internet connection"
+            );
           }
-          throw new Error(`API Error: ${response.status} - ${response.statusText}`);
+          throw new Error(
+            `API Error: ${response.status} - ${response.statusText}`
+          );
         }
 
         const result = await response.json();
@@ -132,14 +136,15 @@ export default function SuperuserPredictionsPage() {
       setTotalCount(allData.length);
     } catch (err: any) {
       console.error("Fetch all data error:", err);
-      let errorMessage = 'Network error. Please check if the API server is running.';
-      
-      if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
+      let errorMessage =
+        "Network error. Please check if the API server is running.";
+
+      if (err.name === "TypeError" && err.message.includes("Failed to fetch")) {
         errorMessage = `Cannot connect to API server at ${API_ENDPOINT}. Please ensure the backend server is running on localhost:8000.`;
       } else if (err.message) {
         errorMessage = err.message;
       }
-      
+
       setError(`Failed to fetch data: ${errorMessage}`);
     } finally {
       setIsLoadingAllData(false);
@@ -217,14 +222,15 @@ export default function SuperuserPredictionsPage() {
       }
     } catch (err: any) {
       console.error("Data fetch error:", err);
-      let errorMessage = 'Network error. Please check if the API server is running.';
-      
-      if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
+      let errorMessage =
+        "Network error. Please check if the API server is running.";
+
+      if (err.name === "TypeError" && err.message.includes("Failed to fetch")) {
         errorMessage = `Cannot connect to API server at ${API_ENDPOINT}. Please ensure the backend server is running on localhost:8000.`;
       } else if (err.message) {
         errorMessage = err.message;
       }
-      
+
       setError(`Failed to fetch data: ${errorMessage}`);
     } finally {
       setLoading(false);
@@ -253,7 +259,6 @@ export default function SuperuserPredictionsPage() {
     selectedMonths,
   ]);
 
-
   const clearFilters = () => {
     setSelectedCohorts([]);
     setSelectedRegions([]);
@@ -271,9 +276,6 @@ export default function SuperuserPredictionsPage() {
     selectedCycles.length +
     selectedMonths.length;
 
-
-
-
   if (error) {
     return (
       <div className="space-y-6">
@@ -282,7 +284,8 @@ export default function SuperuserPredictionsPage() {
             Predictions Dashboard
           </h1>
           <p className="text-gray-500 dark:text-gray-400">
-            Manage and analyze prediction data with advanced filtering and export capabilities.
+            Manage and analyze prediction data with advanced filtering and
+            export capabilities.
           </p>
         </div>
 
@@ -293,7 +296,10 @@ export default function SuperuserPredictionsPage() {
                 Unable to load data
               </div>
               <p className="text-gray-600 mb-4">{error}</p>
-              <Button onClick={() => fetchData()} className="bg-orange-600 hover:bg-orange-700">
+              <Button
+                onClick={() => fetchData()}
+                className="bg-orange-600 hover:bg-orange-700"
+              >
                 Retry
               </Button>
             </div>
@@ -547,7 +553,8 @@ export default function SuperuserPredictionsPage() {
       <div className="flex justify-center mt-4">
         <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            📊 Showing all available data ({predictions.length} records). Charts and analysis include complete dataset.
+            📊 Showing all available data ({predictions.length} records). Charts
+            and analysis include complete dataset.
           </p>
         </div>
       </div>
