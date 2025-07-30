@@ -30,7 +30,6 @@ const FeatureContributionsChart = dynamic(() => import("@/components/charts/Cont
 });
 
 interface Features {
-  household_id: string;
   district: string;
   village: string;
   cluster: string;
@@ -105,11 +104,10 @@ export default function IndividualPredictionPage() {
 
   // Form data
   const [formData, setFormData] = useState<Features>({
-    household_id: "",
     district: "",
     village: "",
     cluster: "",
-    evaluation_month: 6,
+    evaluation_month: 1,
     cohort: "",
     cycle: "",
     region: "",
@@ -259,16 +257,6 @@ export default function IndividualPredictionPage() {
           {/* Basic Information */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="household_id">Household ID</Label>
-              <Input
-                id="household_id"
-                value={formData.household_id}
-                onChange={(e) => updateFormField("household_id", e.target.value)}
-                placeholder="Enter household ID"
-              />
-            </div>
-            
-            <div className="space-y-2">
               <Label htmlFor="region">Region *</Label>
               <Input
                 id="region"
@@ -334,7 +322,7 @@ export default function IndividualPredictionPage() {
                 id="evaluation_month"
                 type="number"
                 value={formData.evaluation_month}
-                onChange={(e) => updateFormField("evaluation_month", parseInt(e.target.value) || 6)}
+                onChange={(e) => updateFormField("evaluation_month", parseInt(e.target.value) || 1)}
                 min="1"
                 max="24"
               />
@@ -412,6 +400,30 @@ export default function IndividualPredictionPage() {
                   value={[formData.education_level_encoded[0]]}
                   onValueChange={(value) => updateNumericArray("education_level_encoded", value[0])}
                   max={4}
+                  min={0}
+                  step={1}
+                  className="w-full"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Average Water Consumed Per Day (L): {formData.Average_Water_Consumed_Per_Day[0]}</Label>
+                <Slider
+                  value={[formData.Average_Water_Consumed_Per_Day[0]]}
+                  onValueChange={(value) => updateNumericArray("Average_Water_Consumed_Per_Day", value[0])}
+                  max={100}
+                  min={5}
+                  step={5}
+                  className="w-full"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Composts Number: {formData.composts_num[0]}</Label>
+                <Slider
+                  value={[formData.composts_num[0]]}
+                  onValueChange={(value) => updateNumericArray("composts_num", value[0])}
+                  max={10}
                   min={0}
                   step={1}
                   className="w-full"
@@ -504,6 +516,87 @@ export default function IndividualPredictionPage() {
                   onCheckedChange={(checked) => updateBooleanArray("hhh_sex", checked)}
                 />
                 <Label htmlFor="hhh_sex">Head of Household (Female)</Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="perennial_crops_grown_food_banana"
+                  checked={formData.perennial_crops_grown_food_banana[0]}
+                  onCheckedChange={(checked) => updateBooleanArray("perennial_crops_grown_food_banana", checked)}
+                />
+                <Label htmlFor="perennial_crops_grown_food_banana">Grows Food Banana</Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="perennial_crops_grown_coffee"
+                  checked={formData.perennial_crops_grown_coffee[0]}
+                  onCheckedChange={(checked) => updateBooleanArray("perennial_crops_grown_coffee", checked)}
+                />
+                <Label htmlFor="perennial_crops_grown_coffee">Grows Coffee</Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="irish_potatoes"
+                  checked={formData.irish_potatoes[0]}
+                  onCheckedChange={(checked) => updateBooleanArray("irish_potatoes", checked)}
+                />
+                <Label htmlFor="irish_potatoes">Grows Irish Potatoes</Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="sorghum"
+                  checked={formData.sorghum[0]}
+                  onCheckedChange={(checked) => updateBooleanArray("sorghum", checked)}
+                />
+                <Label htmlFor="sorghum">Grows Sorghum</Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="hh_produce_lq_manure"
+                  checked={formData.hh_produce_lq_manure[0]}
+                  onCheckedChange={(checked) => updateBooleanArray("hh_produce_lq_manure", checked)}
+                />
+                <Label htmlFor="hh_produce_lq_manure">Produces Liquid Manure</Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="non_bio_waste_mgt_present"
+                  checked={formData.non_bio_waste_mgt_present[0]}
+                  onCheckedChange={(checked) => updateBooleanArray("non_bio_waste_mgt_present", checked)}
+                />
+                <Label htmlFor="non_bio_waste_mgt_present">Non-Bio Waste Management</Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="soap_ash_present"
+                  checked={formData.soap_ash_present[0]}
+                  onCheckedChange={(checked) => updateBooleanArray("soap_ash_present", checked)}
+                />
+                <Label htmlFor="soap_ash_present">Soap Ash Present</Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="standard_evaluation"
+                  checked={formData.standard_evaluation[0]}
+                  onCheckedChange={(checked) => updateBooleanArray("standard_evaluation", checked)}
+                />
+                <Label htmlFor="standard_evaluation">Standard Evaluation</Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="checkin_evaluation"
+                  checked={formData.checkin_evaluation[0]}
+                  onCheckedChange={(checked) => updateBooleanArray("checkin_evaluation", checked)}
+                />
+                <Label htmlFor="checkin_evaluation">Check-in Evaluation</Label>
               </div>
             </div>
           </div>

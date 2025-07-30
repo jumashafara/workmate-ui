@@ -387,7 +387,7 @@ const ChatPage = () => {
 
     const botMessage: Message = {
       id: messages.length + 2,
-      text: "",
+      text: "Thinking...",
       sender: "bot",
       timestamp: new Date().toLocaleTimeString(),
     };
@@ -407,12 +407,19 @@ const ChatPage = () => {
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let receivedText = "";
+      let isFirstChunk = true;
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
         receivedText += decoder.decode(value, { stream: true });
+
+        // On first chunk, clear the "Thinking..." text and set loading to false
+        if (isFirstChunk) {
+          setIsLoading(false);
+          isFirstChunk = false;
+        }
 
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
@@ -441,7 +448,11 @@ const ChatPage = () => {
       }
     } catch (error) {
       console.error("Error:", error);
-      setIsLoading(false);
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.id === botMessage.id ? { ...msg, text: "Sorry, I encountered an error. Please try again." } : msg
+        )
+      );
     } finally {
       setIsLoading(false);
     }
@@ -906,7 +917,19 @@ const ChatPage = () => {
                             </div>
                           ) : (
                             <div className="break-words">
-                              {renderBotMessageText(message.text)}
+                              {message.text === "Thinking..." ? (
+                                <div className="flex items-center space-x-2">
+                                  <Loader2
+                                    className="h-4 w-4 animate-spin"
+                                    style={{ color: THEME_COLORS.primary.main }}
+                                  />
+                                  <span className="text-sm text-muted-foreground">
+                                    Thinking...
+                                  </span>
+                                </div>
+                              ) : (
+                                renderBotMessageText(message.text)
+                              )}
                             </div>
                           )}
                         </div>
@@ -920,7 +943,7 @@ const ChatPage = () => {
                         >
                           {message.timestamp}
                         </div>
-                        {message.sender === "bot" && message.text && (
+                        {message.sender === "bot" && message.text && message.text !== "Thinking..." && (
                           <Button
                             variant="ghost"
                             size="sm"
@@ -933,33 +956,6 @@ const ChatPage = () => {
                       </div>
                     </div>
                   ))}
-
-                  {isLoading && (
-                    <div className="flex mb-4 w-full items-start gap-3 flex-row">
-                      {/* Bot Avatar */}
-                      <Avatar className="h-8 w-8 flex-shrink-0 mt-1">
-                        <AvatarFallback className="text-white text-xs font-medium bg-gray-600">
-                          <Bot className="h-4 w-4" />
-                        </AvatarFallback>
-                      </Avatar>
-
-                      {/* Loading Bubble */}
-                      <div className="max-w-[85%] md:max-w-[70%] rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm bg-gray-100 dark:bg-gray-800">
-                        <div className="flex items-center space-x-2">
-                          <Loader2
-                            className="h-4 w-4 animate-spin"
-                            style={{ color: THEME_COLORS.primary.main }}
-                          />
-                          <span className="text-sm text-muted-foreground">
-                            Thinking...
-                          </span>
-                        </div>
-                        <div className="text-xs mt-2 text-right text-muted-foreground">
-                          {new Date().toLocaleTimeString()}
-                        </div>
-                      </div>
-                    </div>
-                  )}
                   <div ref={messagesEndRef} />
                 </div>
               )}
