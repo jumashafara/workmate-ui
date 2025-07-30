@@ -19,7 +19,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Tooltip,
   TooltipContent,
@@ -670,7 +669,7 @@ const ChatPage = () => {
         @keyframes fadeIn {
           from {
             opacity: 0;
-            transform: translateY(10px);
+            transform: translateY(8px);
           }
           to {
             opacity: 1;
@@ -678,63 +677,65 @@ const ChatPage = () => {
           }
         }
         .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out forwards;
+          animation: fadeIn 0.2s ease-out forwards;
         }
       `}</style>
       <div className="flex h-[calc(100vh-2rem)] w-full max-w-none mx-auto px-4">
         {/* Main Chat Area */}
         <Card
-          className="w-full flex flex-col shadow-lg border-0 overflow-hidden"
+          className="w-full flex flex-col bg-white border border-slate-200 overflow-hidden"
           style={{
             minHeight: "calc(100vh - 4rem)",
             height: "calc(100vh - 4rem)",
+            borderRadius: "12px",
           }}
         >
-          <CardHeader
-            className="p-0 rounded-t-sm"
-            style={{
-              backgroundColor: THEME_COLORS.primary.main,
-              color: THEME_COLORS.primary.contrastText,
-            }}
-          >
-            <div className="flex items-center justify-between w-full px-6 py-4">
+          <CardHeader className="bg-white border-b border-slate-200 px-6 ">
+            <div className="flex items-center justify-between w-full">
               {/* Left side - Title and Logo */}
               <div className="flex items-center gap-3">
-                <Bot className="h-6 w-6 text-white" />
-                <h1 className="text-xl font-semibold text-white">
-                  Chat with Workmate
-                </h1>
+                <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+                  <Bot className="h-4 w-4 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-base font-semibold text-slate-900">
+                    Workmate Chatbot
+                  </h1>
+                  <p className="text-xs text-slate-500">AI Assistant</p>
+                </div>
               </div>
 
               {/* Right side - Action Buttons */}
               <div className="flex items-center gap-2">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setIsHistoryOpen(true)}
-                      className="text-white hover:bg-white/10 h-9 w-9 p-0"
-                    >
-                      <History className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Chat History</TooltipContent>
-                </Tooltip>
+                <div className="flex items-center gap-2">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsHistoryOpen(true)}
+                        className="h-9 w-9 p-0 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                      >
+                        <History className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Chat History</TooltipContent>
+                  </Tooltip>
 
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={createNewChat}
-                      className="text-white hover:bg-white/10 h-9 w-9 p-0"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>New Chat</TooltipContent>
-                </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={createNewChat}
+                        className="h-9 w-9 p-0 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>New Chat</TooltipContent>
+                  </Tooltip>
+                </div>
               </div>
             </div>
           </CardHeader>
@@ -919,185 +920,171 @@ const ChatPage = () => {
           </Dialog>
 
           <CardContent className="flex-1 flex flex-col p-0 min-h-0">
-            <ScrollArea className="flex-1 px-6" style={{ minHeight: "400px" }}>
-              {messages.length === 0 && !hasStartedConversation ? (
-                <div className="flex flex-col items-center justify-center h-full text-center space-y-6">
-                  <div className="space-y-2">
-                    <h2 className="text-2xl font-semibold">
-                      Chat with Workmate
-                    </h2>
-                    <p className="text-muted-foreground">
-                      Ask me anything about Raising the Village, WASH programs,
-                      or data collection.
-                    </p>
-                  </div>
+            <ScrollArea className="flex-1" style={{ minHeight: "400px" }}>
+              <div className="max-w-5xl mx-auto">
+                {messages.length === 0 && !hasStartedConversation ? (
+                  <div className="flex flex-col items-center justify-center h-full text-center px-6">
+                    <div className="max-w-md space-y-6">
+                      <div className="w-16 h-16 bg-orange-500 rounded-2xl flex items-center justify-center mx-auto">
+                        <Bot className="h-8 w-8 text-white" />
+                      </div>
+                      <div className="space-y-2">
+                        <h2 className="text-2xl font-bold text-slate-900">
+                          How can I help you today?
+                        </h2>
+                        <p className="text-slate-600 text-base">
+                          Ask me anything about Raising the Village, WASH
+                          programs, or data collection.
+                        </p>
+                      </div>
 
-                  <div className="grid grid-cols-1 gap-3 max-w-md w-full">
-                    <div
-                      className="rounded-lg p-4 mb-2"
-                      style={{ backgroundColor: "#FFF7ED" }}
-                    >
-                      <h3
-                        className="font-medium mb-3"
-                        style={{ color: THEME_COLORS.primary.main }}
-                      >
-                        Try asking
-                      </h3>
+                      <div className="grid gap-3 w-full">
+                        {suggestedQuestions.map((question, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setInput(question)}
+                            className="p-4 text-left bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg transition-colors group"
+                          >
+                            <div className="flex items-center gap-3">
+                              <MessageSquare className="h-4 w-4 text-orange-500 flex-shrink-0" />
+                              <span className="text-sm text-slate-700 group-hover:text-slate-900">
+                                {question}
+                              </span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                    {suggestedQuestions.map((question, index) => (
-                      <div
-                        key={index}
-                        className="cursor-pointer hover:bg-orange-50 hover:border-orange-300 transition-all duration-200 border border-gray-200 rounded-lg p-4"
-                        onClick={() => setInput(question)}
-                      >
-                        <div
-                          className="flex items-center gap-2"
-                          style={{ color: THEME_COLORS.primary.main }}
+                  </div>
+                ) : (
+                  <div className="space-y-4 py-6">
+                    {messages.length > messageLimit && (
+                      <div className="flex justify-center mb-4">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleLoadMore}
+                          className="gap-2"
+                          style={{
+                            borderColor: THEME_COLORS.primary.main,
+                            color: THEME_COLORS.primary.main,
+                          }}
                         >
-                          <MessageSquare className="h-4 w-4" />
-                          <p className="text-sm font-medium">{question}</p>
+                          <RefreshCw
+                            className="h-4 w-4"
+                            style={{ color: THEME_COLORS.primary.main }}
+                          />
+                          Load More
+                        </Button>
+                      </div>
+                    )}
+
+                    {displayedMessages.map((message) => (
+                      <div
+                        key={message.id}
+                        className={cn(
+                          "flex mb-4 animate-fadeIn w-full items-start gap-3",
+                          message.sender === "user"
+                            ? "flex-row-reverse"
+                            : "flex-row"
+                        )}
+                      >
+                        {/* Avatar */}
+                        <div
+                          className={cn(
+                            "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-1",
+                            message.sender === "user"
+                              ? "bg-orange-500"
+                              : "bg-slate-600"
+                          )}
+                        >
+                          {message.sender === "user" ? (
+                            <User className="h-4 w-4 text-white" />
+                          ) : (
+                            <Bot className="h-4 w-4 text-white" />
+                          )}
+                        </div>
+
+                        {/* Message Bubble */}
+                        <div
+                          className={cn(
+                            "max-w-[80%] md:max-w-[70%] rounded-lg px-4 py-3 break-words",
+                            message.sender === "user"
+                              ? "bg-orange-500 text-white"
+                              : "bg-slate-100 text-slate-900"
+                          )}
+                        >
+                          <div className="break-words">
+                            {message.sender === "user" ? (
+                              <div className="whitespace-pre-wrap break-words text-white">
+                                {renderUserMessageText(message.text)}
+                              </div>
+                            ) : (
+                              <div className="break-words">
+                                {message.text === "Thinking..." ? (
+                                  <div className="flex items-center space-x-2">
+                                    <Loader2 className="h-4 w-4 animate-spin text-slate-500" />
+                                    <span className="text-sm text-slate-500">
+                                      Thinking...
+                                    </span>
+                                  </div>
+                                ) : (
+                                  renderBotMessageText(message.text)
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          <div
+                            className={cn(
+                              "text-xs mt-2 text-right flex items-center justify-end gap-2",
+                              message.sender === "user"
+                                ? "text-white/70"
+                                : "text-slate-500"
+                            )}
+                          >
+                            <span>{message.timestamp}</span>
+                            {message.sender === "bot" &&
+                              message.text &&
+                              message.text !== "Thinking..." && (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() =>
+                                        copyToClipboard(
+                                          message.text,
+                                          message.id
+                                        )
+                                      }
+                                      className="h-5 w-5 p-0 opacity-60 hover:opacity-100 text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded"
+                                    >
+                                      {copiedMessageId === message.id ? (
+                                        <Check className="h-3 w-3 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-3 w-3" />
+                                      )}
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    {copiedMessageId === message.id
+                                      ? "Copied!"
+                                      : "Copy message"}
+                                  </TooltipContent>
+                                </Tooltip>
+                              )}
+                          </div>
                         </div>
                       </div>
                     ))}
+                    <div ref={messagesEndRef} />
                   </div>
-                </div>
-              ) : (
-                <div className="space-y-4 py-6">
-                  {messages.length > messageLimit && (
-                    <div className="flex justify-center mb-4">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleLoadMore}
-                        className="gap-2"
-                        style={{
-                          borderColor: THEME_COLORS.primary.main,
-                          color: THEME_COLORS.primary.main,
-                        }}
-                      >
-                        <RefreshCw
-                          className="h-4 w-4"
-                          style={{ color: THEME_COLORS.primary.main }}
-                        />
-                        Load More
-                      </Button>
-                    </div>
-                  )}
-
-                  {displayedMessages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={cn(
-                        "flex mb-4 animate-fadeIn w-full items-start gap-3",
-                        message.sender === "user"
-                          ? "flex-row-reverse"
-                          : "flex-row"
-                      )}
-                    >
-                      {/* Avatar */}
-                      <Avatar className="h-8 w-8 flex-shrink-0 mt-1">
-                        <AvatarFallback
-                          className="text-white text-xs font-medium"
-                          style={{
-                            backgroundColor:
-                              message.sender === "user"
-                                ? THEME_COLORS.primary.main
-                                : "#6B7280",
-                          }}
-                        >
-                          {message.sender === "user" ? (
-                            <User className="h-4 w-4" />
-                          ) : (
-                            <Bot className="h-4 w-4" />
-                          )}
-                        </AvatarFallback>
-                      </Avatar>
-
-                      {/* Message Bubble */}
-                      <div
-                        className={cn(
-                          "max-w-[85%] md:max-w-[70%] rounded-2xl px-4 py-3 shadow-sm break-words",
-                          message.sender === "user"
-                            ? "rounded-tr-sm text-white"
-                            : "rounded-tl-sm bg-gray-100 dark:bg-gray-800"
-                        )}
-                        style={{
-                          backgroundColor:
-                            message.sender === "user"
-                              ? THEME_COLORS.primary.main
-                              : undefined,
-                        }}
-                      >
-                        <div className="break-words">
-                          {message.sender === "user" ? (
-                            <div className="whitespace-pre-wrap break-words text-white">
-                              {renderUserMessageText(message.text)}
-                            </div>
-                          ) : (
-                            <div className="break-words">
-                              {message.text === "Thinking..." ? (
-                                <div className="flex items-center space-x-2">
-                                  <Loader2
-                                    className="h-4 w-4 animate-spin"
-                                    style={{ color: THEME_COLORS.primary.main }}
-                                  />
-                                  <span className="text-sm text-muted-foreground">
-                                    Thinking...
-                                  </span>
-                                </div>
-                              ) : (
-                                renderBotMessageText(message.text)
-                              )}
-                            </div>
-                          )}
-                        </div>
-                        <div
-                          className={cn(
-                            "text-xs mt-2 text-right flex items-center justify-end gap-2",
-                            message.sender === "user"
-                              ? "text-white/70"
-                              : "text-muted-foreground"
-                          )}
-                        >
-                          <span>{message.timestamp}</span>
-                          {message.sender === "bot" &&
-                            message.text &&
-                            message.text !== "Thinking..." && (
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() =>
-                                      copyToClipboard(message.text, message.id)
-                                    }
-                                    className="h-5 w-5 p-0 transition-colors opacity-60 hover:opacity-100 text-muted-foreground hover:text-foreground"
-                                  >
-                                    {copiedMessageId === message.id ? (
-                                      <Check className="h-3 w-3 text-green-500" />
-                                    ) : (
-                                      <Copy className="h-3 w-3" />
-                                    )}
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  {copiedMessageId === message.id
-                                    ? "Copied!"
-                                    : "Copy message"}
-                                </TooltipContent>
-                              </Tooltip>
-                            )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  <div ref={messagesEndRef} />
-                </div>
-              )}
+                )}
+              </div>
             </ScrollArea>
 
-            <div className="border-t p-6 space-y-3 flex-shrink-0">
-              <div className="flex space-x-2">
+            <div className="border-t border-slate-200 bg-white p-4">
+              <div className="flex space-x-3 max-w-5xl mx-auto">
                 <Input
                   ref={inputRef}
                   value={input}
@@ -1110,22 +1097,17 @@ const ChatPage = () => {
                     }
                   }}
                   disabled={isLoading}
-                  className="flex-1 border-gray-300 focus:border-orange-500 focus:ring-orange-500 rounded-lg"
+                  className="flex-1 border-slate-300 focus:border-orange-500 focus:ring-orange-500 bg-white placeholder-slate-400"
                 />
                 <Button
                   onClick={sendMessage}
                   disabled={!input.trim() || isLoading}
-                  size="icon"
-                  className="flex-shrink-0"
-                  style={{
-                    backgroundColor: THEME_COLORS.primary.main,
-                    borderColor: THEME_COLORS.primary.main,
-                  }}
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg disabled:opacity-50"
                 >
                   {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin text-white" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
-                    <Send className="h-4 w-4 text-white" />
+                    <Send className="h-4 w-4" />
                   )}
                 </Button>
               </div>
