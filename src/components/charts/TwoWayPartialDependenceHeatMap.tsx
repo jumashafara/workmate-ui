@@ -197,52 +197,54 @@ const TwoWayPartialDependenceHeatMap: React.FC<
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Model</label>
-            <Select value={model} onValueChange={setModel}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="year1_classification">
-                  Year 1 Classification
-                </SelectItem>
-                <SelectItem value="year2_classification">
-                  Year 2 Classification
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Feature 1</label>
-            <Select value={feature1} onValueChange={setFeature1}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {featureList.map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-6">
+          <div className="flex flex-row gap-2 mb-2">
+            <div className="flex flex-col">
+              <label className="text-xs font-medium">Model</label>
+              <Select value={model} onValueChange={setModel}>
+                <SelectTrigger className="text-xs h-8 min-w-[120px]">
+                  <SelectValue className="text-xs" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="year1_classification" className="text-xs">
+                    Year 1 Classification
                   </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Feature 2</label>
-            <Select value={feature2} onValueChange={setFeature2}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {featureList.map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
+                  <SelectItem value="year2_classification" className="text-xs">
+                    Year 2 Classification
                   </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col">
+              <label className="text-xs font-medium">Feature 1</label>
+              <Select value={feature1} onValueChange={setFeature1}>
+                <SelectTrigger className="text-xs h-8 min-w-[120px]">
+                  <SelectValue className="text-xs" />
+                </SelectTrigger>
+                <SelectContent>
+                  {featureList.map(([value, label]) => (
+                    <SelectItem key={value} value={value} className="text-xs">
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col">
+              <label className="text-xs font-medium">Feature 2</label>
+              <Select value={feature2} onValueChange={setFeature2}>
+                <SelectTrigger className="text-xs h-8 min-w-[120px]">
+                  <SelectValue className="text-xs" />
+                </SelectTrigger>
+                <SelectContent>
+                  {featureList.map(([value, label]) => (
+                    <SelectItem key={value} value={value} className="text-xs">
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 

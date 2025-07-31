@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { MessageCircle, BarChart3, Brain } from "lucide-react";
+import { MessageCircle, BarChart3, Brain, Home } from "lucide-react";
 import Image from "next/image";
 import { getUserData } from "@/utils/ccokie";
 
@@ -34,9 +34,9 @@ const getNavigationData = (userRole: string, isSuperuser: boolean) => {
   if (isSuperuser) {
     navItems = [
       {
-        title: "Risk Assessment",
+        title: "Dashboard",
         url: "#",
-        icon: BarChart3,
+        icon: Home,
         isActive: true,
         items: [
           {
