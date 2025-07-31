@@ -27,7 +27,7 @@ interface AuthResponse {
 }
 
 import { ACCOUNTS_ENDPOINT } from "./endpoints";
-import { getAuthToken } from "../utils/ccokie";
+import { getAuthToken } from "./cookie";
 
 export const register = async (data: RegisterData) => {
   const response = await fetch(ACCOUNTS_ENDPOINT + "/register/", {
@@ -43,7 +43,9 @@ export const register = async (data: RegisterData) => {
     return responseData;
   } else {
     const error = await response.json();
-    throw new Error(error.error || error.error_message || "Error registering user");
+    throw new Error(
+      error.error || error.error_message || "Error registering user"
+    );
   }
 };
 
@@ -90,12 +92,14 @@ export const updatePasswordAPI = async (
   const response = await fetch(ACCOUNTS_ENDPOINT + "/change-password/", {
     method: "POST",
     headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${getAuthToken()}`,
-      },
-      body: JSON.stringify({ old_password: currentPassword, new_password: newPassword }),
-    }
-  );
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getAuthToken()}`,
+    },
+    body: JSON.stringify({
+      old_password: currentPassword,
+      new_password: newPassword,
+    }),
+  });
   return response.json();
 };
 
@@ -111,8 +115,8 @@ export const requestPasswordResetAPI = async (email: string) => {
 };
 
 export const validateResetTokenAPI = async (uid: string, token: string) => {
-  console.log('validateResetTokenAPI called with:', { uid, token });
-  
+  console.log("validateResetTokenAPI called with:", { uid, token });
+
   try {
     const response = await fetch(ACCOUNTS_ENDPOINT + "/validate-reset-token/", {
       method: "POST",
@@ -121,20 +125,24 @@ export const validateResetTokenAPI = async (uid: string, token: string) => {
       },
       body: JSON.stringify({ uid, token }),
     });
-    
-    console.log('validateResetTokenAPI response status:', response.status);
-    
+
+    console.log("validateResetTokenAPI response status:", response.status);
+
     const data = await response.json();
-    console.log('validateResetTokenAPI response data:', data);
-    
+    console.log("validateResetTokenAPI response data:", data);
+
     return data;
   } catch (error) {
-    console.error('Error in validateResetTokenAPI:', error);
+    console.error("Error in validateResetTokenAPI:", error);
     throw error;
   }
 };
 
-export const resetPasswordAPI = async (uid: string, token: string, newPassword: string) => {
+export const resetPasswordAPI = async (
+  uid: string,
+  token: string,
+  newPassword: string
+) => {
   const response = await fetch(ACCOUNTS_ENDPOINT + "/reset-password/", {
     method: "POST",
     headers: {
@@ -176,12 +184,14 @@ export const getGoogleAuthUrl = async (): Promise<string> => {
   }
 };
 
-export const googleAuthenticate = async (code: string): Promise<AuthResponse> => {
+export const googleAuthenticate = async (
+  code: string
+): Promise<AuthResponse> => {
   // URL decode the code if it's encoded
   const decodedCode = decodeURIComponent(code);
-  
-  console.log('Authenticating with Google code:', decodedCode);
-  
+
+  console.log("Authenticating with Google code:", decodedCode);
+
   const response = await fetch(ACCOUNTS_ENDPOINT + "/google/callback/", {
     method: "POST",
     headers: {

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getUserData } from "@/utils/ccokie";
+import { getUserData } from "@/utils/cookie";
 
 export default function DashboardRedirector() {
   const router = useRouter();

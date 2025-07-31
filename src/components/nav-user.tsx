@@ -20,7 +20,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { getUserData, clearAuthCookies } from "@/utils/ccokie";
+import { getUserData, clearAuthCookies } from "@/utils/cookie";
 
 export function NavUser() {
   const { isMobile } = useSidebar();

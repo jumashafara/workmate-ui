@@ -1,37 +1,37 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Separator } from "@/components/ui/separator"
-import { signInSchema, type SignInFormData } from "@/lib/schemas/auth"
-import { login, getGoogleAuthUrl, googleAuthenticate } from "@/api/auth"
-import { setAuthToken, setRefreshToken, setUserData } from "@/utils/ccokie"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Separator } from "@/components/ui/separator";
+import { signInSchema, type SignInFormData } from "@/lib/schemas/auth";
+import { login, getGoogleAuthUrl, googleAuthenticate } from "@/api/auth";
+import { setAuthToken, setRefreshToken, setUserData } from "@/utils/cookie";
 
 export default function SignInPage() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
-  const [error, setError] = useState("")
-  const router = useRouter()
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
 
   // Check for Google OAuth callback
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search)
-    const code = urlParams.get('code')
-    
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get("code");
+
     if (code) {
-      handleGoogleCallback(code)
+      handleGoogleCallback(code);
     }
-  }, [])
+  }, []);
 
   const {
     register,
@@ -39,18 +39,21 @@ export default function SignInPage() {
     formState: { errors },
   } = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema),
-  })
+  });
 
   const onSubmit = async (data: SignInFormData) => {
-    setIsLoading(true)
-    setError("")
+    setIsLoading(true);
+    setError("");
 
     try {
-      const response = await login({ username: data.email, password: data.password })
-      
+      const response = await login({
+        username: data.email,
+        password: data.password,
+      });
+
       // Save the tokens
-      setAuthToken(response.access_token)
-      setRefreshToken(response.refresh_token)
+      setAuthToken(response.access_token);
+      setRefreshToken(response.refresh_token);
       setUserData({
         email: response.user.email,
         full_name: response.user.full_name,
@@ -58,26 +61,26 @@ export default function SignInPage() {
         role: response.user.role,
         region: response.user.region,
         district: response.user.district,
-        superuser: response.user.is_superuser
-      })
-      
+        superuser: response.user.is_superuser,
+      });
+
       // Redirect to dashboard on success
-      router.push("/dashboard")
+      router.push("/dashboard");
     } catch (err: any) {
-      setError(err.message || "Invalid email or password. Please try again.")
+      setError(err.message || "Invalid email or password. Please try again.");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleGoogleCallback = async (code: string) => {
     try {
-      setIsGoogleLoading(true)
-      const response = await googleAuthenticate(code)
-      
+      setIsGoogleLoading(true);
+      const response = await googleAuthenticate(code);
+
       // Save the tokens
-      setAuthToken(response.access_token)
-      setRefreshToken(response.refresh_token)
+      setAuthToken(response.access_token);
+      setRefreshToken(response.refresh_token);
       setUserData({
         email: response.user.email,
         full_name: response.user.full_name,
@@ -85,33 +88,35 @@ export default function SignInPage() {
         role: response.user.role,
         region: response.user.region,
         district: response.user.district,
-        superuser: response.user.is_superuser
-      })
-      
-      router.push("/dashboard")
+        superuser: response.user.is_superuser,
+      });
+
+      router.push("/dashboard");
     } catch (err: any) {
-      setIsGoogleLoading(false)
-      setError("Google authentication failed: " + err.message)
+      setIsGoogleLoading(false);
+      setError("Google authentication failed: " + err.message);
     }
-  }
+  };
 
   const handleGoogleSignIn = async () => {
-    setIsGoogleLoading(true)
-    setError("")
+    setIsGoogleLoading(true);
+    setError("");
 
     try {
-      const authUrl = await getGoogleAuthUrl()
-      window.location.href = authUrl
+      const authUrl = await getGoogleAuthUrl();
+      window.location.href = authUrl;
     } catch (err: any) {
-      setIsGoogleLoading(false)
-      setError("Failed to initiate Google login: " + err.message)
+      setIsGoogleLoading(false);
+      setError("Failed to initiate Google login: " + err.message);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900">Sign in to your account</h1>
+        <h1 className="text-2xl font-bold text-gray-900">
+          Sign in to your account
+        </h1>
         <p className="mt-2 text-sm text-gray-600">
           Enter your credentials to access your account
         </p>
@@ -167,7 +172,9 @@ export default function SignInPage() {
             </button>
           </div>
           {errors.password && (
-            <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+            <p className="mt-1 text-sm text-red-600">
+              {errors.password.message}
+            </p>
           )}
         </div>
 
@@ -252,5 +259,5 @@ export default function SignInPage() {
         </Link>
       </p>
     </div>
-  )
+  );
 }

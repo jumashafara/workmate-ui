@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthToken } from './utils/ccokie';
+import { getAuthToken } from './utils/cookie';
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

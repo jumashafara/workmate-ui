@@ -4,7 +4,7 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import { MessageCircle, BarChart3, Brain, Home } from "lucide-react";
 import Image from "next/image";
-import { getUserData } from "@/utils/ccokie";
+import { getUserData } from "@/utils/cookie";
 
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";

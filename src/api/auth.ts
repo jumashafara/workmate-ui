@@ -27,7 +27,7 @@ interface AuthResponse {
 }
 
 import { ACCOUNTS_ENDPOINT } from "@/utils/endpoints";
-import { getAuthToken } from "@/utils/ccokie";
+import { getAuthToken } from "@/utils/cookie";
 
 export const register = async (data: RegisterData) => {
   const response = await fetch(ACCOUNTS_ENDPOINT + "/register/", {

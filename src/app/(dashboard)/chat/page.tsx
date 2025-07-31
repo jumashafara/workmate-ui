@@ -50,7 +50,7 @@ const THEME_COLORS = {
     contrastText: "#FFFFFF",
   },
 };
-import { getUserData } from "@/utils/ccokie";
+import { getUserData } from "@/utils/cookie";
 import logToTrubrics from "@/utils/Trubrics";
 // import logToDATAIDEA from "@/utils/Dataidea"; // Temporarily disabled due to fetch errors
 import ChatHistoryAPI, { ChatConversation } from "@/utils/ChatHistory";
