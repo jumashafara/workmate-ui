@@ -234,8 +234,7 @@ export default function ModelMetricsPage() {
               Model Metrics
             </h1>
             <p className="text-gray-600 dark:text-gray-400 text-lg mb-4">
-              Comprehensive model performance evaluation with advanced metrics
-              and interactive visualizations
+              Advanced model metrics & interactive charts
             </p>
             <div className="flex items-center gap-6 text-sm">
               <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">

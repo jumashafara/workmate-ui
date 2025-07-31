@@ -50,8 +50,7 @@ export default function FeatureImportancePage() {
           Feature Importance
         </h1>
         <p className="text-gray-500 dark:text-gray-400">
-          Understand which features contribute most to model predictions and how
-          they interact.
+          See which features matter most and how they interact.
         </p>
       </div>
 
