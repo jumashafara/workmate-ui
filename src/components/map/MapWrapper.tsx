@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import React, { useState, useRef, useEffect } from "react";
 
 interface Household {
+  id: number;
   household_id: string;
   village: string;
   latitude: number;

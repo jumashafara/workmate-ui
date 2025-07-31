@@ -50,7 +50,6 @@ export default function ProjectManagerPredictionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [predictions, setPredictions] = useState<PredictionData[]>([]);
-  const [totalCount, setTotalCount] = useState(0);
 
   // Filter states
   const [selectedCohorts, setSelectedCohorts] = useState<string[]>([]);
@@ -133,7 +132,6 @@ export default function ProjectManagerPredictionsPage() {
       }
 
       setPredictions(allData);
-      setTotalCount(allData.length);
     } catch (err: any) {
       console.error("Fetch all data error:", err);
       let errorMessage = 'Network error. Please check if the API server is running.';
@@ -359,7 +357,7 @@ export default function ProjectManagerPredictionsPage() {
       </div>
 
       {/* Interactive Dashboard Charts */}
-      <DashboardCharts data={predictions} totalCount={totalCount} />
+      <DashboardCharts data={predictions} />
 
       {/* Filters */}
       <Card>

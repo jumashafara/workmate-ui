@@ -135,7 +135,9 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({ households, maxMarkers = MA
 
   const toggleFullScreen = useCallback(() => {
     if (mapContainerRef.current) {
-      if (!document.fullscreenElement) mapContainerRef.current.requestFullscreen?.catch(err => console.error('Fullscreen error:', err));
+      if (!document.fullscreenElement) {
+        mapContainerRef.current.requestFullscreen()?.catch(err => console.error('Fullscreen error:', err));
+      }
       else document.exitFullscreen?.();
     }
   }, []);
