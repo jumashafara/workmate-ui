@@ -225,30 +225,77 @@ export default function ModelMetricsPage() {
     <div className="space-y-6 pb-80">
       {/* Header */}
       <div className="bg-white dark:bg-slate-900 rounded-xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm">
-        <div className="flex items-start gap-4">
-          <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-xl">
-            <Brain className="h-8 w-8 text-orange-600 dark:text-orange-400" />
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-xl">
+              <Brain className="h-8 w-8 text-orange-600 dark:text-orange-400" />
+            </div>
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                Model Metrics
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 text-lg mb-4">
+                Advanced model metrics & interactive charts
+              </p>
+              <div className="flex items-center gap-6 text-sm">
+                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                  <BarChart3 className="h-4 w-4" />
+                  <span>Performance Metrics</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                  <Target className="h-4 w-4" />
+                  <span>Model Accuracy</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                  <Activity className="h-4 w-4" />
+                  <span>Real-time Evaluation</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Model Metrics
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 text-lg mb-4">
-              Advanced model metrics & interactive charts
-            </p>
-            <div className="flex items-center gap-6 text-sm">
-              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                <BarChart3 className="h-4 w-4" />
-                <span>Performance Metrics</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                <Target className="h-4 w-4" />
-                <span>Model Accuracy</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                <Activity className="h-4 w-4" />
-                <span>Real-time Evaluation</span>
-              </div>
+          
+          {/* Model Selector - Moved to extreme right */}
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 min-w-[280px]">
+            <div className="flex items-center gap-2 mb-3">
+              <Settings className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+              <Label
+                htmlFor="model-select"
+                className="text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Active Model
+              </Label>
+            </div>
+            <Select
+              value={modelOptions.find((m) => m.value === model.name)?.id}
+              onValueChange={handleModelChange}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a model" />
+              </SelectTrigger>
+              <SelectContent>
+                {modelOptions.map((option) => (
+                  <SelectItem key={option.id} value={option.id}>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        className={`text-xs ${
+                          option.type === "classification"
+                            ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                            : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                        }`}
+                      >
+                        {option.type}
+                      </Badge>
+                      {option.name}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+              Current:{" "}
+              <span className="text-orange-600 dark:text-orange-400 font-medium">
+                {modelOptions.find((m) => m.value === model.name)?.name}
+              </span>
             </div>
           </div>
         </div>
@@ -257,64 +304,17 @@ export default function ModelMetricsPage() {
       {/* Model Statistics Table */}
       <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
         <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-                <TrendingUp className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-              </div>
-              <div>
-                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Model Performance Summary
-                </CardTitle>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  Key metrics and statistics for the selected {model.type} model
-                </p>
-              </div>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+              <TrendingUp className="h-5 w-5 text-orange-600 dark:text-orange-400" />
             </div>
-
-            {/* Model Selector */}
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 min-w-[280px]">
-              <div className="flex items-center gap-2 mb-3">
-                <Settings className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-                <Label
-                  htmlFor="model-select"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Active Model
-                </Label>
-              </div>
-              <Select
-                value={modelOptions.find((m) => m.value === model.name)?.id}
-                onValueChange={handleModelChange}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a model" />
-                </SelectTrigger>
-                <SelectContent>
-                  {modelOptions.map((option) => (
-                    <SelectItem key={option.id} value={option.id}>
-                      <div className="flex items-center gap-2">
-                        <Badge
-                          className={`text-xs ${
-                            option.type === "classification"
-                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                              : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                          }`}
-                        >
-                          {option.type}
-                        </Badge>
-                        {option.name}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                Current:{" "}
-                <span className="text-orange-600 dark:text-orange-400 font-medium">
-                  {modelOptions.find((m) => m.value === model.name)?.name}
-                </span>
-              </div>
+            <div>
+              <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                Model Performance Summary
+              </CardTitle>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Key metrics and statistics for the selected {model.type} model
+              </p>
             </div>
           </div>
         </CardHeader>
