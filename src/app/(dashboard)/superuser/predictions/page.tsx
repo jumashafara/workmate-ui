@@ -50,7 +50,6 @@ export default function SuperuserPredictionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [predictions, setPredictions] = useState<PredictionData[]>([]);
-  const [totalCount, setTotalCount] = useState(0);
 
   // Filter states
   const [selectedCohorts, setSelectedCohorts] = useState<string[]>([]);
@@ -71,69 +70,44 @@ export default function SuperuserPredictionsPage() {
 
   const [isLoadingAllData, setIsLoadingAllData] = useState<boolean>(false);
 
-  // Fetch all data by making multiple requests if needed
-  const fetchAllDataIteratively = async () => {
+  const fetchAllData = async () => {
     try {
       setIsLoadingAllData(true);
       setError(null);
-      let allData: PredictionData[] = [];
-      let currentPageFetch = 1;
-      let hasMoreData = true;
-      const pageSize = 500;
 
-      while (hasMoreData) {
-        const params = new URLSearchParams();
-        params.append("page", currentPageFetch.toString());
-        params.append("page_size", pageSize.toString());
+      const params = new URLSearchParams();
+      if (selectedCohorts.length > 0)
+        params.append("cohort", selectedCohorts.join(","));
+      if (selectedRegions.length > 0)
+        params.append("region", selectedRegions.join(","));
+      if (selectedDistricts.length > 0)
+        params.append("district", selectedDistricts.join(","));
+      if (selectedClusters.length > 0)
+        params.append("cluster", selectedClusters.join(","));
+      if (selectedCycles.length > 0)
+        params.append("cycle", selectedCycles.join(","));
+      if (selectedMonths.length > 0)
+        params.append("evaluation_month", selectedMonths.join(","));
 
-        // Add filter parameters
-        if (selectedCohorts.length > 0)
-          params.append("cohort", selectedCohorts.join(","));
-        if (selectedRegions.length > 0)
-          params.append("region", selectedRegions.join(","));
-        if (selectedDistricts.length > 0)
-          params.append("district", selectedDistricts.join(","));
-        if (selectedClusters.length > 0)
-          params.append("cluster", selectedClusters.join(","));
-        if (selectedCycles.length > 0)
-          params.append("cycle", selectedCycles.join(","));
-        if (selectedMonths.length > 0)
-          params.append("evaluation_month", selectedMonths.join(","));
-
-        const response = await fetch(
-          `${API_ENDPOINT}/standard-evaluations/?${params.toString()}`
-        );
-        if (!response.ok) {
-          if (response.status === 0 || !navigator.onLine) {
-            throw new Error(
-              "Network error: Please check your internet connection"
-            );
-          }
+      const response = await fetch(
+        `${API_ENDPOINT}/standard-evaluations/?${params.toString()}`
+      );
+      if (!response.ok) {
+        if (response.status === 0 || !navigator.onLine) {
           throw new Error(
-            `API Error: ${response.status} - ${response.statusText}`
+            "Network error: Please check your internet connection"
           );
         }
-
-        const result = await response.json();
-
-        if (result.results && result.results.length > 0) {
-          allData = [...allData, ...result.results];
-          hasMoreData = result.results.length === pageSize && !!result.next;
-          currentPageFetch++;
-
-          if (currentPageFetch > 50) {
-            // Safety check
-            hasMoreData = false;
-          }
-        } else {
-          hasMoreData = false;
-        }
-
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        throw new Error(
+          `API Error: ${response.status} - ${response.statusText}`
+        );
       }
 
+      const result = await response.json();
+      
+      const allData = result.predictions || [];
+
       setPredictions(allData);
-      setTotalCount(allData.length);
     } catch (err: any) {
       console.error("Fetch all data error:", err);
       let errorMessage =
@@ -157,8 +131,7 @@ export default function SuperuserPredictionsPage() {
       setLoading(true);
       setError(null);
 
-      // Always fetch all data
-      await fetchAllDataIteratively();
+      await fetchAllData();
 
       // Fetch filter options
       const filterParams = new URLSearchParams();
@@ -383,7 +356,7 @@ export default function SuperuserPredictionsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm">
+      {/* <div className="bg-white dark:bg-slate-900 rounded-xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="flex items-start gap-4">
           <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
             <BarChart3 className="h-8 w-8 text-blue-600 dark:text-blue-400" />
@@ -392,9 +365,6 @@ export default function SuperuserPredictionsPage() {
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
               Predictions Dashboard
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 text-lg mb-4">
-              Advanced prediction analytics with intelligent filtering and comprehensive visualizations
-            </p>
             <div className="flex items-center gap-6 text-sm">
               <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                 <TrendingUp className="h-4 w-4" />
@@ -402,7 +372,7 @@ export default function SuperuserPredictionsPage() {
               </div>
               <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                 <Users className="h-4 w-4" />
-                <span>{totalCount.toLocaleString()} Records</span>
+                <span>{predictions.length.toLocaleString()} Records</span>
               </div>
               <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                 <MapPin className="h-4 w-4" />
@@ -411,13 +381,10 @@ export default function SuperuserPredictionsPage() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
-      {/* Interactive Dashboard Charts */}
-      <DashboardCharts data={predictions} totalCount={totalCount} />
-
-      {/* Filters */}
-      <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
+ {/* Filters */}
+ <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-3">
@@ -525,96 +492,14 @@ export default function SuperuserPredictionsPage() {
               </div>
             </div>
 
-            {/* Active Filters */}
-            {activeFiltersCount > 0 && (
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Active Filters</h4>
-                <div className="flex flex-wrap gap-2">
-                {selectedRegions.map((region) => (
-                  <Badge key={region} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
-                    Region: {region}
-                    <X
-                      className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
-                      onClick={() =>
-                        setSelectedRegions((prev) =>
-                          prev.filter((r) => r !== region)
-                        )
-                      }
-                    />
-                  </Badge>
-                ))}
-                {selectedDistricts.map((district) => (
-                  <Badge key={district} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
-                    District: {district}
-                    <X
-                      className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
-                      onClick={() =>
-                        setSelectedDistricts((prev) =>
-                          prev.filter((d) => d !== district)
-                        )
-                      }
-                    />
-                  </Badge>
-                ))}
-                {selectedClusters.map((cluster) => (
-                  <Badge key={cluster} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
-                    Cluster: {cluster}
-                    <X
-                      className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
-                      onClick={() =>
-                        setSelectedClusters((prev) =>
-                          prev.filter((c) => c !== cluster)
-                        )
-                      }
-                    />
-                  </Badge>
-                ))}
-                {selectedCohorts.map((cohort) => (
-                  <Badge key={cohort} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
-                    Cohort: {cohort}
-                    <X
-                      className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
-                      onClick={() =>
-                        setSelectedCohorts((prev) =>
-                          prev.filter((c) => c !== cohort)
-                        )
-                      }
-                    />
-                  </Badge>
-                ))}
-                {selectedCycles.map((cycle) => (
-                  <Badge key={cycle} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
-                    Cycle: {cycle}
-                    <X
-                      className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
-                      onClick={() =>
-                        setSelectedCycles((prev) =>
-                          prev.filter((c) => c !== cycle)
-                        )
-                      }
-                    />
-                  </Badge>
-                ))}
-                {selectedMonths.map((month) => (
-                  <Badge key={month} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
-                    Month: {month}
-                    <X
-                      className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
-                      onClick={() =>
-                        setSelectedMonths((prev) =>
-                          prev.filter((m) => m !== month)
-                        )
-                      }
-                    />
-                  </Badge>
-                ))}
-                </div>
-              </div>
-            )}
           </CardContent>
         )}
       </Card>
 
+      {/* Interactive Dashboard Charts */}
+      <DashboardCharts data={predictions} />
+
+     
       {/* Map and Charts */}
       <div className="space-y-6">
         <HouseholdMap households={predictions} />

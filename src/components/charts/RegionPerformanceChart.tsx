@@ -82,6 +82,11 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
       .sort((a, b) => b.achievement_rate - a.achievement_rate);
   }, [data]);
 
+  const colorPalette = [
+    "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
+    "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"
+  ];
+
   // Prepare data for Plotly
   const plotData = [
     {
@@ -90,18 +95,13 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
       type: "bar" as const,
       name: "Achievement Rate (%)",
       marker: {
-        color: regionStats.map((stat) =>
-          stat.achievement_rate >= 70
-            ? "#4CAF50"
-            : stat.achievement_rate >= 50
-            ? "#EA580C"
-            : "#1c2434"
-        ),
+        color: regionStats.map((_, i) => colorPalette[i % colorPalette.length]),
         opacity: 0.8,
         line: {
           color: "#2E7D32",
           width: 1,
         },
+        cornerradius: 10,
       },
       text: regionStats.map(
         (stat) =>

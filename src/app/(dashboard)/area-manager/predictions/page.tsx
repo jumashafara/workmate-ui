@@ -22,6 +22,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import dynamic from 'next/dynamic';
+import { getUserData } from "@/utils/cookie";
 
 const DashboardCharts = dynamic(() => import("@/components/charts/DashboardCharts"), { ssr: false });
 const RegionPerformanceChart = dynamic(() => import("@/components/charts/RegionPerformanceChart"), { ssr: false });
@@ -51,18 +52,20 @@ interface FilterOption {
   label: string;
 }
 
-// Mock user data - replace with actual user context
-const getUserData = () => ({
-  region: "Central", // Example region for area manager
-});
-
 export default function AreaManagerPredictionsPage() {
-  const userData = getUserData();
-  const region = userData.region;
+  const [userData, setUserData] = useState<any>(null);
+
+  useEffect(() => {
+    const data = getUserData();
+    setUserData(data);
+  }, []);
+
+  const region = userData?.region;
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [predictions, setPredictions] = useState<PredictionData[]>([]);
+  const [allRegionPredictions, setAllRegionPredictions] = useState<PredictionData[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   
   // Filter states
@@ -84,188 +87,101 @@ export default function AreaManagerPredictionsPage() {
 
   const [isLoadingAllData, setIsLoadingAllData] = useState<boolean>(false);
 
-  // Fetch all data by making multiple requests if needed
-  const fetchAllDataIteratively = async () => {
+  const fetchAllData = async () => {
+    if (!region) return;
     try {
       setIsLoadingAllData(true);
       setError(null);
-      let allData: PredictionData[] = [];
-      let currentPageFetch = 1;
-      let hasMoreData = true;
-      const pageSize = 500;
-
-      while (hasMoreData) {
-        const params = new URLSearchParams();
-        params.append("page", currentPageFetch.toString());
-        params.append("page_size", pageSize.toString());
-
-        // Always include user's region in params
-        if (region) params.append("region", region);
-
-        // Add filter parameters
-        if (selectedCohorts.length > 0)
-          params.append("cohort", selectedCohorts.join(","));
-        if (selectedDistricts.length > 0)
-          params.append("district", selectedDistricts.join(","));
-        if (selectedClusters.length > 0)
-          params.append("cluster", selectedClusters.join(","));
-        if (selectedCycles.length > 0)
-          params.append("cycle", selectedCycles.join(","));
-        if (selectedMonths.length > 0)
-          params.append("evaluation_month", selectedMonths.join(","));
-        if (selectedVillages.length > 0)
-          params.append("village", selectedVillages.join(","));
-
-        const response = await fetch(
-          `${API_ENDPOINT}/standard-evaluations/?${params.toString()}`
-        );
-        if (!response.ok) {
-          if (response.status === 0 || !navigator.onLine) {
-            throw new Error('Network error: Please check your internet connection');
-          }
-          throw new Error(`API Error: ${response.status} - ${response.statusText}`);
-        }
-
-        const result = await response.json();
-
-        if (result.results && result.results.length > 0) {
-          // Filter to only include data from user's region
-          const filteredResults = region 
-            ? result.results.filter((item: PredictionData) => item.region === region)
-            : result.results;
-            
-          allData = [...allData, ...filteredResults];
-          hasMoreData = result.results.length === pageSize && !!result.next;
-          currentPageFetch++;
-
-          if (currentPageFetch > 50) {
-            // Safety check
-            hasMoreData = false;
-          }
-        } else {
-          hasMoreData = false;
-        }
-
-        await new Promise((resolve) => setTimeout(resolve, 100));
+      const params = new URLSearchParams();
+  
+      if (region) params.append("region", region);
+      if (selectedCohorts.length > 0) params.append("cohort", selectedCohorts.join(","));
+      if (selectedDistricts.length > 0) params.append("district", selectedDistricts.join(","));
+      if (selectedClusters.length > 0) params.append("cluster", selectedClusters.join(","));
+      if (selectedCycles.length > 0) params.append("cycle", selectedCycles.join(","));
+      if (selectedMonths.length > 0) params.append("evaluation_month", selectedMonths.join(","));
+      if (selectedVillages.length > 0) params.append("village", selectedVillages.join(","));
+  
+      const response = await fetch(`${API_ENDPOINT}/standard-evaluations/?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status} - ${response.statusText}`);
       }
-
+  
+      const result = await response.json();
+      const allData = result.predictions || [];
       setPredictions(allData);
       setTotalCount(allData.length);
     } catch (err: any) {
       console.error("Fetch all data error:", err);
-      let errorMessage = 'Network error. Please check if the API server is running.';
-      
-      if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
-        errorMessage = `Cannot connect to API server at ${API_ENDPOINT}. Please ensure the backend server is running on localhost:8000.`;
-      } else if (err.message) {
-        errorMessage = err.message;
-      }
-      
-      setError(`Failed to fetch data: ${errorMessage}`);
+      setError(`Failed to fetch data: ${err.message}`);
     } finally {
       setIsLoadingAllData(false);
     }
   };
-
-  // Fetch predictions and filter options
-  const fetchData = async () => {
+  
+  const fetchAllRegionData = async () => {
     try {
-      setLoading(true);
-      setError(null);
+      const response = await fetch(`${API_ENDPOINT}/standard-evaluations/`);
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status} - ${response.statusText}`);
+      }
+      const result = await response.json();
+      setAllRegionPredictions(result.predictions || []);
+    } catch (err: any) {
+      console.error("Fetch all region data error:", err);
+    }
+  };
 
-      // Always fetch all data for area managers
-      await fetchAllDataIteratively();
-
-      // Fetch filter options
+  const fetchFilterOptions = async () => {
+    if (!region) return;
+    try {
       const filterParams = new URLSearchParams();
-      // Always include user's region in filter params
       if (region) filterParams.append("region", region);
-
-      if (selectedCohorts.length > 0)
-        filterParams.append("cohort", selectedCohorts.join(","));
-      if (selectedDistricts.length > 0)
-        filterParams.append("district", selectedDistricts.join(","));
-      if (selectedClusters.length > 0)
-        filterParams.append("cluster", selectedClusters.join(","));
-      if (selectedCycles.length > 0)
-        filterParams.append("cycle", selectedCycles.join(","));
-      if (selectedMonths.length > 0)
-        filterParams.append("evaluation_month", selectedMonths.join(","));
-
-      const filterResponse = await fetch(
-        `${API_ENDPOINT}/filter-options/?${filterParams.toString()}`
-      );
+      if (selectedCohorts.length > 0) filterParams.append("cohort", selectedCohorts.join(","));
+      if (selectedDistricts.length > 0) filterParams.append("district", selectedDistricts.join(","));
+      if (selectedClusters.length > 0) filterParams.append("cluster", selectedClusters.join(","));
+      if (selectedCycles.length > 0) filterParams.append("cycle", selectedCycles.join(","));
+      if (selectedMonths.length > 0) filterParams.append("evaluation_month", selectedMonths.join(","));
+  
+      const filterResponse = await fetch(`${API_ENDPOINT}/filter-options/?${filterParams.toString()}`);
       if (filterResponse.ok) {
         const filterResult = await filterResponse.json();
-
         if (filterResult) {
-          setCohortOptions(
-            filterResult.cohorts?.map((c: string) => ({
-              value: c,
-              label: c,
-            })) || []
-          );
-          setDistrictOptions(
-            filterResult.districts?.map((d: string) => ({
-              value: d,
-              label: d,
-            })) || []
-          );
-          setClusterOptions(
-            filterResult.clusters?.map((c: string) => ({
-              value: c,
-              label: c,
-            })) || []
-          );
-          setCycleOptions(
-            filterResult.cycles?.map((c: string) => ({
-              value: c,
-              label: c,
-            })) || []
-          );
-          setMonthOptions(
-            filterResult.evaluation_months?.map((em: number) => ({
-              value: em.toString(),
-              label: `Month ${em}`,
-            })) || []
-          );
-          setVillageOptions(
-            filterResult.villages?.map((v: string) => ({
-              value: v,
-              label: v,
-            })) || []
-          );
+          setCohortOptions(filterResult.cohorts?.map((c: string) => ({ value: c, label: c })) || []);
+          setDistrictOptions(filterResult.districts?.map((d: string) => ({ value: d, label: d })) || []);
+          setClusterOptions(filterResult.clusters?.map((c: string) => ({ value: c, label: c })) || []);
+          setCycleOptions(filterResult.cycles?.map((c: string) => ({ value: c, label: c })) || []);
+          setMonthOptions(filterResult.evaluation_months?.map((em: number) => ({ value: em.toString(), label: `Month ${em}` })) || []);
+          setVillageOptions(filterResult.villages?.map((v: string) => ({ value: v, label: v })) || []);
         }
       }
-    } catch (err: any) {
-      console.error("Data fetch error:", err);
-      let errorMessage = 'Network error. Please check if the API server is running.';
-      
-      if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
-        errorMessage = `Cannot connect to API server at ${API_ENDPOINT}. Please ensure the backend server is running on localhost:8000.`;
-      } else if (err.message) {
-        errorMessage = err.message;
-      }
-      
-      setError(`Failed to fetch data: ${errorMessage}`);
-    } finally {
-      setLoading(false);
-      setIsLoadingAllData(false);
+    } catch (err) {
+      console.error("Failed to fetch filter options:", err);
     }
   };
+
+  const fetchData = async () => {
+    setLoading(true);
+    await Promise.all([fetchAllData(), fetchFilterOptions(), fetchAllRegionData()]);
+    setLoading(false);
+  };
+  
 
   // Initial data load
   useEffect(() => {
-    fetchData();
-  }, []);
-
-  // Debounced effect for filter changes - don't include selectedRegions since it's fixed for area managers
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
+    if (region) {
       fetchData();
-    }, 300);
+    }
+  }, [region]);
 
-    return () => clearTimeout(timeoutId);
+  // Debounced effect for filter changes
+  useEffect(() => {
+    if (region) {
+      const timeoutId = setTimeout(() => {
+        fetchData();
+      }, 300);
+      return () => clearTimeout(timeoutId);
+    }
   }, [
     selectedCohorts,
     selectedDistricts,
@@ -273,6 +189,7 @@ export default function AreaManagerPredictionsPage() {
     selectedCycles,
     selectedMonths,
     selectedVillages,
+    region,
   ]);
 
   // Clear all filters except region for area managers
@@ -293,6 +210,15 @@ export default function AreaManagerPredictionsPage() {
     selectedMonths.length +
     selectedVillages.length;
 
+  if (!userData) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-96 w-full" />
+      </div>
+    );
+  }
+
   if (error) {
     return (
       <div className="space-y-6">
@@ -304,7 +230,7 @@ export default function AreaManagerPredictionsPage() {
             </div>
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                Area Manager - Predictions Dashboard
+                Area Manager {region} - Predictions Dashboard
               </h1>
               <p className="text-gray-600 dark:text-gray-400 text-lg">
                 Manage and analyze prediction data for your region ({region}) with advanced filtering capabilities.
@@ -412,7 +338,7 @@ export default function AreaManagerPredictionsPage() {
           </div>
           <div className="flex-1">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Area Manager - Predictions Dashboard
+              Area Manager ({region}) - Predictions Dashboard
             </h1>
             <p className="text-gray-600 dark:text-gray-400 text-lg mb-4">
               Advanced prediction analytics for your region ({region}) with comprehensive filtering and visualizations
@@ -434,28 +360,6 @@ export default function AreaManagerPredictionsPage() {
           </div>
         </div>
       </div>
-
-      {/* Region Context Card */}
-      <Card className="border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/10">
-        <CardContent className="py-4">
-          <div className="flex items-center gap-4">
-            <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-              <MapPin className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-            </div>
-            <div className="flex-1">
-              <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 mb-1">
-                Your Region: {region}
-              </Badge>
-              <p className="text-sm text-orange-700 dark:text-orange-300">
-                Data is automatically filtered to show only your region
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Interactive Dashboard Charts */}
-      <DashboardCharts data={predictions} totalCount={totalCount} />
 
       {/* Filters */}
       <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
@@ -566,100 +470,19 @@ export default function AreaManagerPredictionsPage() {
               </div>
             </div>
 
-            {/* Active Filters */}
-            {activeFiltersCount > 0 && (
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Active Filters</h4>
-                <div className="flex flex-wrap gap-2">
-                {selectedDistricts.map((district) => (
-                  <Badge key={district} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
-                    District: {district}
-                    <X
-                      className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
-                      onClick={() =>
-                        setSelectedDistricts((prev) =>
-                          prev.filter((d) => d !== district)
-                        )
-                      }
-                    />
-                  </Badge>
-                ))}
-                {selectedClusters.map((cluster) => (
-                  <Badge key={cluster} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
-                    Cluster: {cluster}
-                    <X
-                      className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
-                      onClick={() =>
-                        setSelectedClusters((prev) =>
-                          prev.filter((c) => c !== cluster)
-                        )
-                      }
-                    />
-                  </Badge>
-                ))}
-                {selectedCohorts.map((cohort) => (
-                  <Badge key={cohort} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
-                    Cohort: {cohort}
-                    <X
-                      className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
-                      onClick={() =>
-                        setSelectedCohorts((prev) =>
-                          prev.filter((c) => c !== cohort)
-                        )
-                      }
-                    />
-                  </Badge>
-                ))}
-                {selectedCycles.map((cycle) => (
-                  <Badge key={cycle} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
-                    Cycle: {cycle}
-                    <X
-                      className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
-                      onClick={() =>
-                        setSelectedCycles((prev) =>
-                          prev.filter((c) => c !== cycle)
-                        )
-                      }
-                    />
-                  </Badge>
-                ))}
-                {selectedMonths.map((month) => (
-                  <Badge key={month} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
-                    Month: {month}
-                    <X
-                      className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
-                      onClick={() =>
-                        setSelectedMonths((prev) =>
-                          prev.filter((m) => m !== month)
-                        )
-                      }
-                    />
-                  </Badge>
-                ))}
-                {selectedVillages.map((village) => (
-                  <Badge key={village} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
-                    Village: {village}
-                    <X
-                      className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
-                      onClick={() =>
-                        setSelectedVillages((prev) =>
-                          prev.filter((v) => v !== village)
-                        )
-                      }
-                    />
-                  </Badge>
-                ))}
-                </div>
-              </div>
-            )}
           </CardContent>
         )}
       </Card>
 
+      {/* Interactive Dashboard Charts */}
+      <DashboardCharts data={predictions} />
+
+      
+
       {/* Map and Charts */}
       <div className="space-y-6">
         <HouseholdMap households={predictions} />
-        <RegionPerformanceChart data={predictions} />
+        <RegionPerformanceChart data={allRegionPredictions} />
       </div>
 
       {/* Data Information */}

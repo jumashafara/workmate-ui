@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import { API_ENDPOINT } from "../../utils/endpoints";
+
 interface ClusterStat {
   district: string;
   cluster: string;
@@ -26,12 +27,10 @@ interface ClusterStatsProps {
 
 const ClusterStats: React.FC<ClusterStatsProps> = ({ apiUrl = `${API_ENDPOINT}/cluster-stats/`, queryParams }) => {
   const [clusterStats, setClusterStats] = useState<ClusterStat[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState<keyof ClusterStat>("district");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const rowsPerPage = 10; // Number of rows per page
 
   useEffect(() => {
     fetchClusterStats();
@@ -42,9 +41,7 @@ const ClusterStats: React.FC<ClusterStatsProps> = ({ apiUrl = `${API_ENDPOINT}/c
       setLoading(true);
       let url = apiUrl;
       
-      // If we're on the standard evaluations page with filters
       if (queryParams) {
-        // Add group_by=cluster to the query params
         const params = new URLSearchParams(queryParams);
         params.set('group_by', 'cluster');
         url = `${API_ENDPOINT}/standard-evaluations/?${params.toString()}`;
@@ -53,10 +50,6 @@ const ClusterStats: React.FC<ClusterStatsProps> = ({ apiUrl = `${API_ENDPOINT}/c
       const response = await fetch(url);
       const data = await response.json();
       
-      // Reset to first page when data changes
-      setCurrentPage(1);
-      
-      // Handle both array response and object with data property
       const statsData = Array.isArray(data) ? data : data.data || [];
       setClusterStats(statsData);
       setLoading(false);
@@ -67,18 +60,12 @@ const ClusterStats: React.FC<ClusterStatsProps> = ({ apiUrl = `${API_ENDPOINT}/c
     }
   };
 
-  // Handle sorting
   const handleSort = (field: keyof ClusterStat) => {
     const isAsc = sortField === field && sortDirection === "asc";
     setSortDirection(isAsc ? "desc" : "asc");
     setSortField(field);
   };
 
-  // Get current rows for pagination
-  const indexOfLastRow = currentPage * rowsPerPage;
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  
-  // Sort data
   const sortedData = [...clusterStats].sort((a, b) => {
     const aValue = a[sortField];
     const bValue = b[sortField];
@@ -87,7 +74,6 @@ const ClusterStats: React.FC<ClusterStatsProps> = ({ apiUrl = `${API_ENDPOINT}/c
       return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
     }
     
-    // Handle string comparison
     const aString = String(aValue || '');
     const bString = String(bValue || '');
     return sortDirection === 'asc' 
@@ -95,9 +81,6 @@ const ClusterStats: React.FC<ClusterStatsProps> = ({ apiUrl = `${API_ENDPOINT}/c
       : bString.localeCompare(aString);
   });
   
-  const currentRows = sortedData.slice(indexOfFirstRow, indexOfLastRow);
-  const totalPages = Math.ceil(clusterStats.length / rowsPerPage);
-
   const SortButton = ({ field, children }: { field: keyof ClusterStat; children: React.ReactNode }) => (
     <Button
       variant="ghost"
@@ -144,7 +127,7 @@ const ClusterStats: React.FC<ClusterStatsProps> = ({ apiUrl = `${API_ENDPOINT}/c
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentRows.map((stat, index) => (
+            {sortedData.map((stat, index) => (
               <TableRow key={index}>
                 <TableCell>{stat.district}</TableCell>
                 <TableCell>{stat.cluster}</TableCell>
@@ -159,32 +142,6 @@ const ClusterStats: React.FC<ClusterStatsProps> = ({ apiUrl = `${API_ENDPOINT}/c
           </TableBody>
         </Table>
       </div>
-
-      {clusterStats.length > 0 && totalPages > 1 && (
-        <div className="flex justify-center">
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </Button>
-            <span className="text-sm text-gray-600">
-              Page {currentPage} of {totalPages}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

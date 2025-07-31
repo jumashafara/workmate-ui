@@ -34,23 +34,20 @@ const getNavigationData = (userRole: string, isSuperuser: boolean) => {
   if (isSuperuser) {
     navItems = [
       {
-        title: "Dashboard",
+        title: "Standard Evaluations",
         url: "#",
         icon: Home,
         isActive: true,
         items: [
           {
-            title: "Predictions Dashboard",
+            title: "Aggregated Predictions",
             url: "/superuser/predictions",
           },
           {
             title: "Predictions Trends",
             url: "/superuser/trends",
           },
-          {
-            title: "Check-in Evaluations",
-            url: "/reports/checkins",
-          },
+          
         ],
       },
       {
@@ -77,13 +74,13 @@ const getNavigationData = (userRole: string, isSuperuser: boolean) => {
   } else if (userRole === "area_manager") {
     navItems = [
       {
-        title: "Risk Assessment",
+        title: "Standard Evaluations",
         url: "#",
         icon: BarChart3,
         isActive: true,
         items: [
           {
-            title: "Predictions Dashboard",
+            title: "Aggregated Predictions",
             url: "/area-manager/predictions",
           },
           {

@@ -24,14 +24,12 @@ interface DistrictStatsProps {
   queryParams?: URLSearchParams;
 }
 
-  const DistrictStats: React.FC<DistrictStatsProps> = ({ apiUrl = `${API_ENDPOINT}/district-stats/`, queryParams }) => {
+const DistrictStats: React.FC<DistrictStatsProps> = ({ apiUrl = `${API_ENDPOINT}/district-stats/`, queryParams }) => {
   const [districtStats, setDistrictStats] = useState<DistrictStat[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState<keyof DistrictStat>("district");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const rowsPerPage = 10; // Number of rows per page
 
   useEffect(() => {
     fetchDistrictStats();
@@ -42,9 +40,7 @@ interface DistrictStatsProps {
       setLoading(true);
       let url = apiUrl;
       
-      // If we're on the standard evaluations page with filters
       if (queryParams) {
-        // Add group_by=district to the query params
         const params = new URLSearchParams(queryParams);
         params.set('group_by', 'district');
         url = `/api/standard-evaluations/?${params.toString()}`;
@@ -53,10 +49,6 @@ interface DistrictStatsProps {
       const response = await fetch(url);
       const data = await response.json();
       
-      // Reset to first page when data changes
-      setCurrentPage(1);
-      
-      // Handle both array response and object with data property
       const statsData = Array.isArray(data) ? data : data.data || [];
       setDistrictStats(statsData);
       setLoading(false);
@@ -67,18 +59,12 @@ interface DistrictStatsProps {
     }
   };
 
-  // Handle sorting
   const handleSort = (field: keyof DistrictStat) => {
     const isAsc = sortField === field && sortDirection === "asc";
     setSortDirection(isAsc ? "desc" : "asc");
     setSortField(field);
   };
 
-  // Get current rows for pagination
-  const indexOfLastRow = currentPage * rowsPerPage;
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  
-  // Sort data
   const sortedData = [...districtStats].sort((a, b) => {
     const aValue = a[sortField];
     const bValue = b[sortField];
@@ -87,7 +73,6 @@ interface DistrictStatsProps {
       return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
     }
     
-    // Handle string comparison
     const aString = String(aValue || '');
     const bString = String(bValue || '');
     return sortDirection === 'asc' 
@@ -95,9 +80,6 @@ interface DistrictStatsProps {
       : bString.localeCompare(aString);
   });
   
-  const currentRows = sortedData.slice(indexOfFirstRow, indexOfLastRow);
-  const totalPages = Math.ceil(districtStats.length / rowsPerPage);
-
   const SortButton = ({ field, children }: { field: keyof DistrictStat; children: React.ReactNode }) => (
     <Button
       variant="ghost"
@@ -141,7 +123,7 @@ interface DistrictStatsProps {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentRows.map((stat, index) => (
+            {sortedData.map((stat, index) => (
               <TableRow key={index}>
                 <TableCell>{stat.district}</TableCell>
                 <TableCell>{stat.evaluation_month}</TableCell>
@@ -155,32 +137,6 @@ interface DistrictStatsProps {
           </TableBody>
         </Table>
       </div>
-
-      {districtStats.length > 0 && totalPages > 1 && (
-        <div className="flex justify-center">
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </Button>
-            <span className="text-sm text-gray-600">
-              Page {currentPage} of {totalPages}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

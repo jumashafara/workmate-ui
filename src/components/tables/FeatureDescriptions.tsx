@@ -151,10 +151,8 @@ const defaultVariables = [
 const VariableDescriptions: React.FC<VariableDescriptionsProps> = ({
   variables = defaultVariables,
 }) => {
-  const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState<keyof VariableDescription>("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const rowsPerPage = 8; // Number of rows per page
 
   // Handle sorting
   const handleSort = (field: keyof VariableDescription) => {
@@ -203,18 +201,6 @@ const VariableDescriptions: React.FC<VariableDescriptionsProps> = ({
       : bString.localeCompare(aString);
   });
 
-  // Get current rows for pagination
-  const indexOfLastRow = currentPage * rowsPerPage;
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = sortedData.slice(indexOfFirstRow, indexOfLastRow);
-  const totalPages = Math.ceil(sortedData.length / rowsPerPage);
-
-  console.log("Variables provided:", variables ? variables.length : 0); // Check the incoming variables
-  console.log("Data to display:", dataToDisplay.length); // Check what's being used
-  console.log("Sorted Data:", sortedData.length); // Check the sorted data
-  console.log("Current Rows:", currentRows.length); // Check the current rows for pagination
-  console.log("Total Pages:", totalPages); // Check pagination calculation
-
   return (
     <div className="space-y-4">
       <div className="rounded-md border max-h-96 overflow-auto">
@@ -233,8 +219,8 @@ const VariableDescriptions: React.FC<VariableDescriptionsProps> = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentRows.length > 0 ? (
-              currentRows.map((variable, index) => (
+            {sortedData.length > 0 ? (
+              sortedData.map((variable, index) => (
                 <TableRow key={index}>
                   <TableCell className="font-medium">{variable.name}</TableCell>
                   <TableCell>{variable.description}</TableCell>
@@ -251,34 +237,6 @@ const VariableDescriptions: React.FC<VariableDescriptionsProps> = ({
           </TableBody>
         </Table>
       </div>
-
-      {sortedData.length > rowsPerPage && (
-        <div className="flex justify-center">
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </Button>
-            <span className="text-sm text-gray-600">
-              Page {currentPage} of {totalPages}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
