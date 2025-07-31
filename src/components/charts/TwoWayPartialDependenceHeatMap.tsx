@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2 } from "lucide-react";
+import { Activity, Loader2 } from "lucide-react";
 import { fetch2DPartialDependence } from "@/utils/ModelMetrics";
 
 interface TwoWayPartialDependenceHeatMapProps {
@@ -182,12 +182,21 @@ const TwoWayPartialDependenceHeatMap: React.FC<
   return (
     <Card className="w-full shadow-sm">
       <CardHeader>
-        <CardTitle>Two-Way Partial Dependence</CardTitle>
-        <CardDescription>
-          How does the prediction change when two features interact?
-        </CardDescription>
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+            <Activity className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+          </div>
+          <div>
+            <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+              Two-Way Partial Dependence
+            </CardTitle>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Feature interaction effects heatmap
+            </p>
+          </div>
+        </div>
       </CardHeader>
-      <CardContent className="pt-6">
+      <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="space-y-2">
             <label className="text-sm font-medium">Model</label>

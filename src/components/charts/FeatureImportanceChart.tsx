@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2 } from "lucide-react";
+import { Loader2, TrendingUp } from "lucide-react";
 import { API_ENDPOINT } from "@/utils/endpoints";
 interface FeatureImportanceChartProps {
   featureNames?: string[];
@@ -188,11 +188,18 @@ const FeatureImportanceChart: React.FC<FeatureImportanceChartProps> = ({
     <Card className="w-full shadow-sm ">
       <CardHeader>
         <div className="flex justify-between items-start">
-          <div>
-            <CardTitle>Feature Importance Chart</CardTitle>
-            <CardDescription>
-              What were the most important features?
-            </CardDescription>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+              <TrendingUp className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+            </div>
+            <div>
+              <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                Feature Importance
+              </CardTitle>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Ranking of features by their impact on model predictions
+              </p>
+            </div>
           </div>
           <CardAction>
             <Select value={model} onValueChange={setModel}>

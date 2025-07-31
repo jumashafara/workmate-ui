@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2 } from "lucide-react";
+import { Loader2, Target } from "lucide-react";
 import { API_ENDPOINT } from "@/utils/endpoints";
 
 const PartialDependencePlot: React.FC = () => {
@@ -254,12 +254,21 @@ const PartialDependencePlot: React.FC = () => {
   return (
     <Card className="w-full shadow-sm">
       <CardHeader>
-        <CardTitle>Partial Dependence</CardTitle>
-        <CardDescription>
-          How does the prediction change if you change one feature?
-        </CardDescription>
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+            <Target className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+          </div>
+          <div>
+            <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+              Partial Dependence Plot
+            </CardTitle>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Individual feature effect on predictions
+            </p>
+          </div>
+        </div>
       </CardHeader>
-      <CardContent className="pt-6">
+      <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div className="space-y-2">
             <label className="text-sm font-medium">Model</label>
