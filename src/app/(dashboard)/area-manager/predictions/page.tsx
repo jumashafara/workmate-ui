@@ -23,29 +23,12 @@ import {
 } from "lucide-react";
 import dynamic from 'next/dynamic';
 import { getUserData } from "@/utils/cookie";
+import { PredictionData } from "@/types/predictions";
 
 const DashboardCharts = dynamic(() => import("@/components/charts/DashboardCharts"), { ssr: false });
 const RegionPerformanceChart = dynamic(() => import("@/components/charts/RegionPerformanceChart"), { ssr: false });
 const HouseholdMap = dynamic(() => import("@/components/map/HouseholdMap"), { ssr: false });
 import { API_ENDPOINT } from "@/utils/endpoints";
-
-interface PredictionData {
-  id: number;
-  household_id: string;
-  cohort: string;
-  cycle: string;
-  region: string;
-  district: string;
-  cluster: string;
-  village: string;
-  latitude: number;
-  longitude: number;
-  altitude: number;
-  evaluation_month: number;
-  prediction: number;
-  probability: number;
-  predicted_income: number;
-}
 
 interface FilterOption {
   value: string;
@@ -230,7 +213,7 @@ export default function AreaManagerPredictionsPage() {
             </div>
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                Area Manager {region} - Predictions Dashboard
+                Area Manager ({region}) - Predictions Dashboard
               </h1>
               <p className="text-gray-600 dark:text-gray-400 text-lg">
                 Manage and analyze prediction data for your region ({region}) with advanced filtering capabilities.
@@ -340,9 +323,6 @@ export default function AreaManagerPredictionsPage() {
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
               Area Manager ({region}) - Predictions Dashboard
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 text-lg mb-4">
-              Advanced prediction analytics for your region ({region}) with comprehensive filtering and visualizations
-            </p>
             <div className="flex items-center gap-6 text-sm">
               <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                 <TrendingUp className="h-4 w-4" />

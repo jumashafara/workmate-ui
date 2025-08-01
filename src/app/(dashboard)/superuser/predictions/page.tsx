@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { Filter, X, BarChart3, TrendingUp, Users, MapPin, AlertCircle } from "lucide-react";
 import dynamic from "next/dynamic";
+import { PredictionData } from "@/types/predictions";
 
 const DashboardCharts = dynamic(
   () => import("@/components/charts/DashboardCharts"),
@@ -22,24 +23,6 @@ const HouseholdMap = dynamic(() => import("@/components/map/MapWrapper"), {
   ssr: false,
 });
 import { API_ENDPOINT } from "@/utils/endpoints";
-
-interface PredictionData {
-  id: number;
-  household_id: string;
-  cohort: string;
-  cycle: string;
-  region: string;
-  district: string;
-  cluster: string;
-  village: string;
-  latitude: number;
-  longitude: number;
-  altitude: number;
-  evaluation_month: number;
-  prediction: number;
-  probability: number;
-  predicted_income: number;
-}
 
 interface FilterOption {
   value: string;
@@ -383,8 +366,8 @@ export default function SuperuserPredictionsPage() {
         </div>
       </div> */}
 
- {/* Filters */}
- <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
+{/* Filters */}
+<Card className="border-gray-200 dark:border-gray-700 shadow-sm">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-3">
