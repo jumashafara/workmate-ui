@@ -105,6 +105,7 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
           color: "#2E7D32",
           width: 1,
         },
+        cornerradius: 10,
       },
       text: regionStats.map(
         (stat) =>
