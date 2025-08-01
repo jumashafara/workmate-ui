@@ -22,24 +22,7 @@ const DashboardCharts = dynamic(() => import("@/components/charts/DashboardChart
 const RegionPerformanceChart = dynamic(() => import("@/components/charts/RegionPerformanceChart"), { ssr: false });
 const HouseholdMap = dynamic(() => import("@/components/map/HouseholdMap"), { ssr: false });
 import { API_ENDPOINT } from "@/utils/endpoints";
-
-interface PredictionData {
-  id: number;
-  household_id: string;
-  cohort: string;
-  cycle: string;
-  region: string;
-  district: string;
-  cluster: string;
-  village: string;
-  latitude: number;
-  longitude: number;
-  altitude: number;
-  evaluation_month: number;
-  prediction: number;
-  probability: number;
-  predicted_income: number;
-}
+import { PredictionData } from "@/types/predictions";
 
 interface FilterOption {
   value: string;
