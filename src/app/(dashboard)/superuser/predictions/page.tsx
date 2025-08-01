@@ -465,6 +465,29 @@ export default function SuperuserPredictionsPage() {
         {showFilters && (
           <CardContent className="space-y-6 pt-2">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+
+            <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cohort</Label>
+                <MultiSelect
+                  options={cohortOptions}
+                  selected={selectedCohorts}
+                  onChange={setSelectedCohorts}
+                  placeholder="Select cohorts"
+                  emptyText="No cohorts found"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cycle</Label>
+                <MultiSelect
+                  options={cycleOptions}
+                  selected={selectedCycles}
+                  onChange={setSelectedCycles}
+                  placeholder="Select cycles"
+                  emptyText="No cycles found"
+                />
+              </div>
+              
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Region</Label>
                 <MultiSelect
@@ -495,28 +518,6 @@ export default function SuperuserPredictionsPage() {
                   onChange={setSelectedClusters}
                   placeholder="Select clusters"
                   emptyText="No clusters found"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cohort</Label>
-                <MultiSelect
-                  options={cohortOptions}
-                  selected={selectedCohorts}
-                  onChange={setSelectedCohorts}
-                  placeholder="Select cohorts"
-                  emptyText="No cohorts found"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cycle</Label>
-                <MultiSelect
-                  options={cycleOptions}
-                  selected={selectedCycles}
-                  onChange={setSelectedCycles}
-                  placeholder="Select cycles"
-                  emptyText="No cycles found"
                 />
               </div>
 
