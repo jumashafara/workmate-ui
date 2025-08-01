@@ -7,6 +7,7 @@ import MarkerClusterGroup from 'react-leaflet-markercluster';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 interface PredictionData {
   id: number;
@@ -32,7 +33,10 @@ const MapInstanceHandler: React.FC<{ onMapReady: (map: Map) => void }> = ({ onMa
 };
 
 const FeatureDisplay: React.FC<{ household: PredictionData }> = ({ household }) => {
-  const renderValue = (value: any) => {
+  const { formatCurrency } = useCurrency();
+
+  const renderValue = (key: string, value: any) => {
+    if (key === 'predicted_income') return formatCurrency(value);
     if (typeof value === 'boolean') return value ? 'Yes' : 'No';
     if (value === null || value === undefined) return 'N/A';
     if (typeof value === 'number' && Math.abs(value) > 1000) return value.toLocaleString();
@@ -53,7 +57,7 @@ const FeatureDisplay: React.FC<{ household: PredictionData }> = ({ household }) 
           {features.map(([key, value]) => (
             <tr key={key} style={{ borderBottom: '1px solid #eee' }}>
               <td style={{ padding: '4px 0', fontWeight: 'bold', fontSize: '0.85rem' }}>{formatKey(key)}</td>
-              <td style={{ padding: '4px 0', textAlign: 'right', fontSize: '0.85rem' }}>{renderValue(value)}</td>
+              <td style={{ padding: '4px 0', textAlign: 'right', fontSize: '0.85rem' }}>{renderValue(key, value)}</td>
             </tr>
           ))}
         </tbody>
@@ -147,14 +151,14 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({ households, maxMarkers = MA
 
   if (!hasData) {
     return (
-      <div className="bg-white rounded-md shadow-md p-6 mb-6 h-[500px] flex items-center justify-center text-gray-500">
+      <div className="h-[500px] flex items-center justify-center text-gray-500">
         {!households?.length ? "No household data available." : "No valid coordinates found."}
       </div>
     );
   }
 
   return (
-    <div ref={mapContainerRef} className={`bg-white rounded-md shadow-md mb-6 relative ${isFullScreen ? 'fixed inset-0 z-[9999] p-0 rounded-none h-screen w-screen' : 'h-[500px] p-6'}`}>
+    <div ref={mapContainerRef} className={`relative ${isFullScreen ? 'fixed inset-0 z-[9999] p-0 rounded-none h-screen w-screen' : 'h-[500px]'}`}>
       <div className="absolute top-8 right-8 z-[1000] flex gap-2">
         {totalCount > maxMarkers && (
           <button onClick={toggleShowAll} className="bg-blue-600 text-white px-3 py-1.5 rounded-md shadow-lg hover:bg-blue-700 text-sm" disabled={showAllMarkers && totalCount > 1000}>

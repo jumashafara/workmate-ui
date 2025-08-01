@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import dynamic from "next/dynamic";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 import {
@@ -46,6 +47,8 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
   data,
   height = 400,
 }) => {
+  const { currency, formatCurrency, exchangeRate } = useCurrency();
+
   // Process data to aggregate by region
   const regionStats = useMemo(() => {
     if (!data || data.length === 0) return [];
@@ -90,9 +93,10 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
   // Prepare data for Plotly
   const plotData = [
     {
-      x: regionStats.map((stat) => stat.region),
-      y: regionStats.map((stat) => stat.achievement_rate),
+      y: regionStats.map((stat) => stat.region),
+      x: regionStats.map((stat) => stat.achievement_rate),
       type: "bar" as const,
+      orientation: "h" as const,
       name: "Achievement Rate (%)",
       marker: {
         color: regionStats.map((_, i) => colorPalette[i % colorPalette.length]),
@@ -101,46 +105,40 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
           color: "#2E7D32",
           width: 1,
         },
-        cornerradius: 10,
       },
       text: regionStats.map(
         (stat) =>
-          `${stat.achievement_rate.toFixed(1)}%<br>` +
-          `${stat.achieved_count}/${stat.total_households} households`
+          `${stat.achievement_rate.toFixed(1)}%`
       ),
-      textposition: "outside" as const,
+      textposition: "inside" as const,
+      insidetextanchor: 'middle' as const,
       hovertemplate:
-        "<b>%{x}</b><br>" +
-        "Achievement Rate: %{y:.1f}%<br>" +
+        "<b>%{y}</b><br>" +
+        "Achievement Rate: %{x:.1f}%<br>" +
         "Achieved: %{customdata[0]} households<br>" +
         "Total Households: %{customdata[1]}<br>" +
-        "Average Income + Production: $%{customdata[2]:.0f}<br>" +
+        `Average Income + Production: %{customdata[2]}<br>` +
         "Average Probability: %{customdata[3]:.3f}" +
         "<extra></extra>",
       customdata: regionStats.map((stat) => [
         stat.achieved_count,
         stat.total_households,
-        stat.avg_income,
+        formatCurrency(stat.avg_income),
         stat.avg_probability,
       ]),
     },
   ];
 
   const layout = {
-    title: {
-      text: "Regional Performance Analysis",
-      font: { size: 16, family: "Arial, sans-serif", color: "#1c2434" },
-      x: 0.5,
-      xanchor: "center" as const,
+    
+    yaxis: {
+      title: { text: "", font: { color: "#1c2434", family: "Gabarito" } },
+      automargin: true,
+      tickfont: { color: "#1c2434", family: "Gabarito" },
+      categoryorder: 'total ascending' as const,
     },
     xaxis: {
-      title: { text: "Region", font: { color: "#1c2434" } },
-      tickangle: -45,
-      automargin: true,
-      tickfont: { color: "#1c2434" },
-    },
-    yaxis: {
-      title: { text: "Achievement Rate (%)", font: { color: "#1c2434" } },
+      title: { text: "Achievement Rate (%)", font: { color: "#1c2434", family: "Gabarito" } },
       range: [
         0,
         Math.max(
@@ -148,15 +146,15 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
           Math.max(...regionStats.map((s) => s.achievement_rate)) + 10
         ),
       ],
-      tickfont: { color: "#1c2434" },
+      tickfont: { color: "#1c2434", family: "Gabarito"   },
     },
     showlegend: false,
     autosize: true,
     margin: {
-      l: 60,
-      r: 60,
+      l: 120,
+      r: 40,
       t: 80,
-      b: 100,
+      b: 60,
     },
     hovermode: "closest" as const,
     plot_bgcolor: "#fafafa",

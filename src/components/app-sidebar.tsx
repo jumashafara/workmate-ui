@@ -2,9 +2,11 @@
 
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { MessageCircle, BarChart3, Brain, Home } from "lucide-react";
+import { MessageCircle, BarChart3, Brain, Home, DollarSign, Repeat } from "lucide-react";
 import Image from "next/image";
 import { getUserData } from "@/utils/cookie";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import { Button } from "@/components/ui/button";
 
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -44,7 +46,7 @@ const getNavigationData = (userRole: string, isSuperuser: boolean) => {
             url: "/superuser/predictions",
           },
           {
-            title: "Predictions Trends",
+            title: "Cluster Trends",
             url: "/superuser/trends",
           },
           
@@ -84,7 +86,7 @@ const getNavigationData = (userRole: string, isSuperuser: boolean) => {
             url: "/area-manager/predictions",
           },
           {
-            title: "Predictions Trends",
+            title: "Cluster Trends",
             url: "/area-manager/trends",
           },
         ],
@@ -124,6 +126,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     navMain: any[];
     projects: any[];
   }>({ teams: [], navMain: [], projects: [] });
+  
+  const { currency, toggleCurrency, exchangeRate } = useCurrency();
 
   useEffect(() => {
     const userData = getUserData();
@@ -161,7 +165,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={navigationData.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser />
+        <div className="flex flex-col gap-2 p-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={toggleCurrency}
+            className="flex items-center justify-center gap-2"
+          >
+            <Repeat className="h-4 w-4" />
+            <span>Toggle to {currency === 'USD' ? 'UGX' : 'USD'}</span>
+          </Button>
+          <div className="text-xs text-center text-gray-500 dark:text-gray-400">
+            1 USD = {exchangeRate.toLocaleString()} UGX
+          </div>
+          <NavUser />
+        </div>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

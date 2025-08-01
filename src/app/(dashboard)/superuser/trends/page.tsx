@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -13,9 +13,21 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Label } from "@/components/ui/label";
 import { MultiSelect } from "@/components/ui/multi-select";
-import { Filter, X, TrendingUp, BarChart3, Users, Activity, AlertCircle } from "lucide-react";
+import {
+  Filter,
+  X,
+  TrendingUp,
+  BarChart3,
+  Users,
+  Activity,
+  AlertCircle,
+  Group,
+  Map,
+  Building,
+} from "lucide-react";
 import dynamic from "next/dynamic";
 import { API_ENDPOINT } from "@/utils/endpoints";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
@@ -55,6 +67,7 @@ interface FilterOption {
 export default function SuperuserTrendsPage() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ClusterIncomeData[]>([]);
+  const { currency, formatCurrency, exchangeRate } = useCurrency();
 
   // Filter states
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
@@ -232,82 +245,80 @@ export default function SuperuserTrendsPage() {
     selectedClusters.length +
     selectedMonths.length;
 
-  // Simple linear regression function
-  const linearRegression = (x: number[], y: number[]) => {
-    const n = x.length;
-    const sumX = x.reduce((a, b) => a + b, 0);
-    const sumY = y.reduce((a, b) => a + b, 0);
-    const sumXY = x.reduce((acc, xi, i) => acc + xi * y[i], 0);
-    const sumXX = x.reduce((acc, xi) => acc + xi * xi, 0);
+  const lineChartData = useMemo(() => {
+    const linearRegression = (x: number[], y: number[]) => {
+      const n = x.length;
+      const sumX = x.reduce((a, b) => a + b, 0);
+      const sumY = y.reduce((a, b) => a + b, 0);
+      const sumXY = x.reduce((acc, xi, i) => acc + xi * y[i], 0);
+      const sumXX = x.reduce((acc, xi) => acc + xi * xi, 0);
+      const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+      const intercept = (sumY - slope * sumX) / n;
+      return { slope, intercept };
+    };
 
-    const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
-    const intercept = (sumY - slope * sumX) / n;
-
-    return { slope, intercept };
-  };
-
-  // Prepare chart data with predictions
-  const getLineChartData = () => {
     const clusters = [...new Set(data.map((d) => d.cluster))];
     const allTraces: any[] = [];
-
-    // Collect all data points for overall trend calculation
     const allDataPoints: { month: number; income: number }[] = [];
 
     clusters.forEach((cluster) => {
       const clusterData = data
         .filter((d) => d.cluster === cluster)
         .sort((a, b) => a.evaluation_month - b.evaluation_month);
-
       if (clusterData.length === 0) return;
 
-      // Add to overall data points
       clusterData.forEach((d) => {
-        allDataPoints.push({ month: d.evaluation_month, income: d.avg_income });
+        allDataPoints.push({
+          month: d.evaluation_month,
+          income: d.avg_income,
+        });
       });
 
-      // Actual data trace
       const actualTrace: any = {
         x: clusterData.map((d) => d.evaluation_month),
-        y: clusterData.map((d) => d.avg_income),
+        y: clusterData.map((d) =>
+          currency === "USD" ? d.avg_income : d.avg_income * exchangeRate
+        ),
+        text: clusterData.map((d) => formatCurrency(d.avg_income)),
         type: "scatter",
         mode: "lines+markers",
         name: cluster,
         line: { width: 3 },
         marker: { size: 8 },
         hovertemplate:
-          "<b>%{fullData.name}</b><br>Month: %{x}<br>Avg Income + Production: $%{y:.2f}<extra></extra>",
+          "<b>%{fullData.name}</b><br>Month: %{x}<br>Avg Income + Production: %{text}<extra></extra>",
         showlegend: true,
       };
-
       allTraces.push(actualTrace);
 
-      // Generate prediction if we have at least 2 data points
       if (clusterData.length >= 2) {
         const xValues = clusterData.map((d) => d.evaluation_month);
         const yValues = clusterData.map((d) => d.avg_income);
-
-        // Calculate linear regression
         const { slope, intercept } = linearRegression(xValues, yValues);
-
-        // Predict next evaluation month
         const lastMonth = Math.max(...xValues);
         const interval =
           xValues.length > 1
             ? Math.min(...xValues.slice(1).map((x, i) => x - xValues[i]))
             : 3;
         const nextMonth = lastMonth + interval;
-
         const predictedIncome = slope * nextMonth + intercept;
 
-        // Only show prediction if it's reasonable (positive income)
         if (predictedIncome > 0) {
-          // Create prediction trace (dotted line)
+          const lastActualIncome =
+            clusterData[clusterData.length - 1].avg_income;
           const predictionTrace = {
             x: [lastMonth, nextMonth],
             y: [
-              clusterData[clusterData.length - 1].avg_income,
-              predictedIncome,
+              currency === "USD"
+                ? lastActualIncome
+                : lastActualIncome * exchangeRate,
+              currency === "USD"
+                ? predictedIncome
+                : predictedIncome * exchangeRate,
+            ],
+            text: [
+              formatCurrency(lastActualIncome),
+              formatCurrency(predictedIncome),
             ],
             type: "scatter",
             mode: "lines+markers",
@@ -323,62 +334,60 @@ export default function SuperuserTrendsPage() {
               color: actualTrace.line?.color || "#999999",
             },
             hovertemplate:
-              "<b>%{fullData.name}</b><br>Month: %{x}<br>Predicted Income + Production: $%{y:.2f}<br><i>Linear trend projection</i><extra></extra>",
+              "<b>%{fullData.name}</b><br>Month: %{x}<br>Predicted Income + Production: %{text}<br><i>Linear trend projection</i><extra></extra>",
             showlegend: false,
             opacity: 0.7,
           };
-
           allTraces.push(predictionTrace);
         }
       }
     });
 
-    // Add overall trend line if we have enough data points
     if (allDataPoints.length >= 2) {
       const allMonths = allDataPoints.map((d) => d.month);
       const allIncomes = allDataPoints.map((d) => d.income);
-
-      // Calculate overall trend
       const { slope: overallSlope, intercept: overallIntercept } =
         linearRegression(allMonths, allIncomes);
-
-      // Create trend line points across the actual data range
       const minMonth = Math.min(...allMonths);
       const maxMonth = Math.max(...allMonths);
-
       const trendStartIncome = overallSlope * minMonth + overallIntercept;
       const trendEndIncome = overallSlope * maxMonth + overallIntercept;
 
-      // Add overall trend trace
       const overallTrendTrace = {
         x: [minMonth, maxMonth],
-        y: [trendStartIncome, trendEndIncome],
+        y: [
+          currency === "USD" ? trendStartIncome : trendStartIncome * exchangeRate,
+          currency === "USD" ? trendEndIncome : trendEndIncome * exchangeRate,
+        ],
+        text: [
+          formatCurrency(trendStartIncome),
+          formatCurrency(trendEndIncome),
+        ],
         type: "scatter",
         mode: "lines",
         name: "Overall Trend",
-        line: {
-          width: 4,
-          color: "#EA580C",
-          dash: "dash",
-        },
+        line: { width: 4, color: "#EA580C", dash: "dash" },
         hovertemplate:
-          "<b>Overall Trend</b><br>Month: %{x}<br>Trend Income + Production: $%{y:.2f}<br><i>Best fit across all selected clusters</i><extra></extra>",
+          "<b>Overall Trend</b><br>Month: %{x}<br>Trend Income + Production: %{text}<br><i>Best fit across all selected clusters</i><extra></extra>",
         showlegend: true,
         opacity: 0.8,
       };
-
-      // Add trend line first so it appears behind other lines
       allTraces.unshift(overallTrendTrace);
     }
-
     return allTraces;
-  };
+  }, [data, currency, formatCurrency, exchangeRate]);
 
-  const getScatterData = () => {
+  const scatterData = useMemo(() => {
     return [
       {
-        x: data.map((d) => d.avg_income),
+        x: data.map((d) =>
+          currency === "USD" ? d.avg_income : d.avg_income * exchangeRate
+        ),
         y: data.map((d) => d.achievement_rate),
+        customdata: data.map((d) => [
+          formatCurrency(d.avg_income),
+          d.household_count,
+        ]),
         mode: "markers",
         type: "scatter" as const,
         marker: {
@@ -386,27 +395,29 @@ export default function SuperuserTrendsPage() {
           color: data.map((d) => d.evaluation_month),
           colorscale: "Viridis" as any,
           showscale: true,
-          colorbar: {
-            title: "Evaluation Month",
-          },
+          colorbar: { title: "Evaluation Month" },
         },
         text: data.map((d) => `${d.cluster} - Month ${d.evaluation_month}`),
         hovertemplate:
-          "<b>%{text}</b><br>Avg Income + Production: $%{x:.2f}<br>Achievement Rate: %{y:.1f}%<br>Households: %{marker.size}<extra></extra>",
+          "<b>%{text}</b><br>Avg Income + Production: %{customdata[0]}<br>Achievement Rate: %{y:.1f}%<br>Households: %{customdata[1]}<extra></extra>",
       },
     ];
-  };
+  }, [data, currency, formatCurrency, exchangeRate]);
 
-  // Calculate summary statistics
-  const summaryStats = {
-    totalClusters: [...new Set(data.map((d) => d.cluster))].length,
-    evaluationMonths: [...new Set(data.map((d) => d.evaluation_month))].length,
-    avgIncome:
-      data.length > 0
-        ? data.reduce((sum, d) => sum + d.avg_income, 0) / data.length
-        : 0,
-    totalHouseholds: data.reduce((sum, d) => sum + d.household_count, 0),
-  };
+  const summaryStats = useMemo(() => {
+    return {
+      totalClusters: [...new Set(data.map((d) => d.cluster))].length,
+      totalRegions: [...new Set(data.map((d) => d.region))].length,
+      totalDistricts: [...new Set(data.map((d) => d.district))].length,
+      evaluationMonths: [...new Set(data.map((d) => d.evaluation_month))]
+        .length,
+      avgIncome:
+        data.length > 0
+          ? data.reduce((sum, d) => sum + d.avg_income, 0) / data.length
+          : 0,
+      totalHouseholds: data.reduce((sum, d) => sum + d.household_count, 0),
+    };
+  }, [data]);
 
   if (loading) {
     return (
@@ -448,7 +459,7 @@ export default function SuperuserTrendsPage() {
         </Card>
 
         {/* Charts Skeleton */}
-        <div className="grid gap-6 lg:grid-cols-1">
+        <div className="grid gap-6 lg:grid-cols-2">
           <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
             <CardHeader>
               <div className="space-y-2">
@@ -507,20 +518,31 @@ export default function SuperuserTrendsPage() {
               Cluster Trends Analysis
             </h1>
             <p className="text-gray-600 dark:text-gray-400 text-lg mb-4">
-              Advanced trend analysis with predictive modeling and cluster performance insights
+              Advanced trend analysis with predictive modeling and cluster
+              performance insights
             </p>
             <div className="flex items-center gap-6 text-sm">
               <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                 <BarChart3 className="h-4 w-4" />
                 <span>Interactive Charts</span>
               </div>
+                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                  <Map className="h-4 w-4" />
+                  <span>{summaryStats.totalRegions} Regions</span>
+                </div>
               <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                <Activity className="h-4 w-4" />
+                <Building className="h-4 w-4" />
+                <span>{summaryStats.totalDistricts} Districts</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <Group className="h-4 w-4" />
                 <span>{summaryStats.totalClusters} Clusters</span>
               </div>
               <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                 <Users className="h-4 w-4" />
-                <span>{summaryStats.totalHouseholds.toLocaleString()} Households</span>
+                <span>
+                  {summaryStats.totalHouseholds.toLocaleString()} Households
+                </span>
               </div>
             </div>
           </div>
@@ -536,7 +558,9 @@ export default function SuperuserTrendsPage() {
                 <Filter className="h-5 w-5 text-orange-600 dark:text-orange-400" />
               </div>
               <div>
-                <span className="text-xl font-semibold text-gray-900 dark:text-white">Trend Filters</span>
+                <span className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Trend Filters
+                </span>
                 {activeFiltersCount > 0 && (
                   <Badge className="ml-2 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
                     {activeFiltersCount} active
@@ -545,9 +569,9 @@ export default function SuperuserTrendsPage() {
               </div>
             </CardTitle>
             {activeFiltersCount > 0 && (
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={clearFilters}
                 className="text-red-600 border-red-200 hover:bg-red-50 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/20 transition-colors"
               >
@@ -560,7 +584,9 @@ export default function SuperuserTrendsPage() {
           {/* Filter Controls */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Region</Label>
+              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Region
+              </Label>
               <MultiSelect
                 options={regionOptions}
                 selected={selectedRegions}
@@ -571,7 +597,9 @@ export default function SuperuserTrendsPage() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">District</Label>
+              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                District
+              </Label>
               <MultiSelect
                 options={districtOptions}
                 selected={selectedDistricts}
@@ -582,7 +610,9 @@ export default function SuperuserTrendsPage() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cluster</Label>
+              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Cluster
+              </Label>
               <MultiSelect
                 options={clusterOptions}
                 selected={selectedClusters}
@@ -593,7 +623,9 @@ export default function SuperuserTrendsPage() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Evaluation Month</Label>
+              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Evaluation Month
+              </Label>
               <MultiSelect
                 options={monthOptions}
                 selected={selectedMonths}
@@ -603,72 +635,11 @@ export default function SuperuserTrendsPage() {
               />
             </div>
           </div>
-
-          {/* Active Filters */}
-          {activeFiltersCount > 0 && (
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Active Filters</h4>
-              <div className="flex flex-wrap gap-2">
-              {selectedRegions.map((region) => (
-                <Badge key={region} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
-                  Region: {region}
-                  <X
-                    className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
-                    onClick={() =>
-                      setSelectedRegions((prev) =>
-                        prev.filter((r) => r !== region)
-                      )
-                    }
-                  />
-                </Badge>
-              ))}
-              {selectedDistricts.map((district) => (
-                <Badge key={district} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
-                  District: {district}
-                  <X
-                    className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
-                    onClick={() =>
-                      setSelectedDistricts((prev) =>
-                        prev.filter((d) => d !== district)
-                      )
-                    }
-                  />
-                </Badge>
-              ))}
-              {selectedClusters.map((cluster) => (
-                <Badge key={cluster} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
-                  Cluster: {cluster}
-                  <X
-                    className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
-                    onClick={() =>
-                      setSelectedClusters((prev) =>
-                        prev.filter((c) => c !== cluster)
-                      )
-                    }
-                  />
-                </Badge>
-              ))}
-              {selectedMonths.map((month) => (
-                <Badge key={month} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
-                  Month: {month}
-                  <X
-                    className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
-                    onClick={() =>
-                      setSelectedMonths((prev) =>
-                        prev.filter((m) => m !== month)
-                      )
-                    }
-                  />
-                </Badge>
-              ))}
-              </div>
-            </div>
-          )}
         </CardContent>
       </Card>
 
       {/* Charts */}
-      <div className="grid gap-6 lg:grid-cols-1">
+      <div className="grid gap-6 lg:grid-cols-2">
         {/* Line Chart - Income Trends */}
         <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
           <CardHeader className="pb-4">
@@ -677,7 +648,9 @@ export default function SuperuserTrendsPage() {
                 <TrendingUp className="h-5 w-5 text-orange-600 dark:text-orange-400" />
               </div>
               <div>
-                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">Average Income + Production Trends by Cluster</CardTitle>
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Average Income + Production Trends by Cluster
+                </CardTitle>
                 <CardDescription className="text-gray-600 dark:text-gray-400 mt-1">
                   Solid lines show actual data, dotted lines show predictions.
                   Orange dashed line shows overall trend across all selected
@@ -689,7 +662,7 @@ export default function SuperuserTrendsPage() {
           <CardContent>
             <div className="w-full h-[500px]">
               <Plot
-                data={getLineChartData()}
+                data={lineChartData}
                 layout={{
                   autosize: true,
                   title: "",
@@ -703,7 +676,7 @@ export default function SuperuserTrendsPage() {
                     gridcolor: "#f0f0f0",
                   },
                   yaxis: {
-                    title: "Average Income + Production ($)",
+                    title: `Average Income + Production (${currency})`,
                     showgrid: true,
                     gridcolor: "#f0f0f0",
                   },
@@ -728,7 +701,9 @@ export default function SuperuserTrendsPage() {
                 <BarChart3 className="h-5 w-5 text-orange-600 dark:text-orange-400" />
               </div>
               <div>
-                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">Income + Production vs Achievement Rate</CardTitle>
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Income + Production vs Achievement Rate
+                </CardTitle>
                 <CardDescription className="text-gray-600 dark:text-gray-400 mt-1">
                   Bubble size represents number of households. Color represents
                   evaluation month.
@@ -740,11 +715,13 @@ export default function SuperuserTrendsPage() {
             <div className="w-full h-[500px]">
               <Plot
                 //@ts-ignore
-                data={getScatterData()}
+                data={scatterData}
                 layout={{
                   autosize: true,
                   title: "",
-                  xaxis: { title: "Average Income + Production ($)" },
+                  xaxis: {
+                    title: `Average Income + Production (${currency})`,
+                  },
                   yaxis: { title: "Achievement Rate (%)" },
                   margin: { t: 40, b: 60, l: 80, r: 60 },
                 }}
@@ -764,19 +741,25 @@ export default function SuperuserTrendsPage() {
             <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
               <Activity className="h-5 w-5 text-orange-600 dark:text-orange-400" />
             </div>
-            <CardTitle className="text-xl font-semibold text-orange-900 dark:text-orange-100">Summary Statistics</CardTitle>
+            <CardTitle className="text-xl font-semibold text-orange-900 dark:text-orange-100">
+              Summary Statistics
+            </CardTitle>
           </div>
         </CardHeader>
         <CardContent>
           <div className="grid gap-6 md:grid-cols-4">
             <div className="bg-white dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
-              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">Total Clusters</Label>
+              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">
+                Total Clusters
+              </Label>
               <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mt-2">
                 {summaryStats.totalClusters}
               </div>
             </div>
             <div className="bg-white dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
-              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">Evaluation Months</Label>
+              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">
+                Evaluation Months
+              </Label>
               <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mt-2">
                 {summaryStats.evaluationMonths}
               </div>
@@ -786,11 +769,13 @@ export default function SuperuserTrendsPage() {
                 Avg Income + Production
               </Label>
               <div className="text-2xl font-bold text-orange-600 dark:text-orange-400 mt-2">
-                ${summaryStats.avgIncome.toFixed(0)}
+                {formatCurrency(summaryStats.avgIncome)}
               </div>
             </div>
             <div className="bg-white dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
-              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">Total Households</Label>
+              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">
+                Total Households
+              </Label>
               <div className="text-2xl font-bold text-orange-600 dark:text-orange-400 mt-2">
                 {summaryStats.totalHouseholds.toLocaleString()}
               </div>

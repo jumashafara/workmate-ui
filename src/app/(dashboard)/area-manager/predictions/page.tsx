@@ -20,6 +20,10 @@ import {
   Users,
   MapPin,
   AlertCircle,
+  TowerControl,
+  Building,
+  Group,
+  Download,
 } from "lucide-react";
 import dynamic from 'next/dynamic';
 import { getUserData } from "@/utils/cookie";
@@ -193,6 +197,41 @@ export default function AreaManagerPredictionsPage() {
     selectedMonths.length +
     selectedVillages.length;
 
+  const downloadData = () => {
+    if (!predictions || predictions.length === 0) {
+      alert('No data available to download');
+      return;
+    }
+
+    // Convert data to CSV format, excluding probability column
+    const excludeColumns = ['probability'];
+    const headers = Object.keys(predictions[0]).filter(key => !excludeColumns.includes(key)) as (keyof PredictionData)[];
+    const csvContent = [
+      headers.join(','),
+      ...predictions.map(row => 
+        headers.map(header => {
+          const value = row[header];
+          // Handle values that need quotes (containing commas, quotes, or newlines)
+          if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
+            return `"${value.replace(/"/g, '""')}"`;
+          }
+          return value;
+        }).join(',')
+      )
+    ].join('\n');
+
+    // Create and download the file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `predictions_data_${region}_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (!userData) {
     return (
       <div className="space-y-6">
@@ -213,7 +252,7 @@ export default function AreaManagerPredictionsPage() {
             </div>
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                Area Manager ({region}) - Predictions Dashboard
+                Area Manager ({region}) - Aggregated Predictions
               </h1>
               <p className="text-gray-600 dark:text-gray-400 text-lg">
                 Manage and analyze prediction data for your region ({region}) with advanced filtering capabilities.
@@ -263,16 +302,6 @@ export default function AreaManagerPredictionsPage() {
           </div>
         </div>
 
-        {/* Region Context Skeleton */}
-        <Card className="border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/10">
-          <CardContent className="py-4">
-            <div className="flex items-center gap-2">
-              <Skeleton className="h-6 w-32" />
-              <Skeleton className="h-4 w-48" />
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Dashboard Charts Skeleton */}
         <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
           <Skeleton className="h-96 w-full" />
@@ -321,7 +350,7 @@ export default function AreaManagerPredictionsPage() {
           </div>
           <div className="flex-1">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Area Manager ({region}) - Predictions Dashboard
+              Area Manager ({region}) - Aggregated Predictions
             </h1>
             <div className="flex items-center gap-6 text-sm">
               <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
@@ -336,6 +365,15 @@ export default function AreaManagerPredictionsPage() {
                 <MapPin className="h-4 w-4" />
                 <span>Region: {region}</span>
               </div>
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <Building className="h-4 w-4" />
+                <span>Districts: {districtOptions.length}</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <Group className="h-4 w-4" />
+                <span>Clusters: {clusterOptions.length}</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400"></div>
             </div>
           </div>
         </div>
@@ -350,7 +388,7 @@ export default function AreaManagerPredictionsPage() {
                 <Filter className="h-5 w-5 text-orange-600 dark:text-orange-400" />
               </div>
               <div>
-                <span className="text-xl font-semibold text-gray-900 dark:text-white">Regional Filters</span>
+                <span className="text-xl font-semibold text-gray-900 dark:text-white">Filters </span>
                 {activeFiltersCount > 0 && (
                   <Badge className="ml-2 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
                     {activeFiltersCount} active
@@ -359,6 +397,17 @@ export default function AreaManagerPredictionsPage() {
               </div>
             </CardTitle>
             <div className="flex gap-3">
+            <Button
+                onClick={downloadData}
+                disabled={!predictions || predictions.length === 0}
+                variant="outline"
+                size="sm"
+                className="bg-green-600 hover:bg-green-700 text-white border-green-600 hover:border-green-700"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download CSV
+              </Button>
+
               <Button
                 variant="outline"
                 size="sm"
@@ -367,6 +416,7 @@ export default function AreaManagerPredictionsPage() {
               >
                 {showFilters ? "Hide" : "Show"} Filters
               </Button>
+          
               {activeFiltersCount > 0 && (
                 <Button 
                   variant="outline" 
@@ -383,29 +433,7 @@ export default function AreaManagerPredictionsPage() {
         {showFilters && (
           <CardContent className="space-y-6 pt-2">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">District</Label>
-                <MultiSelect
-                  options={districtOptions}
-                  selected={selectedDistricts}
-                  onChange={setSelectedDistricts}
-                  placeholder="Select districts"
-                  emptyText="No districts found"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cluster</Label>
-                <MultiSelect
-                  options={clusterOptions}
-                  selected={selectedClusters}
-                  onChange={setSelectedClusters}
-                  placeholder="Select clusters"
-                  emptyText="No clusters found"
-                />
-              </div>
-
-              <div className="space-y-2">
+            <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cohort</Label>
                 <MultiSelect
                   options={cohortOptions}
@@ -439,6 +467,28 @@ export default function AreaManagerPredictionsPage() {
               </div>
 
               <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">District</Label>
+                <MultiSelect
+                  options={districtOptions}
+                  selected={selectedDistricts}
+                  onChange={setSelectedDistricts}
+                  placeholder="Select districts"
+                  emptyText="No districts found"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cluster</Label>
+                <MultiSelect
+                  options={clusterOptions}
+                  selected={selectedClusters}
+                  onChange={setSelectedClusters}
+                  placeholder="Select clusters"
+                  emptyText="No clusters found"
+                />
+              </div>
+
+              <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Village</Label>
                 <MultiSelect
                   options={villageOptions}
@@ -460,9 +510,16 @@ export default function AreaManagerPredictionsPage() {
       
 
       {/* Map and Charts */}
-      <div className="space-y-6">
-        <HouseholdMap households={predictions} />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <RegionPerformanceChart data={allRegionPredictions} />
+        <Card className="flex flex-col">
+          <CardHeader>
+            <CardTitle>Household Predictions Map</CardTitle>
+          </CardHeader>
+          <CardContent className="flex-grow">
+            <HouseholdMap households={predictions} />
+          </CardContent>
+        </Card>
       </div>
 
       {/* Data Information */}

@@ -13,9 +13,12 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Label } from "@/components/ui/label";
 import { MultiSelect } from "@/components/ui/multi-select";
-import { Filter, X, TrendingUp, BarChart3, Users, Activity, MapPin } from "lucide-react";
+import { Filter, X, TrendingUp, BarChart3, Users, Activity, MapPin, Building, Group } from "lucide-react";
 import dynamic from "next/dynamic";
 import { API_ENDPOINT } from "@/utils/endpoints";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import { PredictionData } from "@/types/predictions";
+import { getUserData } from "@/utils/cookie";
 
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
@@ -29,53 +32,32 @@ interface ClusterIncomeData {
   district: string;
 }
 
-interface PredictionData {
-  id: number;
-  household_id: string;
-  cohort: string;
-  cycle: string;
-  region: string;
-  district: string;
-  cluster: string;
-  village: string;
-  latitude: number;
-  longitude: number;
-  altitude: number;
-  evaluation_month: number;
-  prediction: number;
-  probability: number;
-  predicted_income: number;
-}
-
 interface FilterOption {
   value: string;
   label: string;
 }
 
-// Mock user data - replace with actual user context
-const getUserData = () => ({
-  region: "Central", // Example region for area manager
-  district: null,
-});
-
 export default function AreaManagerTrendsPage() {
-  const userData = getUserData();
-  const region = userData.region;
-  const district = userData.district;
+  const [userData, setUserData] = useState<any>(null);
 
+  useEffect(() => {
+    const data = getUserData();
+    setUserData(data);
+  }, []);
+
+  const region = userData?.region;
+
+  const { currency, formatCurrency, exchangeRate } = useCurrency();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ClusterIncomeData[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
 
-  // Filter states - Initialize selectedRegions with user's region
-  const [selectedRegions, setSelectedRegions] = useState<string[]>(
-    region ? [region] : []
-  );
+  // Filter states
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
   const [selectedClusters, setSelectedClusters] = useState<string[]>([]);
   const [selectedMonths, setSelectedMonths] = useState<string[]>([]);
 
   // Filter options
-  const [regionOptions, setRegionOptions] = useState<FilterOption[]>([]);
   const [districtOptions, setDistrictOptions] = useState<FilterOption[]>([]);
   const [clusterOptions, setClusterOptions] = useState<FilterOption[]>([]);
   const [monthOptions, setMonthOptions] = useState<FilterOption[]>([]);
@@ -129,17 +111,14 @@ export default function AreaManagerTrendsPage() {
     }));
   };
 
-  // Fetch data using the same pattern as PredictionsDashboard
+  // Fetch data
   const fetchData = async () => {
+    if (!region) return; // Don't fetch if region is not available
     try {
       setLoading(true);
 
-      // Build query parameters
       const params = new URLSearchParams();
-
-      // Always include user's region in params
-      if (region) params.append("region", region);
-
+      params.append("region", region);
       if (selectedDistricts.length > 0)
         params.append("district", selectedDistricts.join(","));
       if (selectedClusters.length > 0)
@@ -147,17 +126,13 @@ export default function AreaManagerTrendsPage() {
       if (selectedMonths.length > 0)
         params.append("evaluation_month", selectedMonths.join(","));
 
-      // Build separate parameters for filter options
       const filterParams = new URLSearchParams();
-      // Always include user's region in filter params
-      if (region) filterParams.append("region", region);
-
+      filterParams.append("region", region);
       if (selectedDistricts.length > 0)
         filterParams.append("district", selectedDistricts.join(","));
       if (selectedClusters.length > 0)
         filterParams.append("cluster", selectedClusters.join(","));
 
-      // Make parallel API calls for data and filter options
       const [dataResponse, filterResponse] = await Promise.all([
         fetch(`${API_ENDPOINT}/standard-evaluations/?${params.toString()}`),
         fetch(`${API_ENDPOINT}/filter-options/?${filterParams.toString()}`),
@@ -172,39 +147,11 @@ export default function AreaManagerTrendsPage() {
         filterResponse.json(),
       ]);
 
-      // Handle data response
-      let predictions: PredictionData[] = [];
-      if (dataResult.results && Array.isArray(dataResult.results)) {
-        predictions = dataResult.results;
-      } else if (
-        dataResult.predictions &&
-        Array.isArray(dataResult.predictions)
-      ) {
-        predictions = dataResult.predictions;
-      } else if (Array.isArray(dataResult)) {
-        predictions = dataResult;
-      }
-
-      // Double check that all predictions are for the user's region
-      if (region) {
-        predictions = predictions.filter((pred) => pred.region === region);
-      }
-
-      // Process data to get cluster-month aggregations
+      let predictions: PredictionData[] = dataResult.predictions || [];
       const clusterData = processClusterData(predictions);
       setData(clusterData);
 
-      // Update filter options
       if (filterResult) {
-        // If user has a region, only show that region in options
-        setRegionOptions(
-          region
-            ? [{ value: region, label: region }]
-            : filterResult.regions?.map((r: string) => ({
-                value: r,
-                label: r,
-              })) || []
-        );
         setDistrictOptions(
           filterResult.districts?.map((d: string) => ({
             value: d,
@@ -231,21 +178,16 @@ export default function AreaManagerTrendsPage() {
     }
   };
 
-  // Initial data load
+  // Effect for fetching data on initial load and when filters change
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (region) {
+      const handler = setTimeout(() => {
+        fetchData();
+      }, 300);
+      return () => clearTimeout(handler);
+    }
+  }, [region, selectedDistricts, selectedClusters, selectedMonths]);
 
-  // Debounced effect for filter changes - don't include selectedRegions since it's fixed for area managers
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      fetchData();
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
-  }, [selectedDistricts, selectedClusters, selectedMonths]);
-
-  // Clear all filters except region for area managers
   const clearFilters = () => {
     setSelectedDistricts([]);
     setSelectedClusters([]);
@@ -274,7 +216,6 @@ export default function AreaManagerTrendsPage() {
     const clusters = [...new Set(data.map((d) => d.cluster))];
     const allTraces: any[] = [];
 
-    // Collect all data points for overall trend calculation
     const allDataPoints: { month: number; income: number }[] = [];
 
     clusters.forEach((cluster) => {
@@ -284,52 +225,44 @@ export default function AreaManagerTrendsPage() {
 
       if (clusterData.length === 0) return;
 
-      // Add to overall data points
       clusterData.forEach((d) => {
-        allDataPoints.push({ month: d.evaluation_month, income: d.avg_income });
+        allDataPoints.push({ month: d.evaluation_month, income: currency === 'USD' ? d.avg_income : d.avg_income * exchangeRate });
       });
 
-      // Actual data trace
       const actualTrace: any = {
         x: clusterData.map((d) => d.evaluation_month),
-        y: clusterData.map((d) => d.avg_income),
+        y: clusterData.map((d) => currency === 'USD' ? d.avg_income : d.avg_income * exchangeRate),
         type: "scatter",
         mode: "lines+markers",
         name: cluster,
         line: { width: 3 },
         marker: { size: 8 },
         hovertemplate:
-          "<b>%{fullData.name}</b><br>Month: %{x}<br>Avg Income + Production: $%{y:.2f}<extra></extra>",
+          `<b>%{fullData.name}</b><br>Month: %{x}<br>Avg Income + Production: %{y}<extra></extra>`,
         showlegend: true,
       };
 
       allTraces.push(actualTrace);
 
-      // Generate prediction if we have at least 2 data points
       if (clusterData.length >= 2) {
         const xValues = clusterData.map((d) => d.evaluation_month);
-        const yValues = clusterData.map((d) => d.avg_income);
+        const yValues = clusterData.map((d) => currency === 'USD' ? d.avg_income : d.avg_income * exchangeRate);
 
-        // Calculate linear regression
         const { slope, intercept } = linearRegression(xValues, yValues);
 
-        // Predict next evaluation month
         const lastMonth = Math.max(...xValues);
         const interval =
           xValues.length > 1
             ? Math.min(...xValues.slice(1).map((x, i) => x - xValues[i]))
             : 3;
         const nextMonth = lastMonth + interval;
-
         const predictedIncome = slope * nextMonth + intercept;
 
-        // Only show prediction if it's reasonable (positive income)
         if (predictedIncome > 0) {
-          // Create prediction trace (dotted line)
           const predictionTrace = {
             x: [lastMonth, nextMonth],
             y: [
-              clusterData[clusterData.length - 1].avg_income,
+              yValues[yValues.length - 1],
               predictedIncome,
             ],
             type: "scatter",
@@ -346,62 +279,50 @@ export default function AreaManagerTrendsPage() {
               color: actualTrace.line?.color || "#999999",
             },
             hovertemplate:
-              "<b>%{fullData.name}</b><br>Month: %{x}<br>Predicted Income + Production: $%{y:.2f}<br><i>Linear trend projection</i><extra></extra>",
+              `<b>%{fullData.name}</b><br>Month: %{x}<br>Predicted Income + Production: %{y}<br><i>Linear trend projection</i><extra></extra>`,
             showlegend: false,
             opacity: 0.7,
           };
-
           allTraces.push(predictionTrace);
         }
       }
     });
 
-    // Add overall trend line if we have enough data points
     if (allDataPoints.length >= 2) {
       const allMonths = allDataPoints.map((d) => d.month);
       const allIncomes = allDataPoints.map((d) => d.income);
-
-      // Calculate overall trend
-      const { slope: overallSlope, intercept: overallIntercept } =
-        linearRegression(allMonths, allIncomes);
-
-      // Create trend line points across the actual data range
+      const { slope: overallSlope, intercept: overallIntercept } = linearRegression(allMonths, allIncomes);
       const minMonth = Math.min(...allMonths);
       const maxMonth = Math.max(...allMonths);
-
       const trendStartIncome = overallSlope * minMonth + overallIntercept;
       const trendEndIncome = overallSlope * maxMonth + overallIntercept;
 
-      // Add overall trend trace
       const overallTrendTrace = {
         x: [minMonth, maxMonth],
         y: [trendStartIncome, trendEndIncome],
         type: "scatter",
         mode: "lines",
         name: "Overall Trend",
-        line: {
-          width: 4,
-          color: "#EA580C",
-          dash: "dash",
-        },
+        line: { width: 4, color: "#EA580C", dash: "dash" },
         hovertemplate:
-          "<b>Overall Trend</b><br>Month: %{x}<br>Trend Income + Production: $%{y:.2f}<br><i>Best fit across all selected clusters</i><extra></extra>",
+          `<b>Overall Trend</b><br>Month: %{x}<br>Trend Income + Production: %{y}<br><i>Best fit across all selected clusters</i><extra></extra>`,
         showlegend: true,
         opacity: 0.8,
       };
-
-      // Add trend line first so it appears behind other lines
       allTraces.unshift(overallTrendTrace);
     }
-
     return allTraces;
   };
 
   const getScatterData = () => {
     return [
       {
-        x: data.map((d) => d.avg_income),
+        x: data.map((d) => currency === 'USD' ? d.avg_income : d.avg_income * exchangeRate),
         y: data.map((d) => d.achievement_rate),
+        customdata: data.map((d) => [
+          formatCurrency(d.avg_income),
+          d.household_count,
+        ]),
         mode: "markers",
         type: "scatter" as const,
         marker: {
@@ -415,12 +336,11 @@ export default function AreaManagerTrendsPage() {
         },
         text: data.map((d) => `${d.cluster} - Month ${d.evaluation_month}`),
         hovertemplate:
-          "<b>%{text}</b><br>Avg Income + Production: $%{x:.2f}<br>Achievement Rate: %{y:.1f}%<br>Households: %{marker.size}<extra></extra>",
+          "<b>%{text}</b><br>Avg Income + Production: %{customdata[0]}<br>Achievement Rate: %{y:.1f}%<br>Households: %{customdata[1]}<extra></extra>",
       },
     ];
   };
 
-  // Calculate summary statistics
   const summaryStats = {
     totalClusters: [...new Set(data.map((d) => d.cluster))].length,
     evaluationMonths: [...new Set(data.map((d) => d.evaluation_month))].length,
@@ -429,12 +349,12 @@ export default function AreaManagerTrendsPage() {
         ? data.reduce((sum, d) => sum + d.avg_income, 0) / data.length
         : 0,
     totalHouseholds: data.reduce((sum, d) => sum + d.household_count, 0),
+    totalDistricts: [...new Set(data.map((d) => d.district))].length,
   };
 
   if (loading) {
     return (
       <div className="space-y-6">
-        {/* Header Skeleton */}
         <div className="bg-white dark:bg-slate-900 rounded-xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm">
           <div className="flex items-start gap-4">
             <Skeleton className="h-14 w-14 rounded-xl" />
@@ -449,8 +369,6 @@ export default function AreaManagerTrendsPage() {
             </div>
           </div>
         </div>
-
-        {/* Region Context Skeleton */}
         <Card className="border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/10">
           <CardContent className="py-4">
             <div className="flex items-center gap-4">
@@ -462,8 +380,6 @@ export default function AreaManagerTrendsPage() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Filters Skeleton */}
         <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
           <CardHeader>
             <div className="flex items-center gap-3">
@@ -482,9 +398,7 @@ export default function AreaManagerTrendsPage() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Charts Skeleton */}
-        <div className="grid gap-6 lg:grid-cols-1">
+        <div className="grid gap-6 lg:grid-cols-2">
           <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
             <CardHeader>
               <div className="space-y-2">
@@ -496,7 +410,6 @@ export default function AreaManagerTrendsPage() {
               <Skeleton className="h-[500px] w-full" />
             </CardContent>
           </Card>
-
           <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
             <CardHeader>
               <div className="space-y-2">
@@ -509,8 +422,6 @@ export default function AreaManagerTrendsPage() {
             </CardContent>
           </Card>
         </div>
-
-        {/* Summary Stats Skeleton */}
         <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
           <CardHeader>
             <Skeleton className="h-6 w-48" />
@@ -532,7 +443,6 @@ export default function AreaManagerTrendsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="bg-white dark:bg-slate-900 rounded-xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="flex items-start gap-4">
           <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-xl">
@@ -540,18 +450,19 @@ export default function AreaManagerTrendsPage() {
           </div>
           <div className="flex-1">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Area Manager - Cluster Trends Analysis
+              Area Manager ({region}) - Cluster Trends Analysis
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 text-lg mb-4">
-              Advanced trend analysis with predictive modeling for your region ({region})
-            </p>
             <div className="flex items-center gap-6 text-sm">
               <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                 <BarChart3 className="h-4 w-4" />
                 <span>Interactive Charts</span>
               </div>
               <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                <Activity className="h-4 w-4" />
+                <Building className="h-4 w-4" />
+                <span>{summaryStats.totalDistricts} Districts</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <Group className="h-4 w-4" />
                 <span>{summaryStats.totalClusters} Clusters</span>
               </div>
               <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
@@ -563,26 +474,6 @@ export default function AreaManagerTrendsPage() {
         </div>
       </div>
 
-      {/* Region Context Card */}
-      <Card className="border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/10">
-        <CardContent className="py-4">
-          <div className="flex items-center gap-4">
-            <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-              <MapPin className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-            </div>
-            <div className="flex-1">
-              <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 mb-1">
-                Your Region: {region}
-              </Badge>
-              <p className="text-sm text-orange-700 dark:text-orange-300">
-                Data is automatically filtered to show only your region
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Filters */}
       <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
@@ -591,7 +482,7 @@ export default function AreaManagerTrendsPage() {
                 <Filter className="h-5 w-5 text-orange-600 dark:text-orange-400" />
               </div>
               <div>
-                <span className="text-xl font-semibold text-gray-900 dark:text-white">Regional Trend Filters</span>
+                <span className="text-xl font-semibold text-gray-900 dark:text-white">Trend Filters</span>
                 {activeFiltersCount > 0 && (
                   <Badge className="ml-2 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
                     {activeFiltersCount} active
@@ -599,108 +490,69 @@ export default function AreaManagerTrendsPage() {
                 )}
               </div>
             </CardTitle>
-            {activeFiltersCount > 0 && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={clearFilters}
-                className="text-red-600 border-red-200 hover:bg-red-50 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/20 transition-colors"
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFilters(!showFilters)}
+                className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
-                Clear All
+                {showFilters ? "Hide" : "Show"} Filters
               </Button>
-            )}
+              {activeFiltersCount > 0 && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={clearFilters}
+                  className="text-red-600 border-red-200 hover:bg-red-50 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/20 transition-colors"
+                >
+                  Clear All
+                </Button>
+              )}
+            </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-6 pt-2">
-          {/* Filter Controls */}
-          <div className="grid gap-6 md:grid-cols-3">
+        {showFilters && (
+          <CardContent className="space-y-6 pt-2">
+            <div className="grid gap-6 md:grid-cols-3">
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">District</Label>
-              <MultiSelect
-                options={districtOptions}
-                selected={selectedDistricts}
-                onChange={setSelectedDistricts}
-                placeholder="Select districts"
-                emptyText="No districts found"
-              />
-            </div>
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Evaluation Month</Label>
+                <MultiSelect
+                  options={monthOptions}
+                  selected={selectedMonths}
+                  onChange={setSelectedMonths}
+                  placeholder="Select months"
+                  emptyText="No months found"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">District</Label>
+                <MultiSelect
+                  options={districtOptions}
+                  selected={selectedDistricts}
+                  onChange={setSelectedDistricts}
+                  placeholder="Select districts"
+                  emptyText="No districts found"
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cluster</Label>
-              <MultiSelect
-                options={clusterOptions}
-                selected={selectedClusters}
-                onChange={setSelectedClusters}
-                placeholder="Select clusters"
-                emptyText="No clusters found"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Evaluation Month</Label>
-              <MultiSelect
-                options={monthOptions}
-                selected={selectedMonths}
-                onChange={setSelectedMonths}
-                placeholder="Select months"
-                emptyText="No months found"
-              />
-            </div>
-          </div>
-
-          {/* Active Filters */}
-          {activeFiltersCount > 0 && (
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Active Filters</h4>
-              <div className="flex flex-wrap gap-2">
-              {selectedDistricts.map((district) => (
-                <Badge key={district} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
-                  District: {district}
-                  <X
-                    className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
-                    onClick={() =>
-                      setSelectedDistricts((prev) =>
-                        prev.filter((d) => d !== district)
-                      )
-                    }
-                  />
-                </Badge>
-              ))}
-              {selectedClusters.map((cluster) => (
-                <Badge key={cluster} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
-                  Cluster: {cluster}
-                  <X
-                    className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
-                    onClick={() =>
-                      setSelectedClusters((prev) =>
-                        prev.filter((c) => c !== cluster)
-                      )
-                    }
-                  />
-                </Badge>
-              ))}
-              {selectedMonths.map((month) => (
-                <Badge key={month} className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors">
-                  Month: {month}
-                  <X
-                    className="ml-1 h-3 w-3 cursor-pointer hover:text-red-600 transition-colors"
-                    onClick={() =>
-                      setSelectedMonths((prev) =>
-                        prev.filter((m) => m !== month)
-                      )
-                    }
-                  />
-                </Badge>
-              ))}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cluster</Label>
+                <MultiSelect
+                  options={clusterOptions}
+                  selected={selectedClusters}
+                  onChange={setSelectedClusters}
+                  placeholder="Select clusters"
+                  emptyText="No clusters found"
+                />
               </div>
             </div>
-          )}
-        </CardContent>
+          </CardContent>
+        )}
       </Card>
 
-      {/* Charts */}
-      <div className="grid gap-6 lg:grid-cols-1">
-        {/* Line Chart - Income Trends */}
+      <div className="grid gap-6 lg:grid-cols-2">
         <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
           <CardHeader className="pb-4">
             <div className="flex items-start gap-3">
@@ -734,7 +586,7 @@ export default function AreaManagerTrendsPage() {
                     gridcolor: "#f0f0f0",
                   },
                   yaxis: {
-                    title: "Average Income + Production ($)",
+                    title: `Average Income + Production (${currency})`,
                     showgrid: true,
                     gridcolor: "#f0f0f0",
                   },
@@ -751,7 +603,6 @@ export default function AreaManagerTrendsPage() {
           </CardContent>
         </Card>
 
-        {/* Scatter Plot */}
         <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
           <CardHeader className="pb-4">
             <div className="flex items-start gap-3">
@@ -775,7 +626,7 @@ export default function AreaManagerTrendsPage() {
                 layout={{
                   autosize: true,
                   title: "",
-                  xaxis: { title: "Average Income + Production ($)" },
+                  xaxis: { title: `Average Income + Production (${currency})` },
                   yaxis: { title: "Achievement Rate (%)" },
                   margin: { t: 40, b: 60, l: 80, r: 60 },
                 }}
@@ -788,7 +639,6 @@ export default function AreaManagerTrendsPage() {
         </Card>
       </div>
 
-      {/* Summary Statistics */}
       <Card className="bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-800">
         <CardHeader className="pb-4">
           <div className="flex items-center gap-3">
@@ -817,7 +667,7 @@ export default function AreaManagerTrendsPage() {
                 Avg Income + Production
               </Label>
               <div className="text-2xl font-bold text-orange-600 dark:text-orange-400 mt-2">
-                ${summaryStats.avgIncome.toFixed(0)}
+                {formatCurrency(summaryStats.avgIncome)}
               </div>
             </div>
             <div className="bg-white dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">

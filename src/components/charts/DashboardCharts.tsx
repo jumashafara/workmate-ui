@@ -7,25 +7,10 @@ import {
   DollarSign,
   TrendingUp,
   Target,
+  Group,
 } from "lucide-react";
-
-interface PredictionData {
-  id: number;
-  household_id: string;
-  cohort: string;
-  cycle: string;
-  region: string;
-  district: string;
-  cluster: string;
-  village: string;
-  latitude: number;
-  longitude: number;
-  altitude: number;
-  evaluation_month: number;
-  prediction: number;
-  probability: number;
-  predicted_income: number;
-}
+import { useCurrency } from "@/contexts/CurrencyContext";
+import { PredictionData } from "@/types/predictions";
 
 interface DashboardChartsProps {
   data: PredictionData[];
@@ -78,42 +63,47 @@ const AggregationCard: React.FC<{
     count: number;
   }[];
   icon: React.ReactNode;
-}> = ({ title, data, icon }) => (
-  <Card className="h-auto">
-    <CardHeader>
-      <CardTitle className="flex items-center gap-2 text-lg">
-        {icon}
-        {title}
-      </CardTitle>
-    </CardHeader>
-    <CardContent className="space-y-2 text-sm max-h-48 overflow-y-auto">
-      {data.length > 0 ? (
-        data.map((item) => (
-          <div
-            key={item.name}
-            className="flex justify-between items-center p-2 rounded-md bg-gray-50 dark:bg-gray-800"
-          >
-            <div className="font-medium">{item.name}</div>
-            <div className="text-right">
-              <div className="flex items-center gap-2">
-                <Target className="h-4 w-4 text-green-500" />
-                <span>{item.avg_prediction.toFixed(1)}%</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-orange-500" />
-                <span>${item.avg_income.toFixed(2)}</span>
+}> = ({ title, data, icon }) => {
+  const { formatCurrency } = useCurrency();
+
+  return (
+    <Card className="h-auto">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-lg">
+          {icon}
+          {title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2 text-sm max-h-48 overflow-y-auto">
+        {data.length > 0 ? (
+          data.map((item) => (
+            <div
+              key={item.name}
+              className="flex justify-between items-center p-2 rounded-md bg-gray-50 dark:bg-gray-800"
+            >
+              <div className="font-medium">{item.name}</div>
+              <div className="text-right">
+                <div className="flex items-center gap-2">
+                  <Target className="h-4 w-4 text-green-500" />
+                  <span>{item.avg_prediction.toFixed(1)}%</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4 text-orange-500" />
+                  <span>{formatCurrency(item.avg_income)}</span>
+                </div>
               </div>
             </div>
-          </div>
-        ))
-      ) : (
-        <div className="text-center text-gray-500">No data to display.</div>
-      )}
-    </CardContent>
-  </Card>
-);
+          ))
+        ) : (
+          <div className="text-center text-gray-500">No data to display.</div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
 
 const DashboardCharts: React.FC<DashboardChartsProps> = ({ data }) => {
+  const { formatCurrency } = useCurrency();
   const regionData = aggregateData(data, "region");
   const districtData = aggregateData(data, "district");
   const clusterData = aggregateData(data, "cluster");
@@ -145,7 +135,7 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({ data }) => {
           </div>
           <div className="text-center">
             <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">
-              ${overallAverageIncome.toFixed(2)}
+              {formatCurrency(overallAverageIncome)}
             </div>
             <div className="text-sm text-blue-700 dark:text-blue-300">
               Avg. Income
@@ -175,7 +165,7 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({ data }) => {
       <AggregationCard
         title="By Cluster"
         data={clusterData}
-        icon={<Users className="h-5 w-5 text-orange-500" />}
+        icon={<Group className="h-5 w-5 text-orange-500" />}
       />
     </div>
   );

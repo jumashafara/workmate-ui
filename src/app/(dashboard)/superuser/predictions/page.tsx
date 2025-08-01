@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MultiSelect } from "@/components/ui/multi-select";
-import { Filter, X, BarChart3, TrendingUp, Users, MapPin, AlertCircle } from "lucide-react";
+import { Filter, X, BarChart3, TrendingUp, Users, MapPin, AlertCircle, Download, Group, Building } from "lucide-react";
 import dynamic from "next/dynamic";
 import { PredictionData } from "@/types/predictions";
 
@@ -232,6 +232,41 @@ export default function SuperuserPredictionsPage() {
     selectedCycles.length +
     selectedMonths.length;
 
+  const downloadData = () => {
+    if (!predictions || predictions.length === 0) {
+      alert('No data available to download');
+      return;
+    }
+
+    // Convert data to CSV format, excluding probability column
+    const excludeColumns = ['probability'];
+    const headers = Object.keys(predictions[0]).filter(key => !excludeColumns.includes(key)) as (keyof PredictionData)[];
+    const csvContent = [
+      headers.join(','),
+      ...predictions.map(row => 
+        headers.map(header => {
+          const value = row[header];
+          // Handle values that need quotes (containing commas, quotes, or newlines)
+          if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
+            return `"${value.replace(/"/g, '""')}"`;
+          }
+          return value;
+        }).join(',')
+      )
+    ].join('\n');
+
+    // Create and download the file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `predictions_data_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (error) {
     return (
       <div className="space-y-6">
@@ -339,14 +374,14 @@ export default function SuperuserPredictionsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      {/* <div className="bg-white dark:bg-slate-900 rounded-xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm">
+      <div className="bg-white dark:bg-slate-900 rounded-xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="flex items-start gap-4">
           <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
             <BarChart3 className="h-8 w-8 text-blue-600 dark:text-blue-400" />
           </div>
           <div className="flex-1">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Predictions Dashboard
+              Superuser - Aggregated Predictions
             </h1>
             <div className="flex items-center gap-6 text-sm">
               <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
@@ -354,20 +389,30 @@ export default function SuperuserPredictionsPage() {
                 <span>Real-time Analytics</span>
               </div>
               <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                <Users className="h-4 w-4" />
-                <span>{predictions.length.toLocaleString()} Records</span>
+                <MapPin className="h-4 w-4" />
+                <span>Regions: {regionOptions.length}</span>
               </div>
               <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                 <MapPin className="h-4 w-4" />
-                <span>Multi-Region Coverage</span>
+                <span>Districts: {districtOptions.length}</span>
               </div>
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <Group className="h-4 w-4" />
+                <span>Clusters: {clusterOptions.length}</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <Group className="h-4 w-4" />
+                <span>{predictions.length.toLocaleString()} Records</span>
+              </div>
+              
             </div>
           </div>
         </div>
-      </div> */}
+      </div>
 
 {/* Filters */}
 <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
+
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-3">
@@ -384,6 +429,17 @@ export default function SuperuserPredictionsPage() {
               </div>
             </CardTitle>
             <div className="flex gap-3">
+
+              <Button
+                onClick={downloadData}
+                disabled={!predictions || predictions.length === 0}
+                variant="outline"
+                size="sm"
+                className="bg-green-600 hover:bg-green-700 text-white border-green-600 hover:border-green-700"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download CSV
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
@@ -392,6 +448,7 @@ export default function SuperuserPredictionsPage() {
               >
                 {showFilters ? "Hide" : "Show"} Filters
               </Button>
+              
               {activeFiltersCount > 0 && (
                 <Button 
                   variant="outline" 
@@ -484,9 +541,16 @@ export default function SuperuserPredictionsPage() {
 
      
       {/* Map and Charts */}
-      <div className="space-y-6">
-        <HouseholdMap households={predictions} />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <RegionPerformanceChart data={predictions} />
+        <Card className="flex flex-col">
+          <CardHeader>
+            <CardTitle>Household Predictions Map</CardTitle>
+          </CardHeader>
+          <CardContent className="flex-grow">
+            <HouseholdMap households={predictions} />
+          </CardContent>
+        </Card>
       </div>
 
       {/* Data Information */}
