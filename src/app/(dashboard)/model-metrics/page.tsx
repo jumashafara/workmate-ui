@@ -408,39 +408,6 @@ export default function ModelMetricsPage() {
               </div>
             </CardContent>
           </Card>
-
-          <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-                  <TrendingUp className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                </div>
-                <div>
-                  <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
-                    Feature Importance
-                  </CardTitle>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Impact of features on model predictions
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="w-full h-[400px] flex items-center justify-center bg-orange-50 dark:bg-orange-900/10 rounded-lg border border-orange-200 dark:border-orange-800">
-                <div className="text-center">
-                  <div className="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-full w-fit mx-auto mb-3">
-                    <TrendingUp className="h-6 w-6 text-orange-600 dark:text-orange-400" />
-                  </div>
-                  <p className="text-orange-700 dark:text-orange-300 font-medium">
-                    Feature Importance Chart
-                  </p>
-                  <p className="text-sm text-orange-600 dark:text-orange-400 mt-1">
-                    Chart implementation in progress
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       )}
     </div>

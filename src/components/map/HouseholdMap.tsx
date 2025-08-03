@@ -3,10 +3,7 @@
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import type { LatLngTuple, Map } from 'leaflet';
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap, GeoJSON } from 'react-leaflet';
-import MarkerClusterGroup from 'react-leaflet-markercluster';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet.markercluster/dist/MarkerCluster.css';
-import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import { useCurrency } from '@/contexts/CurrencyContext';
 
 interface PredictionData {
@@ -17,12 +14,10 @@ interface PredictionData {
 
 interface HouseholdMapProps {
   households: PredictionData[];
-  maxMarkers?: number;
 }
 
 const DEFAULT_CENTER: LatLngTuple = [1.3, 32];
 const DEFAULT_ZOOM = 7;
-const MAX_MARKERS_DEFAULT = 200;
 
 const MapInstanceHandler: React.FC<{ onMapReady: (map: Map) => void }> = ({ onMapReady }) => {
   const map = useMap();
@@ -66,9 +61,8 @@ const FeatureDisplay: React.FC<{ household: PredictionData }> = ({ household }) 
   );
 };
 
-const HouseholdMap: React.FC<HouseholdMapProps> = ({ households, maxMarkers = MAX_MARKERS_DEFAULT }) => {
+const HouseholdMap: React.FC<HouseholdMapProps> = ({ households }) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const [showAllMarkers, setShowAllMarkers] = useState(false);
   const [mapInstance, setMapInstance] = useState<Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [geoJsonData, setGeoJsonData] = useState<any>(null);
@@ -114,9 +108,8 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({ households, maxMarkers = MA
     if (!households?.length) return { validHouseholds: [], hasData: false, totalCount: 0, displayedCount: 0 };
     const valid = households.filter(h => typeof h.latitude === 'number' && typeof h.longitude === 'number' && !isNaN(h.latitude) && !isNaN(h.longitude));
     if (!valid.length) return { validHouseholds: [], hasData: false, totalCount: 0, displayedCount: 0 };
-    const limitedHouseholds = showAllMarkers ? valid : valid.slice(0, maxMarkers);
-    return { validHouseholds: limitedHouseholds, hasData: true, totalCount: valid.length, displayedCount: limitedHouseholds.length };
-  }, [households, maxMarkers, showAllMarkers]);
+    return { validHouseholds: valid, hasData: true, totalCount: valid.length, displayedCount: valid.length };
+  }, [households]);
 
   const getMarkerColor = useCallback((prediction: number): string => (prediction === 0 ? '#dc2626' : '#16a34a'), []);
 
@@ -146,7 +139,6 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({ households, maxMarkers = MA
     }
   }, []);
 
-  const toggleShowAll = useCallback(() => setShowAllMarkers(prev => !prev), []);
   const handleMapReady = useCallback((map: Map) => setMapInstance(map), []);
 
   if (!hasData) {
@@ -160,45 +152,42 @@ const HouseholdMap: React.FC<HouseholdMapProps> = ({ households, maxMarkers = MA
   return (
     <div ref={mapContainerRef} className={`relative ${isFullScreen ? 'fixed inset-0 z-[9999] p-0 rounded-none h-screen w-screen' : 'h-[500px]'}`}>
       <div className="absolute top-8 right-8 z-[1000] flex gap-2">
-        {totalCount > maxMarkers && (
-          <button onClick={toggleShowAll} className="bg-blue-600 text-white px-3 py-1.5 rounded-md shadow-lg hover:bg-blue-700 text-sm" disabled={showAllMarkers && totalCount > 1000}>
-            {showAllMarkers ? `All ${displayedCount} Shown` : `Load All ${totalCount}`}
-          </button>
-        )}
         <button onClick={toggleFullScreen} className="bg-white text-black px-3 py-1.5 rounded-md shadow-lg hover:bg-gray-100">
           {isFullScreen ? 'Exit Full Screen' : 'Full Screen'}
         </button>
       </div>
 
-      {totalCount > displayedCount && (
-        <div className="absolute top-16 left-6 z-[1000] bg-yellow-100 text-yellow-800 px-3 py-1 rounded-md text-sm">
-          Showing {displayedCount} of {totalCount} households
-        </div>
-      )}
-      
       <div className={isFullScreen ? 'h-screen w-full' : 'h-full w-full'}>
         <MapContainer center={DEFAULT_CENTER} zoom={DEFAULT_ZOOM} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
           <MapInstanceHandler onMapReady={handleMapReady} />
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap contributors" />
           {geoJsonData && <GeoJSON data={geoJsonData} style={style} />}
-          <MarkerClusterGroup>
-            {validHouseholds.map((h, index) => (
-              <CircleMarker key={`${h.household_id}-${index}`} center={[h.latitude, h.longitude]} radius={6} pathOptions={{ color: '#ffffff', weight: 2, fillColor: getMarkerColor(h.prediction), fillOpacity: 0.9 }}>
-                <Popup>
-                  <div style={{ width: '300px' }}>
-                    <div style={{ marginBottom: '8px', paddingBottom: '4px', borderBottom: '1px solid #ccc' }}>
-                      <strong style={{ color: getMarkerColor(h.prediction), fontSize: '1.1rem' }}>
-                        {h.prediction === 0 ? '🔴 Not Likely to hit target' : '🟢 Likely to hit target'}
-                      </strong>
-                      <br />
-                      <span style={{ fontSize: '0.9rem', color: '#555' }}>ID: {h.household_id}</span>
-                    </div>
-                    <FeatureDisplay household={h} />
+          {validHouseholds.map((h, index) => (
+            <CircleMarker 
+              key={`${h.household_id}-${index}`} 
+              center={[h.latitude, h.longitude]} 
+              radius={8} 
+              pathOptions={{ 
+                color: '#ffffff', 
+                weight: 2, 
+                fillColor: getMarkerColor(h.prediction), 
+                fillOpacity: 0.9 
+              }}
+            >
+              <Popup>
+                <div style={{ width: '300px' }}>
+                  <div style={{ marginBottom: '8px', paddingBottom: '4px', borderBottom: '1px solid #ccc' }}>
+                    <strong style={{ color: getMarkerColor(h.prediction), fontSize: '1.1rem' }}>
+                      {h.prediction === 0 ? '🔴 Not Likely to hit target' : '🟢 Likely to hit target'}
+                    </strong>
+                    <br />
+                    <span style={{ fontSize: '0.9rem', color: '#555' }}>ID: {h.household_id}</span>
                   </div>
-                </Popup>
-              </CircleMarker>
-            ))}
-          </MarkerClusterGroup>
+                  <FeatureDisplay household={h} />
+                </div>
+              </Popup>
+            </CircleMarker>
+          ))}
         </MapContainer>
       </div>
     </div>
