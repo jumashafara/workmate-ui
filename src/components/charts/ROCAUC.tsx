@@ -74,6 +74,9 @@ const ROCCurve: React.FC<ROCCurveProps> = ({
     hovermode: "closest",
     plot_bgcolor: "white",
     paper_bgcolor: "white",
+    font: {
+      family: "Gabarito, system-ui, sans-serif",
+    },
   };
 
   const config = {

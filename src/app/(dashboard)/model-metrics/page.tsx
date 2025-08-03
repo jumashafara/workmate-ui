@@ -64,11 +64,11 @@ interface ClassificationMetrics {
     achieved_f1_score: number;
     achieved_recall: number;
     achieved_roc_auc: number;
-    not_achieved_precision: number;
-    not_achieved_f1_score: number;
-    not_achieved_recall: number;
-    not_achieved_roc_auc: number;
-    version: number;
+    not_achived_precision: number;
+    not_achived_f1_score: number;
+    not_achived_recall: number;
+    not_achived_roc_auc: number;
+    version: string;
     created_at: string;
     updated_at: string;
     true_positive: number;
@@ -76,7 +76,12 @@ interface ClassificationMetrics {
     true_negative: number;
     false_negative: number;
   };
-  confusion_matrix: number[][];
+  confusion_matrix: {
+    true_negatives: number;
+    false_negatives: number;
+    true_positives: number;
+    false_positives: number;
+  };
 }
 
 interface RegressionMetrics {
@@ -89,7 +94,7 @@ interface RegressionMetrics {
   mean_squared_error: number;
   correlation: number;
   accuracy: number;
-  version: number;
+  version: string;
   created_at: string;
   updated_at: string;
 }
@@ -98,59 +103,33 @@ interface RegressionMetrics {
 const fetchClassificationModelMetrics = async (
   name: string
 ): Promise<ClassificationMetrics> => {
-  // Simulate API call
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  return {
-    model: {
-      id: 1,
-      name: "Year 1 Classification",
-      description: "Classification model for year 1",
-      file_path: "/models/year1_classification.pkl",
-      accuracy: 0.82,
-      achieved_precision: 0.78,
-      achieved_f1_score: 0.81,
-      achieved_recall: 0.85,
-      achieved_roc_auc: 0.85,
-      not_achieved_precision: 0.75,
-      not_achieved_f1_score: 0.79,
-      not_achieved_recall: 0.82,
-      not_achieved_roc_auc: 0.83,
-      version: 1,
-      created_at: "2024-01-01T00:00:00Z",
-      updated_at: "2024-01-01T00:00:00Z",
-      true_positive: 180,
-      false_positive: 25,
-      true_negative: 150,
-      false_negative: 20,
-    },
-    confusion_matrix: [
-      [150, 20],
-      [25, 180],
-    ],
-  };
+  try {
+    const response = await fetch(`${API_ENDPOINT}/models/classification/${name}/`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Failed to fetch classification model metrics:', error);
+    throw error;
+  }
 };
 
 const fetchRegressionModelMetrics = async (
   name: string
 ): Promise<RegressionMetrics> => {
-  // Simulate API call
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  return {
-    id: 1,
-    name: "Year 1 Regression",
-    description: "Regression model for year 1",
-    file_path: "/models/year1_regression.pkl",
-    r_squared: 0.76,
-    adjusted_r_squared: 0.75,
-    mean_squared_error: 0.15,
-    correlation: 0.87,
-    accuracy: 0.82,
-    version: 1,
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-  };
+  try {
+    const response = await fetch(`${API_ENDPOINT}/models/regression/${name}/`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data.model;
+  } catch (error) {
+    console.error('Failed to fetch regression model metrics:', error);
+    throw error;
+  }
 };
 
 export default function ModelMetricsPage() {
@@ -342,18 +321,7 @@ export default function ModelMetricsPage() {
             ) : (
               <ConfusionMatrix
                 confusion_matrix_data={
-                  classificationModelMetrics?.model
-                    ? {
-                        true_positives:
-                          classificationModelMetrics.model.true_positive,
-                        false_positives:
-                          classificationModelMetrics.model.false_positive,
-                        true_negatives:
-                          classificationModelMetrics.model.true_negative,
-                        false_negatives:
-                          classificationModelMetrics.model.false_negative,
-                      }
-                    : undefined
+                  classificationModelMetrics?.confusion_matrix
                 }
               />
             )}

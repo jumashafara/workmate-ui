@@ -84,12 +84,12 @@ const ClassificationModelStatsTable: React.FC<ClassificationModelMetrics> = ({
               </TableCell>
               <TableCell
                 className={`text-center ${
-                  model_metrics?.not_achieved_precision > 0.7
+                  model_metrics?.not_achived_precision > 0.7
                     ? "bg-green-50"
                     : ""
                 }`}
               >
-                {model_metrics?.not_achieved_precision.toFixed(2)}
+                {model_metrics?.not_achived_precision.toFixed(2)}
               </TableCell>
               <TableCell>
                 Proportion of households correctly predicted to hit the target.
@@ -106,10 +106,10 @@ const ClassificationModelStatsTable: React.FC<ClassificationModelMetrics> = ({
               </TableCell>
               <TableCell
                 className={`text-center ${
-                  model_metrics?.not_achieved_recall > 0.7 ? "bg-green-50" : ""
+                  model_metrics?.not_achived_recall > 0.7 ? "bg-green-50" : ""
                 }`}
               >
-                {model_metrics?.not_achieved_recall.toFixed(2)}
+                {model_metrics?.not_achived_recall.toFixed(2)}
               </TableCell>
               <TableCell>
                 Proportion of actual households that hit the target and were
@@ -127,12 +127,12 @@ const ClassificationModelStatsTable: React.FC<ClassificationModelMetrics> = ({
               </TableCell>
               <TableCell
                 className={`text-center ${
-                  model_metrics?.not_achieved_f1_score > 0.7
+                  model_metrics?.not_achived_f1_score > 0.7
                     ? "bg-green-50"
                     : ""
                 }`}
               >
-                {model_metrics?.not_achieved_f1_score.toFixed(2)}
+                {model_metrics?.not_achived_f1_score.toFixed(2)}
               </TableCell>
               <TableCell>
                 Harmonic mean of precision and recall in the context of

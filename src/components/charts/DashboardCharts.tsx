@@ -73,7 +73,7 @@ const AggregationCard: React.FC<{
           {icon}
           {title}
         </CardTitle>
-      </CardHeader>
+        </CardHeader>
       <CardContent className="space-y-2 text-sm max-h-48 overflow-y-auto">
         {data.length > 0 ? (
           data.map((item) => (
@@ -92,13 +92,13 @@ const AggregationCard: React.FC<{
                   <span>{formatCurrency(item.avg_income)}</span>
                 </div>
               </div>
-            </div>
+          </div>
           ))
         ) : (
           <div className="text-center text-gray-500">No data to display.</div>
         )}
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
   );
 };
 

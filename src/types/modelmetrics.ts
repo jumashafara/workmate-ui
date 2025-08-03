@@ -9,11 +9,11 @@ export interface ClassificationMetricsProps {
     achieved_f1_score: number;
     achieved_recall: number;
     achieved_roc_auc: number;
-    not_achieved_precision: number;
-    not_achieved_f1_score: number;
-    not_achieved_recall: number;
-    not_achieved_roc_auc: number;
-    version: number;
+    not_achived_precision: number;
+    not_achived_f1_score: number;
+    not_achived_recall: number;
+    not_achived_roc_auc: number;
+    version: string;
     created_at: string;
     updated_at: string;
     true_positive: number;
@@ -39,7 +39,7 @@ export interface RegressionMetricsProps {
   mean_squared_error: number;
   correlation: number;
   accuracy: number;
-  version: number;
+  version: string;
   created_at: string;
   updated_at: string;
 
