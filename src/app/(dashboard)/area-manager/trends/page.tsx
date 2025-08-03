@@ -369,17 +369,7 @@ export default function AreaManagerTrendsPage() {
             </div>
           </div>
         </div>
-        <Card className="border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/10">
-          <CardContent className="py-4">
-            <div className="flex items-center gap-4">
-              <Skeleton className="h-9 w-9 rounded-lg" />
-              <div className="flex-1 space-y-2">
-                <Skeleton className="h-6 w-32" />
-                <Skeleton className="h-4 w-48" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        
         <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
           <CardHeader>
             <div className="flex items-center gap-3">
