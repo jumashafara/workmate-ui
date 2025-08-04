@@ -1,8 +1,9 @@
-// const API_BASE_URL = 'https://workmate.api.dev.nonproftinnovations.io'
-// const API_BASE_URL = 'http://workmate.api.nonproftinnovations.io/'
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://workmate.api.dev.nonproftinnovations.io' 
-  : 'http://localhost:8000'
+// API Base URL - should match backend domain
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || (
+  process.env.NODE_ENV === 'production' 
+    ? 'https://workmate.api.nonproftinnovations.io' 
+    : 'http://localhost:8000'
+)
 const API_ENDPOINT = `${API_BASE_URL}/api`
 const ACCOUNTS_ENDPOINT = `${API_BASE_URL}/accounts`
 

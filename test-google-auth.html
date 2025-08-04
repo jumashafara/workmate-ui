@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Auth Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        button {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #3367d6;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <h1>Google Authentication Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Test Google Auth URL Generation</h2>
+        <button onclick="testGoogleAuthUrl()">Get Google Auth URL</button>
+        <div id="authUrlResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Test Google OAuth Flow</h2>
+        <button onclick="startGoogleAuth()">Start Google Authentication</button>
+        <div id="authFlowResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Test Callback Processing</h2>
+        <p>URL Parameters: <span id="urlParams"></span></p>
+        <button onclick="processCallback()">Process Callback</button>
+        <div id="callbackResult" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8000';
+        const ACCOUNTS_ENDPOINT = `${API_BASE_URL}/accounts`;
+
+        // Test 1: Get Google Auth URL
+        async function testGoogleAuthUrl() {
+            const resultDiv = document.getElementById('authUrlResult');
+            resultDiv.textContent = 'Testing...';
+            resultDiv.className = 'result';
+
+            try {
+                const response = await fetch(`${ACCOUNTS_ENDPOINT}/google/login/`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.textContent = `✅ Success!\nAuth URL: ${data.auth_url}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.textContent = `❌ Error: ${data.error || 'Unknown error'}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Network Error: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        // Test 2: Start Google Auth Flow
+        function startGoogleAuth() {
+            const resultDiv = document.getElementById('authFlowResult');
+            resultDiv.textContent = 'Starting Google OAuth flow...';
+            resultDiv.className = 'result';
+
+            // This would normally redirect to Google
+            // For testing, we'll just show the URL
+            fetch(`${ACCOUNTS_ENDPOINT}/google/login/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.auth_url) {
+                        resultDiv.textContent = `✅ Auth URL generated!\nClick to proceed: ${data.auth_url}`;
+                        resultDiv.className = 'result success';
+                        
+                        // Add a button to actually redirect
+                        const redirectButton = document.createElement('button');
+                        redirectButton.textContent = 'Redirect to Google';
+                        redirectButton.onclick = () => window.location.href = data.auth_url;
+                        resultDiv.appendChild(redirectButton);
+                    } else {
+                        resultDiv.textContent = `❌ Error: ${data.error || 'Unknown error'}`;
+                        resultDiv.className = 'result error';
+                    }
+                })
+                .catch(error => {
+                    resultDiv.textContent = `❌ Error: ${error.message}`;
+                    resultDiv.className = 'result error';
+                });
+        }
+
+        // Test 3: Process Callback
+        function processCallback() {
+            const resultDiv = document.getElementById('callbackResult');
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const error = urlParams.get('error');
+
+            // Display URL parameters
+            document.getElementById('urlParams').textContent = 
+                `Code: ${code || 'none'}, Error: ${error || 'none'}`;
+
+            if (error) {
+                resultDiv.textContent = `❌ Google OAuth Error: ${error}`;
+                resultDiv.className = 'result error';
+                return;
+            }
+
+            if (!code) {
+                resultDiv.textContent = '❌ No authorization code found in URL';
+                resultDiv.className = 'result error';
+                return;
+            }
+
+            resultDiv.textContent = 'Processing callback...';
+            resultDiv.className = 'result';
+
+            // Test the callback endpoint
+            fetch(`${ACCOUNTS_ENDPOINT}/google/callback/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ code: code }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.access_token) {
+                    resultDiv.textContent = `✅ Authentication successful!\nAccess Token: ${data.access_token.substring(0, 20)}...\nUser: ${data.user.email}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.textContent = `❌ Authentication failed: ${data.error || 'Unknown error'}`;
+                    resultDiv.className = 'result error';
+                }
+            })
+            .catch(error => {
+                resultDiv.textContent = `❌ Network Error: ${error.message}`;
+                resultDiv.className = 'result error';
+            });
+        }
+
+        // Auto-process callback if code is present
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            if (code) {
+                processCallback();
+            }
+        };
+    </script>
+</body>
+</html> 
