@@ -27,9 +27,10 @@ export default function SignInPage() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");
+    const scope = urlParams.get("scope");
 
     if (code) {
-      handleGoogleCallback(code);
+      handleGoogleCallback(code, scope || "");
     }
   }, []);
 
@@ -73,10 +74,10 @@ export default function SignInPage() {
     }
   };
 
-  const handleGoogleCallback = async (code: string) => {
+  const handleGoogleCallback = async (code: string, scope: string) => {
     try {
       setIsGoogleLoading(true);
-      const response = await googleAuthenticate(code);
+      const response = await googleAuthenticate(code, scope);
 
       // Save the tokens
       setAuthToken(response.access_token);
