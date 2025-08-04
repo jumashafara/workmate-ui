@@ -1,5 +1,6 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
   eslint: {
     // Warning: This allows production builds to successfully complete even if
     // your project has ESLint errors.
@@ -8,4 +9,4 @@ const nextConfig = {
   reactStrictMode: false,
 };
 
-module.exports = nextConfig; 
+export default nextConfig;

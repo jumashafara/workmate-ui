@@ -158,35 +158,23 @@ export const getUser = async () => {
 
 // Google Authentication methods
 export const getGoogleAuthUrl = async (): Promise<string> => {
-  console.log("getGoogleAuthUrl: Attempting to fetch Google auth URL from:", `${ACCOUNTS_ENDPOINT}/google/login/`);
   try {
-    const response = await fetch(`${ACCOUNTS_ENDPOINT}/google/login/`, {
+    const response = await fetch(ACCOUNTS_ENDPOINT + "/google/login/", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
     });
 
-    console.log(`getGoogleAuthUrl: Received response with status: ${response.status}`);
-
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: "Server returned a non-JSON error response." }));
-      console.error("getGoogleAuthUrl: Error response from server:", errorData);
-      throw new Error(errorData.error || `Server responded with status ${response.status}`);
+      const error = await response.json();
+      throw new Error(error.error || "Failed to get Google auth URL");
     }
 
     const data = await response.json();
-    console.log("getGoogleAuthUrl: Successfully received data from server:", data);
-
-    if (!data.auth_url) {
-      console.error("getGoogleAuthUrl: 'auth_url' is missing in the server response.", data);
-      throw new Error("'auth_url' field was not found in the response from the server.");
-    }
-    
     return data.auth_url;
   } catch (error) {
-    console.error("getGoogleAuthUrl: An unexpected error occurred during the fetch operation.", error);
-    // Re-throw the error so the calling function can handle it
+    console.error("Error getting Google auth URL:", error);
     throw error;
   }
 };
