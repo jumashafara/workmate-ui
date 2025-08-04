@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { googleAuthenticate } from "@/api/auth";
 import { setAuthToken, setRefreshToken, setUserData } from "@/utils/cookie";
 
-export default function GoogleCallbackPage() {
+function GoogleCallbackContent() {
   const [error, setError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(true);
   const router = useRouter();
@@ -94,4 +94,21 @@ export default function GoogleCallbackPage() {
   }
 
   return null;
+}
+
+export default function GoogleCallbackPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Loading...
+          </h2>
+        </div>
+      </div>
+    }>
+      <GoogleCallbackContent />
+    </Suspense>
+  );
 } 
