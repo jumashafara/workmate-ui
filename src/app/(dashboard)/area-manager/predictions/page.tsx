@@ -32,6 +32,10 @@ import { PredictionData } from "@/types/predictions";
 const DashboardCharts = dynamic(() => import("@/components/charts/DashboardCharts"), { ssr: false });
 const RegionPerformanceChart = dynamic(() => import("@/components/charts/RegionPerformanceChart"), { ssr: false });
 const HouseholdMap = dynamic(() => import("@/components/map/HouseholdMap"), { ssr: false });
+const ClusterParticipationTable = dynamic(
+  () => import("@/components/tables/ClusterParticipationTable"),
+  { ssr: false }
+);
 import { API_ENDPOINT } from "@/utils/endpoints";
 
 interface FilterOption {
@@ -548,6 +552,9 @@ export default function AreaManagerPredictionsPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Cluster Participation Table */}
+      <ClusterParticipationTable data={predictions} />
     </div>
   );
 }

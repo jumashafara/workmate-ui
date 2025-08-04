@@ -22,6 +22,10 @@ const RegionPerformanceChart = dynamic(
 const HouseholdMap = dynamic(() => import("@/components/map/MapWrapper"), {
   ssr: false,
 });
+const ClusterParticipationTable = dynamic(
+  () => import("@/components/tables/ClusterParticipationTable"),
+  { ssr: false }
+);
 import { API_ENDPOINT } from "@/utils/endpoints";
 
 interface FilterOption {
@@ -580,6 +584,9 @@ export default function SuperuserPredictionsPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Cluster Participation Table */}
+      <ClusterParticipationTable data={predictions} />
     </div>
   );
 }
