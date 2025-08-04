@@ -27,12 +27,6 @@ export default function SignInPage() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");
-    const error = urlParams.get("error");
-
-    if (error) {
-      setError(`Google authentication failed: ${error}`);
-      return;
-    }
 
     if (code) {
       handleGoogleCallback(code);
@@ -110,10 +104,8 @@ export default function SignInPage() {
 
     try {
       const authUrl = await getGoogleAuthUrl();
-      console.log("Redirecting to Google OAuth:", authUrl);
       window.location.href = authUrl;
     } catch (err: any) {
-      console.error("Google login error:", err);
       setIsGoogleLoading(false);
       setError("Failed to initiate Google login: " + err.message);
     }
