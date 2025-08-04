@@ -53,6 +53,22 @@ const RegressionModelStatsTable = dynamic(
   }
 );
 
+const ResidualPlot = dynamic(
+  () => import("@/components/charts/ResidualPlot"),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-96 w-full" />,
+  }
+);
+
+const ActualVsPredicted = dynamic(
+  () => import("@/components/charts/ActualVsPredicted"),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-96 w-full" />,
+  }
+);
+
 interface ClassificationMetrics {
   model: {
     id: number;
@@ -85,18 +101,22 @@ interface ClassificationMetrics {
 }
 
 interface RegressionMetrics {
-  id: number;
-  name: string;
-  description: string;
-  file_path: string;
-  r_squared: number;
-  adjusted_r_squared: number;
-  mean_squared_error: number;
-  correlation: number;
-  accuracy: number;
-  version: string;
-  created_at: string;
-  updated_at: string;
+  model: {
+    id: number;
+    name: string;
+    description: string;
+    file_path: string;
+    r_squared: number;
+    adjusted_r_squared: number;
+    mean_squared_error: number;
+    correlation: number;
+    accuracy: number;
+    version: string;
+    created_at: string;
+    updated_at: string;
+  };
+  y_pred: number[];
+  y_test: number[];
 }
 
 // Mock API functions
@@ -125,7 +145,7 @@ const fetchRegressionModelMetrics = async (
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-    return data.model;
+    return data;
   } catch (error) {
     console.error('Failed to fetch regression model metrics:', error);
     throw error;
@@ -305,7 +325,7 @@ export default function ModelMetricsPage() {
               model_metrics={classificationModelMetrics?.model || null}
             />
           ) : (
-            <RegressionModelStatsTable model_metrics={regressionModelMetrics} />
+            <RegressionModelStatsTable model_metrics={regressionModelMetrics?.model || null} />
           )}
         </CardContent>
       </Card>
@@ -344,38 +364,27 @@ export default function ModelMetricsPage() {
       {/* Regression-specific visualizations */}
       {model.type === "regression" && (
         <div className="grid gap-6 lg:grid-cols-2">
-          <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-                  <BarChart3 className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                </div>
-                <div>
-                  <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
-                    Residual Plot
-                  </CardTitle>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Analysis of prediction residuals
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="w-full h-[400px] flex items-center justify-center bg-orange-50 dark:bg-orange-900/10 rounded-lg border border-orange-200 dark:border-orange-800">
-                <div className="text-center">
-                  <div className="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-full w-fit mx-auto mb-3">
-                    <BarChart3 className="h-6 w-6 text-orange-600 dark:text-orange-400" />
-                  </div>
-                  <p className="text-orange-700 dark:text-orange-300 font-medium">
-                    Residual Plot Visualization
-                  </p>
-                  <p className="text-sm text-orange-600 dark:text-orange-400 mt-1">
-                    Chart implementation in progress
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="w-full h-[400px]">
+            {loading ? (
+              <Skeleton className="h-full w-full" />
+            ) : (
+              <ResidualPlot
+                y_pred={regressionModelMetrics?.y_pred || []}
+                y_test={regressionModelMetrics?.y_test || []}
+              />
+            )}
+          </div>
+
+          <div className="w-full h-[400px]">
+            {loading ? (
+              <Skeleton className="h-full w-full" />
+            ) : (
+              <ActualVsPredicted
+                y_pred={regressionModelMetrics?.y_pred || []}
+                y_test={regressionModelMetrics?.y_test || []}
+              />
+            )}
+          </div>
         </div>
       )}
     </div>
