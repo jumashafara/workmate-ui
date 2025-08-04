@@ -110,12 +110,18 @@ export default function SignInPage() {
 
     try {
       const authUrl = await getGoogleAuthUrl();
-      console.log("Redirecting to Google OAuth:", authUrl);
-      window.location.href = authUrl;
+      console.log("handleGoogleSignIn: Received authUrl:", authUrl);
+
+      if (authUrl) {
+        console.log("handleGoogleSignIn: Redirecting to Google OAuth...");
+        window.location.href = authUrl;
+      } else {
+        throw new Error("Received an empty or invalid auth URL from the server.");
+      }
     } catch (err: any) {
-      console.error("Google login error:", err);
+      console.error("handleGoogleSignIn: Failed to initiate Google login.", err);
+      setError(`Failed to start Google Sign-In. Please check the console for more details. Error: ${err.message}`);
       setIsGoogleLoading(false);
-      setError("Failed to initiate Google login: " + err.message);
     }
   };
 
