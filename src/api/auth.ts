@@ -174,10 +174,7 @@ export const getGoogleAuthUrl = async (): Promise<string> => {
   }
 };
 
-export const googleAuthenticate = async (
-  code: string,
-  scope: string
-): Promise<AuthResponse> => {
+export const googleAuthenticate = async (code: string): Promise<AuthResponse> => {
   // URL decode the code if it's encoded
   const decodedCode = decodeURIComponent(code);
 
@@ -188,7 +185,7 @@ export const googleAuthenticate = async (
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ code: decodedCode, scope: scope }),
+    body: JSON.stringify({ code: decodedCode }),
   });
 
   if (response.ok) {

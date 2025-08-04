@@ -27,10 +27,15 @@ export default function SignInPage() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");
-    const scope = urlParams.get("scope");
+    const error = urlParams.get("error");
+
+    if (error) {
+      setError(`Google authentication failed: ${error}`);
+      return;
+    }
 
     if (code) {
-      handleGoogleCallback(code, scope || "");
+      handleGoogleCallback(code);
     }
   }, []);
 
@@ -74,10 +79,10 @@ export default function SignInPage() {
     }
   };
 
-  const handleGoogleCallback = async (code: string, scope: string) => {
+  const handleGoogleCallback = async (code: string) => {
     try {
       setIsGoogleLoading(true);
-      const response = await googleAuthenticate(code, scope);
+      const response = await googleAuthenticate(code);
 
       // Save the tokens
       setAuthToken(response.access_token);
