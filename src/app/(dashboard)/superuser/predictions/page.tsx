@@ -7,7 +7,18 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MultiSelect } from "@/components/ui/multi-select";
-import { Filter, X, BarChart3, TrendingUp, Users, MapPin, AlertCircle, Download, Group, Building } from "lucide-react";
+import {
+  Filter,
+  X,
+  BarChart3,
+  TrendingUp,
+  Users,
+  MapPin,
+  AlertCircle,
+  Download,
+  Group,
+  Building,
+} from "lucide-react";
 import dynamic from "next/dynamic";
 import { PredictionData } from "@/types/predictions";
 
@@ -91,7 +102,7 @@ export default function SuperuserPredictionsPage() {
       }
 
       const result = await response.json();
-      
+
       const allData = result.predictions || [];
 
       setPredictions(allData);
@@ -238,34 +249,46 @@ export default function SuperuserPredictionsPage() {
 
   const downloadData = () => {
     if (!predictions || predictions.length === 0) {
-      alert('No data available to download');
+      alert("No data available to download");
       return;
     }
 
     // Convert data to CSV format, excluding probability column
-    const excludeColumns = ['probability'];
-    const headers = Object.keys(predictions[0]).filter(key => !excludeColumns.includes(key)) as (keyof PredictionData)[];
+    const excludeColumns = ["probability"];
+    const headers = Object.keys(predictions[0]).filter(
+      (key) => !excludeColumns.includes(key)
+    ) as (keyof PredictionData)[];
     const csvContent = [
-      headers.join(','),
-      ...predictions.map(row => 
-        headers.map(header => {
-          const value = row[header];
-          // Handle values that need quotes (containing commas, quotes, or newlines)
-          if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
-            return `"${value.replace(/"/g, '""')}"`;
-          }
-          return value;
-        }).join(',')
-      )
-    ].join('\n');
+      headers.join(","),
+      ...predictions.map((row) =>
+        headers
+          .map((header) => {
+            const value = row[header];
+            // Handle values that need quotes (containing commas, quotes, or newlines)
+            if (
+              typeof value === "string" &&
+              (value.includes(",") ||
+                value.includes('"') ||
+                value.includes("\n"))
+            ) {
+              return `"${value.replace(/"/g, '""')}"`;
+            }
+            return value;
+          })
+          .join(",")
+      ),
+    ].join("\n");
 
     // Create and download the file
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `predictions_data_${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `predictions_data_${new Date().toISOString().split("T")[0]}.csv`
+    );
+    link.style.visibility = "hidden";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -282,10 +305,11 @@ export default function SuperuserPredictionsPage() {
             </div>
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                Predictions Dashboard
+                Superuser - Aggregated Predictions
               </h1>
               <p className="text-gray-600 dark:text-gray-400 text-lg">
-                Advanced prediction analytics with intelligent filtering and comprehensive visualizations
+                Advanced prediction analytics with intelligent filtering and
+                comprehensive visualizations
               </p>
             </div>
           </div>
@@ -408,15 +432,13 @@ export default function SuperuserPredictionsPage() {
                 <Group className="h-4 w-4" />
                 <span>{predictions.length.toLocaleString()} Records</span>
               </div>
-              
             </div>
           </div>
         </div>
       </div>
 
-{/* Filters */}
-<Card className="border-gray-200 dark:border-gray-700 shadow-sm">
-
+      {/* Filters */}
+      <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-3">
@@ -424,7 +446,9 @@ export default function SuperuserPredictionsPage() {
                 <Filter className="h-5 w-5 text-orange-600 dark:text-orange-400" />
               </div>
               <div>
-                <span className="text-xl font-semibold text-gray-900 dark:text-white">Smart Filters</span>
+                <span className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Smart Filters
+                </span>
                 {activeFiltersCount > 0 && (
                   <Badge className="ml-2 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
                     {activeFiltersCount} active
@@ -433,7 +457,6 @@ export default function SuperuserPredictionsPage() {
               </div>
             </CardTitle>
             <div className="flex gap-3">
-
               <Button
                 onClick={downloadData}
                 disabled={!predictions || predictions.length === 0}
@@ -452,11 +475,11 @@ export default function SuperuserPredictionsPage() {
               >
                 {showFilters ? "Hide" : "Show"} Filters
               </Button>
-              
+
               {activeFiltersCount > 0 && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={clearFilters}
                   className="text-red-600 border-red-200 hover:bg-red-50 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/20 transition-colors"
                 >
@@ -469,9 +492,10 @@ export default function SuperuserPredictionsPage() {
         {showFilters && (
           <CardContent className="space-y-6 pt-2">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-
-            <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cohort</Label>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Cohort
+                </Label>
                 <MultiSelect
                   options={cohortOptions}
                   selected={selectedCohorts}
@@ -482,7 +506,9 @@ export default function SuperuserPredictionsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cycle</Label>
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Cycle
+                </Label>
                 <MultiSelect
                   options={cycleOptions}
                   selected={selectedCycles}
@@ -491,9 +517,11 @@ export default function SuperuserPredictionsPage() {
                   emptyText="No cycles found"
                 />
               </div>
-              
+
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Region</Label>
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Region
+                </Label>
                 <MultiSelect
                   options={regionOptions}
                   selected={selectedRegions}
@@ -504,7 +532,9 @@ export default function SuperuserPredictionsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">District</Label>
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  District
+                </Label>
                 <MultiSelect
                   options={districtOptions}
                   selected={selectedDistricts}
@@ -515,7 +545,9 @@ export default function SuperuserPredictionsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cluster</Label>
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Cluster
+                </Label>
                 <MultiSelect
                   options={clusterOptions}
                   selected={selectedClusters}
@@ -526,7 +558,9 @@ export default function SuperuserPredictionsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Evaluation Month</Label>
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Evaluation Month
+                </Label>
                 <MultiSelect
                   options={monthOptions}
                   selected={selectedMonths}
@@ -536,7 +570,6 @@ export default function SuperuserPredictionsPage() {
                 />
               </div>
             </div>
-
           </CardContent>
         )}
       </Card>
@@ -544,7 +577,6 @@ export default function SuperuserPredictionsPage() {
       {/* Interactive Dashboard Charts */}
       <DashboardCharts data={predictions} />
 
-     
       {/* Map and Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <RegionPerformanceChart data={predictions} />
@@ -573,7 +605,8 @@ export default function SuperuserPredictionsPage() {
                 Complete Dataset Loaded
               </h4>
               <p className="text-sm text-orange-700 dark:text-orange-300">
-                Displaying all {predictions.length.toLocaleString()} prediction records with real-time analytics and interactive visualizations.
+                Displaying all {predictions.length.toLocaleString()} prediction
+                records with real-time analytics and interactive visualizations.
               </p>
             </div>
             <div className="text-right">
@@ -587,7 +620,6 @@ export default function SuperuserPredictionsPage() {
           </div>
         </CardContent>
       </Card>
-
     </div>
   );
 }
