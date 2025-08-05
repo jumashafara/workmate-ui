@@ -1,13 +1,28 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { googleAuthenticate } from "@/api/auth";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { setAuthToken, setRefreshToken, setUserData } from "@/utils/cookie";
 
-const GoogleCallback: React.FC = () => {
+// Skeleton loader component
+const GoogleCallbackSkeleton = () => (
+  <div className="min-h-screen flex items-center justify-center p-4">
+    <Card className="w-full max-w-md">
+      <CardContent className="flex flex-col items-center justify-center min-h-[300px] text-center p-8">
+        <Skeleton className="h-12 w-12 rounded-full mb-6" />
+        <Skeleton className="h-8 w-64 mb-4" />
+        <Skeleton className="h-4 w-80" />
+      </CardContent>
+    </Card>
+  </div>
+);
+
+// Main component that uses useSearchParams
+const GoogleCallbackContent: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -86,6 +101,15 @@ const GoogleCallback: React.FC = () => {
         </CardContent>
       </Card>
     </div>
+  );
+};
+
+// Main page component with Suspense boundary
+const GoogleCallback: React.FC = () => {
+  return (
+    <Suspense fallback={<GoogleCallbackSkeleton />}>
+      <GoogleCallbackContent />
+    </Suspense>
   );
 };
 
