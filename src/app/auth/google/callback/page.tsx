@@ -5,33 +5,44 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { googleAuthenticate } from "@/lib/api/auth";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Shield } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, Shield, CheckCircle, XCircle, ArrowRight, Home, RefreshCw, Lock, UserCheck } from "lucide-react";
 import { setAuthToken, setRefreshToken, setUserData } from "@/utils/cookie";
 
 function AuthLoadingFallback() {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <Card className="w-full max-w-md shadow-2xl border-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm">
         <CardContent className="p-8 text-center">
           <div className="space-y-6">
             <div className="relative">
-              <Shield className="h-16 w-16 text-primary mx-auto mb-4" />
-              <div className="absolute -top-1 -right-1">
-                <Loader2 className="h-6 w-6 animate-spin text-orange-600" />
+              <div className="w-16 h-16 rounded-full bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center shadow-lg mx-auto">
+                <Shield className="h-8 w-8 text-white" />
+              </div>
+              <div className="absolute -top-2 -right-2">
+                <Loader2 className="h-6 w-6 text-orange-600 animate-spin" />
               </div>
             </div>
+            
+            <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900/20 dark:text-orange-300 dark:border-orange-800">
+              <Lock className="h-3 w-3 mr-1" />
+              Secure Authentication
+            </Badge>
+            
             <div className="space-y-2">
-              <h1 className="text-2xl font-semibold">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                 Initializing Authentication
               </h1>
-              <p className="text-muted-foreground">
+              <p className="text-gray-600 dark:text-gray-300">
                 Setting up secure connection...
               </p>
             </div>
+            
             <div className="flex justify-center space-x-1">
-              <div className="h-2 w-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-              <div className="h-2 w-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-              <div className="h-2 w-2 bg-primary rounded-full animate-bounce"></div>
+              <div className="h-2 w-2 bg-orange-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+              <div className="h-2 w-2 bg-orange-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+              <div className="h-2 w-2 bg-orange-500 rounded-full animate-bounce"></div>
             </div>
           </div>
         </CardContent>
@@ -93,35 +104,82 @@ function GoogleCallbackContent() {
   }, [searchParams, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <Card className="w-full max-w-md shadow-2xl border-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm">
         <CardContent className="p-8 text-center">
           {loading ? (
-            <div className="space-y-4">
-              <Loader2 className="h-12 w-12 animate-spin text-orange-600 mx-auto" />
+            <div className="space-y-6">
+              <div className="relative">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center shadow-lg mx-auto">
+                  <UserCheck className="h-8 w-8 text-white" />
+                </div>
+                <div className="absolute -top-2 -right-2">
+                  <Loader2 className="h-6 w-6 text-orange-600 animate-spin" />
+                </div>
+              </div>
+              
+              <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900/20 dark:text-orange-300 dark:border-orange-800">
+                <Shield className="h-3 w-3 mr-1" />
+                Verifying Credentials
+              </Badge>
+              
               <div className="space-y-2">
-                <h1 className="text-2xl font-semibold">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                   Completing Google Authentication
                 </h1>
-                <p className="text-muted-foreground">
-                  Please wait while we authenticate your account...
+                <p className="text-gray-600 dark:text-gray-300">
+                  Please wait while we securely authenticate your account...
                 </p>
+              </div>
+              
+              <div className="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+                <span>Verifying credentials</span>
               </div>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-6">
+              <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center mx-auto">
+                <XCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
+              </div>
+              
+              <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800">
+                <XCircle className="h-3 w-3 mr-1" />
+                Authentication Failed
+              </Badge>
+              
               <div className="space-y-2">
-                <h1 className="text-2xl font-semibold text-destructive">
+                <h1 className="text-2xl font-bold text-red-600 dark:text-red-400">
                   Authentication Failed
                 </h1>
-                <p className="text-muted-foreground">{error}</p>
-              </div>
-              <div className="pt-4">
-                <p className="text-sm text-muted-foreground">
-                  Try signing in again or contact support if the problem
-                  persists.
+                <p className="text-gray-600 dark:text-gray-300">
+                  {error}
                 </p>
               </div>
+              
+              <div className="space-y-3">
+                <Button 
+                  variant="outline" 
+                  className="w-full border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20"
+                  onClick={() => router.push("/sign-in")}
+                >
+                  <ArrowRight className="h-4 w-4 mr-2" />
+                  Try Again
+                </Button>
+                
+                <Button 
+                  variant="ghost" 
+                  className="w-full text-gray-600 dark:text-gray-400"
+                  onClick={() => router.push("/")}
+                >
+                  <Home className="h-4 w-4 mr-2" />
+                  Go to Home
+                </Button>
+              </div>
+              
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                If the problem persists, please contact support for assistance.
+              </p>
             </div>
           )}
         </CardContent>
