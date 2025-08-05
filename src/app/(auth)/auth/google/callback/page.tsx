@@ -97,7 +97,7 @@ function GoogleCallbackContent() {
       <Card className="w-full max-w-md">
         <CardContent className="p-8 text-center">
           {loading ? (
-            <div className="space-y-4">
+            <div className="">
               <Loader2 className="h-12 w-12 animate-spin text-orange-600 mx-auto" />
               <div className="space-y-2">
                 <h1 className="text-2xl font-semibold">
