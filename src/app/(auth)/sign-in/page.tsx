@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import Link from "next/link";
 import { Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -64,10 +65,14 @@ export default function SignInPage() {
         superuser: response.user.is_superuser,
       });
 
-      // Redirect to dashboard on success
+      // Show success toast and redirect to dashboard
+      toast.success("Successfully signed in!");
       router.push("/dashboard");
     } catch (err: any) {
-      setError(err.message || "Invalid email or password. Please try again.");
+      const errorMessage =
+        err.message || "Invalid email or password. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -91,10 +96,13 @@ export default function SignInPage() {
         superuser: response.user.is_superuser,
       });
 
+      toast.success("Successfully signed in with Google!");
       router.push("/dashboard");
     } catch (err: any) {
       setIsGoogleLoading(false);
-      setError("Google authentication failed: " + err.message);
+      const errorMessage = "Google authentication failed: " + err.message;
+      setError(errorMessage);
+      toast.error(errorMessage);
     }
   };
 
@@ -107,7 +115,9 @@ export default function SignInPage() {
       window.location.href = authUrl;
     } catch (err: any) {
       setIsGoogleLoading(false);
-      setError("Failed to initiate Google login: " + err.message);
+      const errorMessage = "Failed to initiate Google login: " + err.message;
+      setError(errorMessage);
+      toast.error(errorMessage);
     }
   };
 
