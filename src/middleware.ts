@@ -10,6 +10,9 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/forgot-password') ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
+    pathname.startsWith('/auth/google/callback') ||
+    pathname.startsWith('/google') ||
+    pathname.startsWith('/RTV_Logo.png') ||
     pathname === '/favicon.ico') {
     return NextResponse.next();
   }
@@ -32,6 +35,6 @@ export const config = {
     // Skip Next.js internals and all static files, unless found in search params
     '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
     // Always run for API routes
-    // '/(api|trpc)(.*)',
+    '/(api|trpc)(.*)',
   ],
 };
