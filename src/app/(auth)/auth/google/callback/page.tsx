@@ -60,7 +60,7 @@ const GoogleCallbackContent: React.FC = () => {
         toast.success("Google login successful! Redirecting...");
 
         // Redirect to home page
-        router.push("/");
+        router.push("/dashboard");
       } catch (error: any) {
         console.error("Google authentication error:", error);
         setError(error.message || "Failed to authenticate with Google");
