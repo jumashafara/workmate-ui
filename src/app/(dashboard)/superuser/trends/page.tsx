@@ -357,7 +357,9 @@ export default function SuperuserTrendsPage() {
       const overallTrendTrace = {
         x: [minMonth, maxMonth],
         y: [
-          currency === "USD" ? trendStartIncome : trendStartIncome * exchangeRate,
+          currency === "USD"
+            ? trendStartIncome
+            : trendStartIncome * exchangeRate,
           currency === "USD" ? trendEndIncome : trendEndIncome * exchangeRate,
         ],
         text: [
@@ -460,7 +462,7 @@ export default function SuperuserTrendsPage() {
         </Card>
 
         {/* Charts Skeleton */}
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-1">
           <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
             <CardHeader>
               <div className="space-y-2">
@@ -487,7 +489,7 @@ export default function SuperuserTrendsPage() {
         </div>
 
         {/* Cluster Predictions Table */}
-      <ClusterPredictionsTable data={data} />
+        <ClusterPredictionsTable data={data} />
 
         {/* Summary Stats Skeleton */}
         <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
@@ -503,11 +505,11 @@ export default function SuperuserTrendsPage() {
                 </div>
               ))}
             </div>
-                  </CardContent>
-      </Card>
-    </div>
-  );
-}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -530,10 +532,10 @@ export default function SuperuserTrendsPage() {
                 <BarChart3 className="h-4 w-4" />
                 <span>Interactive Charts</span>
               </div>
-                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                  <Map className="h-4 w-4" />
-                  <span>{summaryStats.totalRegions} Regions</span>
-                </div>
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <Map className="h-4 w-4" />
+                <span>{summaryStats.totalRegions} Regions</span>
+              </div>
               <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                 <Building className="h-4 w-4" />
                 <span>{summaryStats.totalDistricts} Districts</span>
@@ -643,7 +645,7 @@ export default function SuperuserTrendsPage() {
       </Card>
 
       {/* Charts */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-1">
         {/* Line Chart - Income Trends */}
         <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
           <CardHeader className="pb-4">
@@ -790,7 +792,6 @@ export default function SuperuserTrendsPage() {
           </div>
         </CardContent>
       </Card>
-
     </div>
   );
 }

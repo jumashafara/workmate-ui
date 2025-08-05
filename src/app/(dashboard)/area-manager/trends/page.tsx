@@ -13,7 +13,17 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Label } from "@/components/ui/label";
 import { MultiSelect } from "@/components/ui/multi-select";
-import { Filter, X, TrendingUp, BarChart3, Users, Activity, MapPin, Building, Group } from "lucide-react";
+import {
+  Filter,
+  X,
+  TrendingUp,
+  BarChart3,
+  Users,
+  Activity,
+  MapPin,
+  Building,
+  Group,
+} from "lucide-react";
 import dynamic from "next/dynamic";
 import { API_ENDPOINT } from "@/utils/endpoints";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -227,19 +237,24 @@ export default function AreaManagerTrendsPage() {
       if (clusterData.length === 0) return;
 
       clusterData.forEach((d) => {
-        allDataPoints.push({ month: d.evaluation_month, income: currency === 'USD' ? d.avg_income : d.avg_income * exchangeRate });
+        allDataPoints.push({
+          month: d.evaluation_month,
+          income:
+            currency === "USD" ? d.avg_income : d.avg_income * exchangeRate,
+        });
       });
 
       const actualTrace: any = {
         x: clusterData.map((d) => d.evaluation_month),
-        y: clusterData.map((d) => currency === 'USD' ? d.avg_income : d.avg_income * exchangeRate),
+        y: clusterData.map((d) =>
+          currency === "USD" ? d.avg_income : d.avg_income * exchangeRate
+        ),
         type: "scatter",
         mode: "lines+markers",
         name: cluster,
         line: { width: 3 },
         marker: { size: 8 },
-        hovertemplate:
-          `<b>%{fullData.name}</b><br>Month: %{x}<br>Avg Income + Production: %{y}<extra></extra>`,
+        hovertemplate: `<b>%{fullData.name}</b><br>Month: %{x}<br>Avg Income + Production: %{y}<extra></extra>`,
         showlegend: true,
       };
 
@@ -247,7 +262,9 @@ export default function AreaManagerTrendsPage() {
 
       if (clusterData.length >= 2) {
         const xValues = clusterData.map((d) => d.evaluation_month);
-        const yValues = clusterData.map((d) => currency === 'USD' ? d.avg_income : d.avg_income * exchangeRate);
+        const yValues = clusterData.map((d) =>
+          currency === "USD" ? d.avg_income : d.avg_income * exchangeRate
+        );
 
         const { slope, intercept } = linearRegression(xValues, yValues);
 
@@ -262,10 +279,7 @@ export default function AreaManagerTrendsPage() {
         if (predictedIncome > 0) {
           const predictionTrace = {
             x: [lastMonth, nextMonth],
-            y: [
-              yValues[yValues.length - 1],
-              predictedIncome,
-            ],
+            y: [yValues[yValues.length - 1], predictedIncome],
             type: "scatter",
             mode: "lines+markers",
             name: `${cluster} (Predicted)`,
@@ -279,8 +293,7 @@ export default function AreaManagerTrendsPage() {
               symbol: "diamond",
               color: actualTrace.line?.color || "#999999",
             },
-            hovertemplate:
-              `<b>%{fullData.name}</b><br>Month: %{x}<br>Predicted Income + Production: %{y}<br><i>Linear trend projection</i><extra></extra>`,
+            hovertemplate: `<b>%{fullData.name}</b><br>Month: %{x}<br>Predicted Income + Production: %{y}<br><i>Linear trend projection</i><extra></extra>`,
             showlegend: false,
             opacity: 0.7,
           };
@@ -292,7 +305,8 @@ export default function AreaManagerTrendsPage() {
     if (allDataPoints.length >= 2) {
       const allMonths = allDataPoints.map((d) => d.month);
       const allIncomes = allDataPoints.map((d) => d.income);
-      const { slope: overallSlope, intercept: overallIntercept } = linearRegression(allMonths, allIncomes);
+      const { slope: overallSlope, intercept: overallIntercept } =
+        linearRegression(allMonths, allIncomes);
       const minMonth = Math.min(...allMonths);
       const maxMonth = Math.max(...allMonths);
       const trendStartIncome = overallSlope * minMonth + overallIntercept;
@@ -305,8 +319,7 @@ export default function AreaManagerTrendsPage() {
         mode: "lines",
         name: "Overall Trend",
         line: { width: 4, color: "#EA580C", dash: "dash" },
-        hovertemplate:
-          `<b>Overall Trend</b><br>Month: %{x}<br>Trend Income + Production: %{y}<br><i>Best fit across all selected clusters</i><extra></extra>`,
+        hovertemplate: `<b>Overall Trend</b><br>Month: %{x}<br>Trend Income + Production: %{y}<br><i>Best fit across all selected clusters</i><extra></extra>`,
         showlegend: true,
         opacity: 0.8,
       };
@@ -318,7 +331,9 @@ export default function AreaManagerTrendsPage() {
   const getScatterData = () => {
     return [
       {
-        x: data.map((d) => currency === 'USD' ? d.avg_income : d.avg_income * exchangeRate),
+        x: data.map((d) =>
+          currency === "USD" ? d.avg_income : d.avg_income * exchangeRate
+        ),
         y: data.map((d) => d.achievement_rate),
         customdata: data.map((d) => [
           formatCurrency(d.avg_income),
@@ -370,7 +385,7 @@ export default function AreaManagerTrendsPage() {
             </div>
           </div>
         </div>
-        
+
         <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
           <CardHeader>
             <div className="flex items-center gap-3">
@@ -389,7 +404,7 @@ export default function AreaManagerTrendsPage() {
             </div>
           </CardContent>
         </Card>
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-1">
           <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
             <CardHeader>
               <div className="space-y-2">
@@ -458,7 +473,9 @@ export default function AreaManagerTrendsPage() {
               </div>
               <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                 <Users className="h-4 w-4" />
-                <span>{summaryStats.totalHouseholds.toLocaleString()} Households</span>
+                <span>
+                  {summaryStats.totalHouseholds.toLocaleString()} Households
+                </span>
               </div>
             </div>
           </div>
@@ -473,7 +490,9 @@ export default function AreaManagerTrendsPage() {
                 <Filter className="h-5 w-5 text-orange-600 dark:text-orange-400" />
               </div>
               <div>
-                <span className="text-xl font-semibold text-gray-900 dark:text-white">Trend Filters</span>
+                <span className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Trend Filters
+                </span>
                 {activeFiltersCount > 0 && (
                   <Badge className="ml-2 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
                     {activeFiltersCount} active
@@ -491,9 +510,9 @@ export default function AreaManagerTrendsPage() {
                 {showFilters ? "Hide" : "Show"} Filters
               </Button>
               {activeFiltersCount > 0 && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={clearFilters}
                   className="text-red-600 border-red-200 hover:bg-red-50 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/20 transition-colors"
                 >
@@ -506,8 +525,10 @@ export default function AreaManagerTrendsPage() {
         {showFilters && (
           <CardContent className="space-y-6 pt-2">
             <div className="grid gap-6 md:grid-cols-3">
-            <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Evaluation Month</Label>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Evaluation Month
+                </Label>
                 <MultiSelect
                   options={monthOptions}
                   selected={selectedMonths}
@@ -516,9 +537,11 @@ export default function AreaManagerTrendsPage() {
                   emptyText="No months found"
                 />
               </div>
-              
+
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">District</Label>
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  District
+                </Label>
                 <MultiSelect
                   options={districtOptions}
                   selected={selectedDistricts}
@@ -529,7 +552,9 @@ export default function AreaManagerTrendsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cluster</Label>
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Cluster
+                </Label>
                 <MultiSelect
                   options={clusterOptions}
                   selected={selectedClusters}
@@ -543,7 +568,7 @@ export default function AreaManagerTrendsPage() {
         )}
       </Card>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-1">
         <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
           <CardHeader className="pb-4">
             <div className="flex items-start gap-3">
@@ -551,7 +576,9 @@ export default function AreaManagerTrendsPage() {
                 <TrendingUp className="h-5 w-5 text-orange-600 dark:text-orange-400" />
               </div>
               <div>
-                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">Average Income + Production Trends by Cluster</CardTitle>
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Average Income + Production Trends by Cluster
+                </CardTitle>
                 <CardDescription className="text-gray-600 dark:text-gray-400 mt-1">
                   Solid lines show actual data, dotted lines show predictions.
                   Orange dashed line shows overall trend across all selected
@@ -601,7 +628,9 @@ export default function AreaManagerTrendsPage() {
                 <BarChart3 className="h-5 w-5 text-orange-600 dark:text-orange-400" />
               </div>
               <div>
-                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">Income + Production vs Achievement Rate</CardTitle>
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Income + Production vs Achievement Rate
+                </CardTitle>
                 <CardDescription className="text-gray-600 dark:text-gray-400 mt-1">
                   Bubble size represents number of households. Color represents
                   evaluation month.
@@ -639,19 +668,25 @@ export default function AreaManagerTrendsPage() {
             <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
               <Activity className="h-5 w-5 text-orange-600 dark:text-orange-400" />
             </div>
-            <CardTitle className="text-xl font-semibold text-orange-900 dark:text-orange-100">Regional Summary Statistics</CardTitle>
+            <CardTitle className="text-xl font-semibold text-orange-900 dark:text-orange-100">
+              Regional Summary Statistics
+            </CardTitle>
           </div>
         </CardHeader>
         <CardContent>
           <div className="grid gap-6 md:grid-cols-4">
             <div className="bg-white dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
-              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">Total Clusters</Label>
+              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">
+                Total Clusters
+              </Label>
               <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mt-2">
                 {summaryStats.totalClusters}
               </div>
             </div>
             <div className="bg-white dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
-              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">Evaluation Months</Label>
+              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">
+                Evaluation Months
+              </Label>
               <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mt-2">
                 {summaryStats.evaluationMonths}
               </div>
@@ -665,7 +700,9 @@ export default function AreaManagerTrendsPage() {
               </div>
             </div>
             <div className="bg-white dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
-              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">Total Households</Label>
+              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">
+                Total Households
+              </Label>
               <div className="text-2xl font-bold text-orange-600 dark:text-orange-400 mt-2">
                 {summaryStats.totalHouseholds.toLocaleString()}
               </div>
