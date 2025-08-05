@@ -64,7 +64,7 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
   const [currentColumnSet, setCurrentColumnSet] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortField, setSortField] = useState<string>("householdCount");
+  const [sortField, setSortField] = useState<string>("cluster");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [showFilters, setShowFilters] = useState(false);
   const rowsPerPage = 10;
@@ -138,9 +138,6 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
       if (sortField === "cluster") {
         aValue = a.cluster;
         bValue = b.cluster;
-      } else if (sortField === "householdCount") {
-        aValue = a.householdCount;
-        bValue = b.householdCount;
       } else {
         aValue =
           a.averageParticipation[
@@ -200,11 +197,11 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
           format: "average",
         },
         { key: "sweet_potatoes", label: "Sweet Potatoes", format: "average" },
-        {
-          key: "perennial_crops_grown_coffee",
-          label: "Coffee",
-          format: "average",
-        },
+        // {
+        //   key: "perennial_crops_grown_coffee",
+        //   label: "Coffee",
+        //   format: "average",
+        // },
         { key: "irish_potatoes", label: "Irish Potatoes", format: "average" },
         { key: "cassava", label: "Cassava", format: "average" },
         { key: "maize", label: "Maize", format: "average" },
@@ -279,7 +276,7 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
 
   const clearFilters = () => {
     setSearchTerm("");
-    setSortField("householdCount");
+    setSortField("cluster");
     setSortDirection("desc");
     setCurrentPage(0);
   };
@@ -300,7 +297,6 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
     const currentSet = columnSets[currentColumnSet];
     const columnHeaders = [
       "Cluster",
-      "Household Count",
       ...currentSet.columns.map((col) => col.label),
     ];
 
@@ -308,7 +304,6 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
     const csvData = clusterParticipation.map((cluster) => {
       const row = [
         cluster.cluster,
-        cluster.householdCount.toString(),
         ...currentSet.columns.map((col) => {
           const value =
             cluster.averageParticipation[
@@ -411,7 +406,7 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
                 {showFilters ? "Hide Filters" : "Show Filters"}
               </Button>
               {(searchTerm ||
-                sortField !== "householdCount" ||
+                sortField !== "cluster" ||
                 sortDirection !== "desc") && (
                 <Button variant="outline" size="sm" onClick={clearFilters}>
                   Clear Filters
@@ -452,9 +447,6 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="cluster">Cluster Name</SelectItem>
-                    <SelectItem value="householdCount">
-                      Household Count
-                    </SelectItem>
                     {currentColumns.map((column) => (
                       <SelectItem key={column.key} value={column.key}>
                         {column.label}
@@ -552,16 +544,7 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
                         Cluster {getSortIcon("cluster")}
                       </Button>
                     </TableHead>
-                    <TableHead className="text-center font-semibold">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleSort("householdCount")}
-                        className="h-auto p-0 font-semibold hover:bg-transparent"
-                      >
-                        Households {getSortIcon("householdCount")}
-                      </Button>
-                    </TableHead>
+
                     {currentColumns.map((column) => (
                       <TableHead
                         key={column.key}
@@ -589,11 +572,7 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
                           </Badge>
                         </div>
                       </TableCell>
-                      <TableCell className="text-center">
-                        <Badge variant="secondary" className="text-xs">
-                          {cluster.householdCount}
-                        </Badge>
-                      </TableCell>
+
                       {currentColumns.map((column) => (
                         <TableCell key={column.key} className="text-center">
                           <span className="text-sm font-medium">
