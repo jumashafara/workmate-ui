@@ -98,7 +98,7 @@ function GoogleCallbackContent() {
         <CardContent className="p-8 text-center">
           {loading ? (
             <div className="">
-              <Loader2 className="h-12 w-12 animate-spin text-orange-600 mx-auto" />
+              <Loader2 className="w-12 animate-spin text-orange-600 mx-auto" />
               <div className="space-y-2">
                 <h1 className="text-2xl font-semibold">
                   Completing Google Authentication
