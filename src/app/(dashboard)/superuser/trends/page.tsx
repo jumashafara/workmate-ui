@@ -28,6 +28,7 @@ import {
 import dynamic from "next/dynamic";
 import { API_ENDPOINT } from "@/utils/endpoints";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import ClusterPredictionsTable from "@/components/tables/ClusterPredictionsTable";
 
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
@@ -485,6 +486,9 @@ export default function SuperuserTrendsPage() {
           </Card>
         </div>
 
+        {/* Cluster Predictions Table */}
+      <ClusterPredictionsTable data={data} />
+
         {/* Summary Stats Skeleton */}
         <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
           <CardHeader>
@@ -499,11 +503,11 @@ export default function SuperuserTrendsPage() {
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+                  </CardContent>
+      </Card>
+    </div>
+  );
+}
 
   return (
     <div className="space-y-6">
@@ -734,6 +738,9 @@ export default function SuperuserTrendsPage() {
         </Card>
       </div>
 
+      {/* Cluster Predictions Table */}
+      <ClusterPredictionsTable data={data} />
+
       {/* Summary Statistics */}
       <Card className="bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-800">
         <CardHeader className="pb-4">
@@ -783,6 +790,7 @@ export default function SuperuserTrendsPage() {
           </div>
         </CardContent>
       </Card>
+
     </div>
   );
 }

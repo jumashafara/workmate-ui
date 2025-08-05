@@ -406,7 +406,7 @@ export default function AreaManagerPredictionsPage() {
                 disabled={!predictions || predictions.length === 0}
                 variant="outline"
                 size="sm"
-                className="bg-green-600 hover:bg-green-700 text-white border-green-600 hover:border-green-700"
+                className="cursor-pointer"
               >
                 <Download className="h-4 w-4 mr-2" />
                 Download CSV
@@ -526,6 +526,9 @@ export default function AreaManagerPredictionsPage() {
         </Card>
       </div>
 
+      {/* Cluster Participation Table */}
+      <ClusterParticipationTable data={predictions} />
+
       {/* Data Information */}
       <Card className="bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-800">
         <CardContent className="p-6">
@@ -553,8 +556,7 @@ export default function AreaManagerPredictionsPage() {
         </CardContent>
       </Card>
 
-      {/* Cluster Participation Table */}
-      <ClusterParticipationTable data={predictions} />
+      
     </div>
   );
 }
