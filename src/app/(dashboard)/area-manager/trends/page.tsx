@@ -19,6 +19,7 @@ import { API_ENDPOINT } from "@/utils/endpoints";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { PredictionData } from "@/types/predictions";
 import { getUserData } from "@/utils/cookie";
+import ClusterPredictionsTable from "@/components/tables/ClusterPredictionsTable";
 
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
@@ -628,6 +629,9 @@ export default function AreaManagerTrendsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Cluster Predictions Table */}
+      <ClusterPredictionsTable data={data} />
 
       <Card className="bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-800">
         <CardHeader className="pb-4">
