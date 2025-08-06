@@ -5,6 +5,13 @@ export interface ChatMessage {
   message_text: string;
   sender: 'user' | 'bot';
   timestamp: string;
+  feedback?: {
+    id: number;
+    feedback_type: 'positive' | 'negative';
+    user_name: string;
+    created_at: string;
+    updated_at: string;
+  };
 }
 
 export interface ChatConversation {

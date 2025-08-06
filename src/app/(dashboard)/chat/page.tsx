@@ -37,6 +37,8 @@ import {
   MessageSquare,
   Loader2,
   Check,
+  ThumbsUp,
+  ThumbsDown,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
@@ -54,12 +56,21 @@ import { getUserData } from "@/utils/cookie";
 import logToTrubrics from "@/utils/Trubrics";
 // import logToDATAIDEA from "@/utils/Dataidea"; // Temporarily disabled due to fetch errors
 import ChatHistoryAPI, { ChatConversation } from "@/utils/ChatHistory";
+import ChatFeedbackAPI from "@/utils/ChatFeedback";
+import { toast } from "sonner";
 
 interface Message {
   id: number;
   text: string;
   sender: "user" | "bot";
   timestamp: string;
+  feedback?: {
+    id: number;
+    feedback_type: 'positive' | 'negative';
+    user_name: string;
+    created_at: string;
+    updated_at: string;
+  };
 }
 
 const ChatPage = () => {
@@ -85,6 +96,7 @@ const ChatPage = () => {
   const [loadingConversationId, setLoadingConversationId] = useState<
     string | null
   >(null);
+  const [feedbackLoading, setFeedbackLoading] = useState<{messageId: number, type: 'positive' | 'negative'} | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -129,7 +141,7 @@ const ChatPage = () => {
         localStorage.removeItem(`isNewConversation_${conversationId}`);
       } else {
         console.log("Loading existing conversation:", conversationId);
-        loadChatConversation(conversationId);
+        loadChatConversation(conversationId, false);
       }
     }
 
@@ -193,7 +205,7 @@ const ChatPage = () => {
     setIsHistoryOpen(false);
   };
 
-  const loadChatConversation = async (convId: string) => {
+  const loadChatConversation = async (convId: string, closeHistory = true) => {
     setLoadingConversationId(convId);
     try {
       console.log("Loading conversation from backend:", convId);
@@ -209,23 +221,24 @@ const ChatPage = () => {
         setConversationId(convId);
         localStorage.setItem("currentConversationId", convId);
         setHasStartedConversation(false);
-        setIsHistoryOpen(false);
+        if (closeHistory) setIsHistoryOpen(false);
         return;
       }
 
       const convertedMessages: Message[] =
         conversation.messages?.map((msg, index) => ({
-          id: index + 1,
+          id: msg.id || index + 1, // Use the actual message ID from backend
           text: msg.message_text,
           sender: msg.sender,
           timestamp: new Date(msg.timestamp).toLocaleTimeString(),
+          feedback: msg.feedback,
         })) || [];
 
       setMessages(convertedMessages);
       setConversationId(convId);
       localStorage.setItem("currentConversationId", convId);
       setHasStartedConversation(convertedMessages.length > 0);
-      setIsHistoryOpen(false);
+      if (closeHistory) setIsHistoryOpen(false);
 
       setChatHistory((prev) => {
         const existingIndex = prev.findIndex(
@@ -271,7 +284,7 @@ const ChatPage = () => {
         setConversationId(convId);
         localStorage.setItem("currentConversationId", convId);
         setHasStartedConversation(false);
-        setIsHistoryOpen(false);
+        if (closeHistory) setIsHistoryOpen(false);
         return;
       }
 
@@ -281,7 +294,7 @@ const ChatPage = () => {
       setConversationId(convId);
       localStorage.setItem("currentConversationId", convId);
       setHasStartedConversation(false);
-      setIsHistoryOpen(false);
+      if (closeHistory) setIsHistoryOpen(false);
     } finally {
       setLoadingConversationId(null);
     }
@@ -556,6 +569,78 @@ const ChatPage = () => {
 
   const handleLoadMore = () => {
     setMessageLimit((prev) => prev + 6);
+  };
+
+  const submitFeedback = async (messageId: number, feedbackType: 'positive' | 'negative') => {
+    if (feedbackLoading?.messageId === messageId) return;
+    
+    setFeedbackLoading({messageId, type: feedbackType});
+    
+    try {
+      const result = await ChatFeedbackAPI.submitFeedback(messageId, feedbackType, fullname);
+      
+      // Update the message with the feedback
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.id === messageId
+            ? { ...msg, feedback: result.feedback }
+            : msg
+        )
+      );
+      
+      console.log('Feedback submitted:', result.message);
+      
+      // Show toast notification
+      if (feedbackType === 'positive') {
+        toast.success("Thanks for your feedback! 👍", {
+          description: "Your positive feedback helps us improve."
+        });
+      } else {
+        toast.success("Thanks for your feedback! 👎", {
+          description: "Your feedback helps us improve our responses."
+        });
+      }
+    } catch (error) {
+      console.error('Failed to submit feedback:', error);
+      toast.error("Failed to submit feedback", {
+        description: "Please try again later."
+      });
+    } finally {
+      setFeedbackLoading(null);
+    }
+  };
+
+  const removeFeedback = async (messageId: number, feedbackType: 'positive' | 'negative') => {
+    if (feedbackLoading?.messageId === messageId) return;
+    
+    setFeedbackLoading({messageId, type: feedbackType});
+    
+    try {
+      await ChatFeedbackAPI.removeFeedback(messageId);
+      
+      // Remove feedback from the message
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.id === messageId
+            ? { ...msg, feedback: undefined }
+            : msg
+        )
+      );
+      
+      console.log('Feedback removed successfully');
+      
+      // Show toast notification
+      toast.success("Feedback removed", {
+        description: "Your feedback has been removed."
+      });
+    } catch (error) {
+      console.error('Failed to remove feedback:', error);
+      toast.error("Failed to remove feedback", {
+        description: "Please try again later."
+      });
+    } finally {
+      setFeedbackLoading(null);
+    }
   };
 
   const suggestedQuestions = [
@@ -1046,32 +1131,104 @@ const ChatPage = () => {
                             {message.sender === "bot" &&
                               message.text &&
                               message.text !== "Thinking..." && (
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() =>
-                                        copyToClipboard(
-                                          message.text,
-                                          message.id
-                                        )
-                                      }
-                                      className="h-5 w-5 p-0 opacity-60 hover:opacity-100 text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded"
-                                    >
-                                      {copiedMessageId === message.id ? (
-                                        <Check className="h-3 w-3 text-green-500" />
-                                      ) : (
-                                        <Copy className="h-3 w-3" />
-                                      )}
-                                    </Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    {copiedMessageId === message.id
-                                      ? "Copied!"
-                                      : "Copy message"}
-                                  </TooltipContent>
-                                </Tooltip>
+                                <div className="flex items-center gap-1">
+                                  {/* Feedback buttons */}
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => {
+                                          if (message.feedback?.feedback_type === 'positive') {
+                                            removeFeedback(message.id, 'positive');
+                                          } else {
+                                            submitFeedback(message.id, 'positive');
+                                          }
+                                        }}
+                                        disabled={feedbackLoading?.messageId === message.id}
+                                        className={cn(
+                                          "h-5 w-5 p-0 opacity-60 hover:opacity-100 rounded",
+                                          message.feedback?.feedback_type === 'positive'
+                                            ? "text-green-500 opacity-100"
+                                            : "text-slate-500 hover:text-green-500 hover:bg-green-50"
+                                        )}
+                                      >
+                                        {feedbackLoading?.messageId === message.id && feedbackLoading?.type === 'positive' ? (
+                                          <Loader2 className="h-3 w-3 animate-spin" />
+                                        ) : (
+                                          <ThumbsUp className="h-3 w-3" />
+                                        )}
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      {message.feedback?.feedback_type === 'positive'
+                                        ? "Remove positive feedback"
+                                        : "Mark as helpful"}
+                                    </TooltipContent>
+                                  </Tooltip>
+                                  
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => {
+                                          if (message.feedback?.feedback_type === 'negative') {
+                                            removeFeedback(message.id, 'negative');
+                                          } else {
+                                            submitFeedback(message.id, 'negative');
+                                          }
+                                        }}
+                                        disabled={feedbackLoading?.messageId === message.id}
+                                        className={cn(
+                                          "h-5 w-5 p-0 opacity-60 hover:opacity-100 rounded",
+                                          message.feedback?.feedback_type === 'negative'
+                                            ? "text-red-500 opacity-100"
+                                            : "text-slate-500 hover:text-red-500 hover:bg-red-50"
+                                        )}
+                                      >
+                                        {feedbackLoading?.messageId === message.id && feedbackLoading?.type === 'negative' ? (
+                                          <Loader2 className="h-3 w-3 animate-spin" />
+                                        ) : (
+                                          <ThumbsDown className="h-3 w-3" />
+                                        )}
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      {message.feedback?.feedback_type === 'negative'
+                                        ? "Remove negative feedback"
+                                        : "Mark as not helpful"}
+                                    </TooltipContent>
+                                  </Tooltip>
+                                  
+                                  {/* Copy button */}
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() =>
+                                          copyToClipboard(
+                                            message.text,
+                                            message.id
+                                          )
+                                        }
+                                        className="h-5 w-5 p-0 opacity-60 hover:opacity-100 text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded"
+                                      >
+                                        {copiedMessageId === message.id ? (
+                                          <Check className="h-3 w-3 text-green-500" />
+                                        ) : (
+                                          <Copy className="h-3 w-3" />
+                                        )}
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      {copiedMessageId === message.id
+                                        ? "Copied!"
+                                        : "Copy message"}
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </div>
                               )}
                           </div>
                         </div>
