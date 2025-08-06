@@ -266,15 +266,15 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
       "Region", 
       "District",
       "Month 6 Achievement",
-      "Month 6 Income",
+      "Month 6 Income + Production",
       "Month 9 Achievement",
-      "Month 9 Income",
+      "Month 9 Income + Production",
       "Month 12 Achievement",
-      "Month 12 Income",
+      "Month 12 Income + Production",
       "Month 18 Achievement",
-      "Month 18 Income",
+      "Month 18 Income + Production",
       "Month 23 Achievement",
-      "Month 23 Income"
+      "Month 23 Income + Production"
     ];
 
     // Prepare CSV data
@@ -418,15 +418,15 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
                       <SelectItem value="region">Region</SelectItem>
                       <SelectItem value="district">District</SelectItem>
                       <SelectItem value="month6_achievement">Month 6 Achievement</SelectItem>
-                      <SelectItem value="month6_income">Month 6 Income</SelectItem>
+                      <SelectItem value="month6_income">Month 6 Income + Production</SelectItem>
                       <SelectItem value="month9_achievement">Month 9 Achievement</SelectItem>
-                      <SelectItem value="month9_income">Month 9 Income</SelectItem>
+                      <SelectItem value="month9_income">Month 9 Income + Production</SelectItem>
                       <SelectItem value="month12_achievement">Month 12 Achievement</SelectItem>
-                      <SelectItem value="month12_income">Month 12 Income</SelectItem>
+                      <SelectItem value="month12_income">Month 12 Income + Production</SelectItem>
                       <SelectItem value="month18_achievement">Month 18 Achievement</SelectItem>
-                      <SelectItem value="month18_income">Month 18 Income</SelectItem>
+                      <SelectItem value="month18_income">Month 18 Income + Production</SelectItem>
                       <SelectItem value="month23_achievement">Month 23 Achievement</SelectItem>
-                      <SelectItem value="month23_income">Month 23 Income</SelectItem>
+                      <SelectItem value="month23_income">Month 23 Income + Production</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -493,7 +493,7 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
                     </div>
                     <div className="flex items-center gap-1">
                       <DollarSign className="h-3 w-3 text-green-600" />
-                      <span className="text-xs">Income</span>
+                      <span className="text-xs">Income + Production</span>
                     </div>
                   </div>
                 </TableHead>
@@ -508,7 +508,7 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
                     </div>
                     <div className="flex items-center gap-1">
                       <DollarSign className="h-3 w-3 text-green-600" />
-                      <span className="text-xs">Income</span>
+                      <span className="text-xs">Income + Production</span>
                     </div>
                   </div>
                 </TableHead>
@@ -523,7 +523,7 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
                     </div>
                     <div className="flex items-center gap-1">
                       <DollarSign className="h-3 w-3 text-green-600" />
-                      <span className="text-xs">Income</span>
+                      <span className="text-xs">Income + Production</span>
                     </div>
                   </div>
                 </TableHead>
@@ -538,7 +538,7 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
                     </div>
                     <div className="flex items-center gap-1">
                       <DollarSign className="h-3 w-3 text-green-600" />
-                      <span className="text-xs">Income</span>
+                      <span className="text-xs">Income + Production</span>
                     </div>
                   </div>
                 </TableHead>
@@ -553,7 +553,7 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
                     </div>
                     <div className="flex items-center gap-1">
                       <DollarSign className="h-3 w-3 text-green-600" />
-                      <span className="text-xs">Income</span>
+                      <span className="text-xs">Income + Production</span>
                     </div>
                   </div>
                 </TableHead>
