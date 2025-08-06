@@ -178,7 +178,7 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
         },
         {
           key: "predicted_income",
-          label: "Predicted Income",
+          label: "Predicted Income + Production",
           format: "currency",
         },
         {
