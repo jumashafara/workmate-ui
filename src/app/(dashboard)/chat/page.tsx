@@ -1030,8 +1030,8 @@ const ChatPage = () => {
             <ScrollArea className="flex-1" style={{ minHeight: "400px" }}>
               <div className="max-w-5xl mx-auto">
                 {messages.length === 0 && !hasStartedConversation ? (
-                  <div className="flex flex-col items-center justify-center h-full text-center px-6">
-                    <div className="max-w-md space-y-6">
+                  <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] text-center px-6">
+                    <div className="max-w-md space-y-6 mb-20">
                       <div className="w-16 h-16 bg-orange-500 rounded-2xl flex items-center justify-center mx-auto">
                         <Bot className="h-8 w-8 text-white" />
                       </div>
