@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { TrendingUp, DollarSign, Target, Search, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { TrendingUp, DollarSign, Target, Search, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Download } from "lucide-react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface ClusterIncomeData {
@@ -257,6 +257,64 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
     return sortDirection === "asc" ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />;
   };
 
+  const downloadTableData = () => {
+    if (processedData.length === 0) return;
+
+    // Define CSV headers
+    const headers = [
+      "Cluster",
+      "Region", 
+      "District",
+      "Month 6 Achievement",
+      "Month 6 Income",
+      "Month 9 Achievement",
+      "Month 9 Income",
+      "Month 12 Achievement",
+      "Month 12 Income",
+      "Month 18 Achievement",
+      "Month 18 Income",
+      "Month 24 Achievement",
+      "Month 24 Income"
+    ];
+
+    // Prepare CSV data
+    const csvData = processedData.map((cluster) => {
+      const row = [
+        cluster.cluster,
+        cluster.region,
+        cluster.district,
+        cluster.month6.achievement_rate ? cluster.month6.achievement_rate.toFixed(1) : "-",
+        cluster.month6.avg_income ? cluster.month6.avg_income.toFixed(2) : "-",
+        cluster.month9.achievement_rate ? cluster.month9.achievement_rate.toFixed(1) : "-",
+        cluster.month9.avg_income ? cluster.month9.avg_income.toFixed(2) : "-",
+        cluster.month12.achievement_rate ? cluster.month12.achievement_rate.toFixed(1) : "-",
+        cluster.month12.avg_income ? cluster.month12.avg_income.toFixed(2) : "-",
+        cluster.month18.achievement_rate ? cluster.month18.achievement_rate.toFixed(1) : "-",
+        cluster.month18.avg_income ? cluster.month18.avg_income.toFixed(2) : "-",
+        cluster.month24.achievement_rate ? cluster.month24.achievement_rate.toFixed(1) : "-",
+        cluster.month24.avg_income ? cluster.month24.avg_income.toFixed(2) : "-"
+      ];
+      return row.join(",");
+    });
+
+    // Create CSV content
+    const csvContent = [headers.join(","), ...csvData].join("\n");
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `cluster_predictions_by_evaluation_month_${new Date().toISOString().split("T")[0]}.csv`
+    );
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (processedData.length === 0) {
     return (
       <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
@@ -313,6 +371,15 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
                   Clear Filters
                 </Button>
               )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={downloadTableData}
+                disabled={processedData.length === 0}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download CSV
+              </Button>
             </div>
             <div className="text-sm text-gray-500">
               {processedData.length} clusters found
