@@ -191,23 +191,23 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
     {
       name: "Agriculture",
       columns: [
-        { key: "ground_nuts", label: "Ground Nuts", format: "average" },
-        // { key: 'composts_num', label: 'Composts', format: 'average' },
+        { key: "ground_nuts", label: "Ground Nuts", format: "percentage" },
+        // { key: 'composts_num', label: 'Composts', format: 'percentage' },
         {
           key: "perennial_crops_grown_food_banana",
           label: "Banana",
-          format: "average",
+          format: "percentage",
         },
-        { key: "sweet_potatoes", label: "Sweet Potatoes", format: "average" },
+        { key: "sweet_potatoes", label: "Sweet Potatoes", format: "percentage" },
         // {
         //   key: "perennial_crops_grown_coffee",
         //   label: "Coffee",
-        //   format: "average",
+        //   format: "percentage",
         // },
-        { key: "irish_potatoes", label: "Irish Potatoes", format: "average" },
-        { key: "cassava", label: "Cassava", format: "average" },
-        { key: "maize", label: "Maize", format: "average" },
-        // { key: 'sorghum', label: 'Sorghum', format: 'average' },
+        { key: "irish_potatoes", label: "Irish Potatoes", format: "percentage" },
+        { key: "cassava", label: "Cassava", format: "percentage" },
+        { key: "maize", label: "Maize", format: "percentage" },
+        // { key: 'sorghum', label: 'Sorghum', format: 'percentage' },
         {
           key: "Land_size_for_Crop_Agriculture_Acres",
           label: "Land Size (Acres)",
