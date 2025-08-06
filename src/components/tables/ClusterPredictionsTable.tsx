@@ -52,7 +52,7 @@ interface ClusterPredictionRow {
     achievement_rate: number | null;
     avg_income: number | null;
   };
-  month24: {
+  month23: {
     achievement_rate: number | null;
     avg_income: number | null;
   };
@@ -84,7 +84,7 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
           month9: { achievement_rate: null, avg_income: null },
           month12: { achievement_rate: null, avg_income: null },
           month18: { achievement_rate: null, avg_income: null },
-          month24: { achievement_rate: null, avg_income: null },
+          month23: { achievement_rate: null, avg_income: null },
         });
       }
 
@@ -116,8 +116,8 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
             avg_income: item.avg_income,
           };
           break;
-        case 24:
-          cluster.month24 = {
+        case 23:
+          cluster.month23 = {
             achievement_rate: item.achievement_rate,
             avg_income: item.avg_income,
           };
@@ -186,13 +186,13 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
           aValue = a.month18.avg_income ?? 0;
           bValue = b.month18.avg_income ?? 0;
           break;
-        case "month24_achievement":
-          aValue = a.month24.achievement_rate ?? 0;
-          bValue = a.month24.achievement_rate ?? 0;
+        case "month23_achievement":
+          aValue = a.month23.achievement_rate ?? 0;
+          bValue = b.month23.achievement_rate ?? 0;
           break;
-        case "month24_income":
-          aValue = a.month24.avg_income ?? 0;
-          bValue = a.month24.avg_income ?? 0;
+        case "month23_income":
+          aValue = a.month23.avg_income ?? 0;
+          bValue = b.month23.avg_income ?? 0;
           break;
         default:
           aValue = a.cluster.toLowerCase();
@@ -273,8 +273,8 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
       "Month 12 Income",
       "Month 18 Achievement",
       "Month 18 Income",
-      "Month 24 Achievement",
-      "Month 24 Income"
+      "Month 23 Achievement",
+      "Month 23 Income"
     ];
 
     // Prepare CSV data
@@ -291,8 +291,8 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
         cluster.month12.avg_income ? cluster.month12.avg_income.toFixed(2) : "-",
         cluster.month18.achievement_rate ? cluster.month18.achievement_rate.toFixed(1) : "-",
         cluster.month18.avg_income ? cluster.month18.avg_income.toFixed(2) : "-",
-        cluster.month24.achievement_rate ? cluster.month24.achievement_rate.toFixed(1) : "-",
-        cluster.month24.avg_income ? cluster.month24.avg_income.toFixed(2) : "-"
+        cluster.month23.achievement_rate ? cluster.month23.achievement_rate.toFixed(1) : "-",
+        cluster.month23.avg_income ? cluster.month23.avg_income.toFixed(2) : "-"
       ];
       return row.join(",");
     });
@@ -425,8 +425,8 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
                       <SelectItem value="month12_income">Month 12 Income</SelectItem>
                       <SelectItem value="month18_achievement">Month 18 Achievement</SelectItem>
                       <SelectItem value="month18_income">Month 18 Income</SelectItem>
-                      <SelectItem value="month24_achievement">Month 24 Achievement</SelectItem>
-                      <SelectItem value="month24_income">Month 24 Income</SelectItem>
+                      <SelectItem value="month23_achievement">Month 23 Achievement</SelectItem>
+                      <SelectItem value="month23_income">Month 23 Income</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -543,10 +543,10 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
                   </div>
                 </TableHead>
 
-                {/* Month 24 */}
+                {/* Month 23 */}
                 <TableHead className="text-center min-w-[120px]">
                   <div className="flex flex-col items-center gap-1">
-                    <Badge variant="outline" className="text-xs">Month 24</Badge>
+                    <Badge variant="outline" className="text-xs">Month 23</Badge>
                     <div className="flex items-center gap-1">
                       <Target className="h-3 w-3 text-blue-600" />
                       <span className="text-xs">Achievement</span>
@@ -620,14 +620,14 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
                     </div>
                   </TableCell>
 
-                  {/* Month 24 */}
+                  {/* Month 23 */}
                   <TableCell className="text-center">
                     <div className="flex flex-col gap-1">
-                      <div className={`text-sm font-medium ${getAchievementColor(cluster.month24.achievement_rate)}`}>
-                        {renderValue(cluster.month24.achievement_rate, 'achievement')}
+                      <div className={`text-sm font-medium ${getAchievementColor(cluster.month23.achievement_rate)}`}>
+                        {renderValue(cluster.month23.achievement_rate, 'achievement')}
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400">
-                        {renderValue(cluster.month24.avg_income, 'income')}
+                        {renderValue(cluster.month23.avg_income, 'income')}
                       </div>
                     </div>
                   </TableCell>
