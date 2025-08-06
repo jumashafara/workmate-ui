@@ -120,7 +120,7 @@ export default function ProjectManagerPredictionsPage() {
       let errorMessage = 'Network error. Please check if the API server is running.';
       
       if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
-        errorMessage = `Cannot connect to API server at ${API_ENDPOINT}. Please ensure the backend server is running on localhost:8000.`;
+        errorMessage = `Cannot connect to API server, check internet connection or try again later. If the problem persists, contact support.`;
       } else if (err.message) {
         errorMessage = err.message;
       }
@@ -211,7 +211,7 @@ export default function ProjectManagerPredictionsPage() {
       let errorMessage = 'Network error. Please check if the API server is running.';
       
       if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
-        errorMessage = `Cannot connect to API server at ${API_ENDPOINT}. Please ensure the backend server is running on localhost:8000.`;
+        errorMessage = `Cannot connect to API server, check internet connection or try again later. If the problem persists, contact support.`;
       } else if (err.message) {
         errorMessage = err.message;
       }

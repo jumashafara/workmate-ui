@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { TrendingUp, DollarSign, Target, Search, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { TrendingUp, DollarSign, Target, Search, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Download } from "lucide-react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface ClusterIncomeData {
@@ -52,7 +52,7 @@ interface ClusterPredictionRow {
     achievement_rate: number | null;
     avg_income: number | null;
   };
-  month24: {
+  month23: {
     achievement_rate: number | null;
     avg_income: number | null;
   };
@@ -84,7 +84,7 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
           month9: { achievement_rate: null, avg_income: null },
           month12: { achievement_rate: null, avg_income: null },
           month18: { achievement_rate: null, avg_income: null },
-          month24: { achievement_rate: null, avg_income: null },
+          month23: { achievement_rate: null, avg_income: null },
         });
       }
 
@@ -116,8 +116,8 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
             avg_income: item.avg_income,
           };
           break;
-        case 24:
-          cluster.month24 = {
+        case 23:
+          cluster.month23 = {
             achievement_rate: item.achievement_rate,
             avg_income: item.avg_income,
           };
@@ -186,13 +186,13 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
           aValue = a.month18.avg_income ?? 0;
           bValue = b.month18.avg_income ?? 0;
           break;
-        case "month24_achievement":
-          aValue = a.month24.achievement_rate ?? 0;
-          bValue = a.month24.achievement_rate ?? 0;
+        case "month23_achievement":
+          aValue = a.month23.achievement_rate ?? 0;
+          bValue = b.month23.achievement_rate ?? 0;
           break;
-        case "month24_income":
-          aValue = a.month24.avg_income ?? 0;
-          bValue = a.month24.avg_income ?? 0;
+        case "month23_income":
+          aValue = a.month23.avg_income ?? 0;
+          bValue = b.month23.avg_income ?? 0;
           break;
         default:
           aValue = a.cluster.toLowerCase();
@@ -257,6 +257,64 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
     return sortDirection === "asc" ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />;
   };
 
+  const downloadTableData = () => {
+    if (processedData.length === 0) return;
+
+    // Define CSV headers
+    const headers = [
+      "Cluster",
+      "Region", 
+      "District",
+      "Month 6 Achievement",
+      "Month 6 Income + Production",
+      "Month 9 Achievement",
+      "Month 9 Income + Production",
+      "Month 12 Achievement",
+      "Month 12 Income + Production",
+      "Month 18 Achievement",
+      "Month 18 Income + Production",
+      "Month 23 Achievement",
+      "Month 23 Income + Production"
+    ];
+
+    // Prepare CSV data
+    const csvData = processedData.map((cluster) => {
+      const row = [
+        cluster.cluster,
+        cluster.region,
+        cluster.district,
+        cluster.month6.achievement_rate ? cluster.month6.achievement_rate.toFixed(1) : "-",
+        cluster.month6.avg_income ? cluster.month6.avg_income.toFixed(2) : "-",
+        cluster.month9.achievement_rate ? cluster.month9.achievement_rate.toFixed(1) : "-",
+        cluster.month9.avg_income ? cluster.month9.avg_income.toFixed(2) : "-",
+        cluster.month12.achievement_rate ? cluster.month12.achievement_rate.toFixed(1) : "-",
+        cluster.month12.avg_income ? cluster.month12.avg_income.toFixed(2) : "-",
+        cluster.month18.achievement_rate ? cluster.month18.achievement_rate.toFixed(1) : "-",
+        cluster.month18.avg_income ? cluster.month18.avg_income.toFixed(2) : "-",
+        cluster.month23.achievement_rate ? cluster.month23.achievement_rate.toFixed(1) : "-",
+        cluster.month23.avg_income ? cluster.month23.avg_income.toFixed(2) : "-"
+      ];
+      return row.join(",");
+    });
+
+    // Create CSV content
+    const csvContent = [headers.join(","), ...csvData].join("\n");
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `cluster_predictions_by_evaluation_month_${new Date().toISOString().split("T")[0]}.csv`
+    );
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (processedData.length === 0) {
     return (
       <Card className="border-gray-200 dark:border-gray-700 shadow-sm">
@@ -313,6 +371,15 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
                   Clear Filters
                 </Button>
               )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={downloadTableData}
+                disabled={processedData.length === 0}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download CSV
+              </Button>
             </div>
             <div className="text-sm text-gray-500">
               {processedData.length} clusters found
@@ -351,15 +418,15 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
                       <SelectItem value="region">Region</SelectItem>
                       <SelectItem value="district">District</SelectItem>
                       <SelectItem value="month6_achievement">Month 6 Achievement</SelectItem>
-                      <SelectItem value="month6_income">Month 6 Income</SelectItem>
+                      <SelectItem value="month6_income">Month 6 Income + Production</SelectItem>
                       <SelectItem value="month9_achievement">Month 9 Achievement</SelectItem>
-                      <SelectItem value="month9_income">Month 9 Income</SelectItem>
+                      <SelectItem value="month9_income">Month 9 Income + Production</SelectItem>
                       <SelectItem value="month12_achievement">Month 12 Achievement</SelectItem>
-                      <SelectItem value="month12_income">Month 12 Income</SelectItem>
+                      <SelectItem value="month12_income">Month 12 Income + Production</SelectItem>
                       <SelectItem value="month18_achievement">Month 18 Achievement</SelectItem>
-                      <SelectItem value="month18_income">Month 18 Income</SelectItem>
-                      <SelectItem value="month24_achievement">Month 24 Achievement</SelectItem>
-                      <SelectItem value="month24_income">Month 24 Income</SelectItem>
+                      <SelectItem value="month18_income">Month 18 Income + Production</SelectItem>
+                      <SelectItem value="month23_achievement">Month 23 Achievement</SelectItem>
+                      <SelectItem value="month23_income">Month 23 Income + Production</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -426,7 +493,7 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
                     </div>
                     <div className="flex items-center gap-1">
                       <DollarSign className="h-3 w-3 text-green-600" />
-                      <span className="text-xs">Income</span>
+                      <span className="text-xs">Income + Production</span>
                     </div>
                   </div>
                 </TableHead>
@@ -441,7 +508,7 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
                     </div>
                     <div className="flex items-center gap-1">
                       <DollarSign className="h-3 w-3 text-green-600" />
-                      <span className="text-xs">Income</span>
+                      <span className="text-xs">Income + Production</span>
                     </div>
                   </div>
                 </TableHead>
@@ -456,7 +523,7 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
                     </div>
                     <div className="flex items-center gap-1">
                       <DollarSign className="h-3 w-3 text-green-600" />
-                      <span className="text-xs">Income</span>
+                      <span className="text-xs">Income + Production</span>
                     </div>
                   </div>
                 </TableHead>
@@ -471,22 +538,22 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
                     </div>
                     <div className="flex items-center gap-1">
                       <DollarSign className="h-3 w-3 text-green-600" />
-                      <span className="text-xs">Income</span>
+                      <span className="text-xs">Income + Production</span>
                     </div>
                   </div>
                 </TableHead>
 
-                {/* Month 24 */}
+                {/* Month 23 */}
                 <TableHead className="text-center min-w-[120px]">
                   <div className="flex flex-col items-center gap-1">
-                    <Badge variant="outline" className="text-xs">Month 24</Badge>
+                    <Badge variant="outline" className="text-xs">Month 23</Badge>
                     <div className="flex items-center gap-1">
                       <Target className="h-3 w-3 text-blue-600" />
                       <span className="text-xs">Achievement</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <DollarSign className="h-3 w-3 text-green-600" />
-                      <span className="text-xs">Income</span>
+                      <span className="text-xs">Income + Production</span>
                     </div>
                   </div>
                 </TableHead>
@@ -553,14 +620,14 @@ export default function ClusterPredictionsTable({ data }: ClusterPredictionsTabl
                     </div>
                   </TableCell>
 
-                  {/* Month 24 */}
+                  {/* Month 23 */}
                   <TableCell className="text-center">
                     <div className="flex flex-col gap-1">
-                      <div className={`text-sm font-medium ${getAchievementColor(cluster.month24.achievement_rate)}`}>
-                        {renderValue(cluster.month24.achievement_rate, 'achievement')}
+                      <div className={`text-sm font-medium ${getAchievementColor(cluster.month23.achievement_rate)}`}>
+                        {renderValue(cluster.month23.achievement_rate, 'achievement')}
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400">
-                        {renderValue(cluster.month24.avg_income, 'income')}
+                        {renderValue(cluster.month23.avg_income, 'income')}
                       </div>
                     </div>
                   </TableCell>

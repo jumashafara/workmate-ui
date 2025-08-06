@@ -119,7 +119,7 @@ const getNavigationData = (userRole: string, isSuperuser: boolean) => {
             />
           </div>
         ),
-        plan: "Analytics",
+        plan: "VENN",
       },
     ],
     navMain: navItems,
@@ -164,8 +164,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             />
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-medium">Workmate App</span>
-            <span className="truncate text-xs">Analytics</span>
+            <span className="truncate font-medium">Workmate</span>
+            <span className="truncate text-xs">VENN</span>
           </div>
         </SidebarMenuButton>
       </SidebarHeader>

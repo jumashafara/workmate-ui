@@ -662,48 +662,48 @@ export default function AreaManagerTrendsPage() {
       {/* Cluster Predictions Table */}
       <ClusterPredictionsTable data={data} />
 
-      <Card className="bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-800">
+      <Card className="bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800">
         <CardHeader className="pb-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-              <Activity className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+              <Activity className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
-            <CardTitle className="text-xl font-semibold text-orange-900 dark:text-orange-100">
+            <CardTitle className="text-xl font-semibold text-blue-900 dark:text-blue-100">
               Regional Summary Statistics
             </CardTitle>
           </div>
         </CardHeader>
         <CardContent>
           <div className="grid gap-6 md:grid-cols-4">
-            <div className="bg-white dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
-              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">
+            <div className="bg-white dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+              <Label className="text-sm font-medium text-blue-700 dark:text-blue-300">
                 Total Clusters
               </Label>
-              <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mt-2">
+              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mt-2">
                 {summaryStats.totalClusters}
               </div>
             </div>
-            <div className="bg-white dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
-              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">
-                Evaluation Months
+            <div className="bg-white dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+              <Label className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                Total Evaluation Months
               </Label>
-              <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mt-2">
+              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mt-2">
                 {summaryStats.evaluationMonths}
               </div>
             </div>
-            <div className="bg-white dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
-              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">
+            <div className="bg-white dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+              <Label className="text-sm font-medium text-blue-700 dark:text-blue-300">
                 Avg Income + Production
               </Label>
-              <div className="text-2xl font-bold text-orange-600 dark:text-orange-400 mt-2">
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-2">
                 {formatCurrency(summaryStats.avgIncome)}
               </div>
             </div>
-            <div className="bg-white dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
-              <Label className="text-sm font-medium text-orange-700 dark:text-orange-300">
+            <div className="bg-white dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+              <Label className="text-sm font-medium text-blue-700 dark:text-blue-300">
                 Total Households
               </Label>
-              <div className="text-2xl font-bold text-orange-600 dark:text-orange-400 mt-2">
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-2">
                 {summaryStats.totalHouseholds.toLocaleString()}
               </div>
             </div>

@@ -112,7 +112,7 @@ export default function SuperuserPredictionsPage() {
         "Network error. Please check if the API server is running.";
 
       if (err.name === "TypeError" && err.message.includes("Failed to fetch")) {
-        errorMessage = `Cannot connect to API server at ${API_ENDPOINT}. Please ensure the backend server is running on localhost:8000.`;
+        errorMessage = `Cannot connect to API server, check internet connection or try again later. If the problem persists, contact support.`;
       } else if (err.message) {
         errorMessage = err.message;
       }
@@ -197,7 +197,7 @@ export default function SuperuserPredictionsPage() {
         "Network error. Please check if the API server is running.";
 
       if (err.name === "TypeError" && err.message.includes("Failed to fetch")) {
-        errorMessage = `Cannot connect to API server at ${API_ENDPOINT}. Please ensure the backend server is running on localhost:8000.`;
+        errorMessage = `Cannot connect to API server, check internet connection or try again later. If the problem persists, contact support.`;
       } else if (err.message) {
         errorMessage = err.message;
       }
@@ -594,26 +594,26 @@ export default function SuperuserPredictionsPage() {
       <ClusterParticipationTable data={predictions} />
 
       {/* Data Information */}
-      <Card className="bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-800">
+      <Card className="bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800">
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
-            <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-              <BarChart3 className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+              <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div className="flex-1">
-              <h4 className="font-semibold text-orange-900 dark:text-orange-100 mb-1">
+              <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">
                 Complete Dataset Loaded
               </h4>
-              <p className="text-sm text-orange-700 dark:text-orange-300">
+              <p className="text-sm text-blue-700 dark:text-blue-300">
                 Displaying all {predictions.length.toLocaleString()} prediction
                 records with real-time analytics and interactive visualizations.
               </p>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                 {predictions.length.toLocaleString()}
               </div>
-              <div className="text-xs text-orange-600 dark:text-orange-400 uppercase tracking-wide">
+              <div className="text-xs text-blue-600 dark:text-blue-400 uppercase tracking-wide">
                 Records
               </div>
             </div>

@@ -1,4 +1,4 @@
 export const siteConfig = {
-    name: "Workmate App",
+    name: "Workmate",
     description: "Workmate is your AI-powered analytics assistant",
 };
