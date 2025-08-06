@@ -881,7 +881,7 @@ const ChatPage = () => {
                         <div
                           key={conversation.conversation_id}
                           className={cn(
-                            "group relative rounded-lg p-3 cursor-pointer transition-all duration-200 border",
+                            "group relative rounded-lg p-3 cursor-pointer transition-all duration-200 border w-full",
                             conversation.conversation_id === conversationId
                               ? "bg-orange-50 border-orange-200 shadow-sm"
                               : "border-transparent hover:bg-gray-50 hover:border-gray-200",
@@ -895,17 +895,10 @@ const ChatPage = () => {
                           }}
                         >
                           {/* Conversation Content */}
-                          <div className="pr-8">
+                          <div className="pr-8 overflow-hidden">
                             <div className="flex items-center gap-2 mb-1">
-                              <h3 className="text-sm font-medium text-gray-900 line-clamp-2 flex-1">
-                                {conversation.first_user_message
-                                  ? conversation.first_user_message.length > 60
-                                    ? `${conversation.first_user_message.substring(
-                                        0,
-                                        60
-                                      )}...`
-                                    : conversation.first_user_message
-                                  : "New Chat"}
+                              <h3 className="text-sm font-medium text-gray-900 truncate max-w-[200px] min-w-0">
+                                {conversation.first_user_message || "New Chat"}
                               </h3>
                               {loadingConversationId ===
                                 conversation.conversation_id && (

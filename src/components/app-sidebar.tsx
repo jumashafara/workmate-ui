@@ -164,7 +164,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             />
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-medium">Workmate</span>
+            <div className="flex items-center gap-2">
+              <span className="truncate font-medium">Workmate</span>
+              <span className="px-1.5 py-0.5 text-[10px] font-medium bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400 rounded-sm">
+                BETA
+              </span>
+            </div>
             <span className="truncate text-xs">VENN</span>
           </div>
         </SidebarMenuButton>
