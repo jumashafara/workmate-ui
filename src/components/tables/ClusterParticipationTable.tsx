@@ -30,6 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface ClusterParticipationTableProps {
   data: PredictionData[];
@@ -61,6 +62,7 @@ interface ClusterParticipation {
 const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
   data,
 }) => {
+  const { formatCurrency } = useCurrency();
   const [currentColumnSet, setCurrentColumnSet] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
@@ -237,9 +239,7 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
     return value.toFixed(2);
   };
 
-  const formatCurrency = (value: number) => {
-    return `$${value.toFixed(2)}`;
-  };
+
 
   const nextColumnSet = () => {
     setCurrentColumnSet((prev) => (prev + 1) % columnSets.length);
@@ -312,7 +312,7 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
           if (col.format === "percentage") {
             return `${(value * 100).toFixed(1)}%`;
           } else if (col.format === "currency") {
-            return `$${value.toFixed(2)}`;
+            return formatCurrency(value);
           } else {
             return value.toFixed(2);
           }
