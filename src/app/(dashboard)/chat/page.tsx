@@ -97,6 +97,7 @@ const ChatPage = () => {
     string | null
   >(null);
   const [feedbackLoading, setFeedbackLoading] = useState<{messageId: number, type: 'positive' | 'negative'} | null>(null);
+  const [loadingModalOpen, setLoadingModalOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -207,6 +208,7 @@ const ChatPage = () => {
 
   const loadChatConversation = async (convId: string, closeHistory = true) => {
     setLoadingConversationId(convId);
+    setLoadingModalOpen(true);
     try {
       console.log("Loading conversation from backend:", convId);
       // Remove new conversation flag since we're loading an existing one
@@ -297,6 +299,7 @@ const ChatPage = () => {
       if (closeHistory) setIsHistoryOpen(false);
     } finally {
       setLoadingConversationId(null);
+      setLoadingModalOpen(false);
     }
   };
 
@@ -1001,6 +1004,32 @@ const ChatPage = () => {
                   )}
                 </Button>
               </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          {/* Loading Conversation Modal */}
+          <Dialog open={loadingModalOpen} onOpenChange={() => {}}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-3">
+                  <Loader2 
+                    className="h-5 w-5 animate-spin" 
+                    style={{ color: THEME_COLORS.primary.main }}
+                  />
+                  Loading Conversation
+                </DialogTitle>
+                <DialogDescription>
+                  Please wait while we load your chat conversation...
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex items-center justify-center py-8">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-16 h-16 rounded-full border-4 border-orange-100 border-t-orange-500 animate-spin"></div>
+                  <p className="text-sm text-muted-foreground">
+                    Retrieving messages from server
+                  </p>
+                </div>
+              </div>
             </DialogContent>
           </Dialog>
 
