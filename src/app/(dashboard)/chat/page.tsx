@@ -768,13 +768,13 @@ const ChatPage = () => {
           animation: fadeIn 0.2s ease-out forwards;
         }
       `}</style>
-      <div className="flex h-[calc(100vh-2rem)] w-full max-w-none mx-auto px-4">
+      <div className="flex h-[calc(100vh-4rem)] w-[95%] max-w-8xl mx-auto px-4">
         {/* Main Chat Area */}
         <Card
           className="w-full flex flex-col bg-white border border-slate-200 overflow-hidden"
           style={{
-            minHeight: "calc(100vh - 4rem)",
-            height: "calc(100vh - 4rem)",
+            minHeight: "calc(100vh - 6rem)",
+            height: "calc(100vh - 6rem)",
             borderRadius: "12px",
           }}
         >
