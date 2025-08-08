@@ -38,6 +38,8 @@ interface ClusterParticipationTableProps {
 
 interface ClusterParticipation {
   cluster: string;
+  region: string;
+  district: string;
   householdCount: number;
   averageParticipation: {
     vsla_participation: number;
@@ -74,18 +76,26 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
   const clusterParticipation = useMemo(() => {
     if (!data || data.length === 0) return [];
 
-    // Group data by cluster
+    // Group data by cluster, region, and district
     const clusterGroups = data.reduce((acc, item) => {
       const cluster = item.cluster || "Unknown";
-      if (!acc[cluster]) {
-        acc[cluster] = [];
+      const region = item.region || "Unknown";
+      const district = item.district || "Unknown";
+      const key = `${cluster}-${region}-${district}`;
+      if (!acc[key]) {
+        acc[key] = {
+          cluster,
+          region,
+          district,
+          households: []
+        };
       }
-      acc[cluster].push(item);
+      acc[key].households.push(item);
       return acc;
-    }, {} as Record<string, PredictionData[]>);
+    }, {} as Record<string, { cluster: string; region: string; district: string; households: PredictionData[] }>);
 
-    // Calculate averages for each cluster
-    let result = Object.entries(clusterGroups).map(([cluster, households]) => {
+    // Calculate averages for each cluster-region-district combination
+    let result = Object.values(clusterGroups).map(({ cluster, region, district, households }) => {
       const participationFeatures = [
         "vsla_participation",
         "business_participation",
@@ -121,6 +131,8 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
 
       return {
         cluster,
+        region,
+        district,
         householdCount: households.length,
         averageParticipation: averages,
       };
@@ -129,7 +141,9 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
     // Filter by search term
     if (searchTerm) {
       result = result.filter((item) =>
-        item.cluster.toLowerCase().includes(searchTerm.toLowerCase())
+        item.cluster.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.region.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.district.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -140,6 +154,12 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
       if (sortField === "cluster") {
         aValue = a.cluster;
         bValue = b.cluster;
+      } else if (sortField === "region") {
+        aValue = a.region;
+        bValue = b.region;
+      } else if (sortField === "district") {
+        aValue = a.district;
+        bValue = b.district;
       } else {
         aValue =
           a.averageParticipation[
@@ -239,6 +259,22 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
     return value.toFixed(2);
   };
 
+  // Calculate column averages for summary row
+  const columnAverages = useMemo(() => {
+    if (clusterParticipation.length === 0) return {};
+
+    const averages: Record<string, number> = {};
+    
+    currentColumns.forEach((column) => {
+      const sum = clusterParticipation.reduce((total, cluster) => {
+        return total + cluster.averageParticipation[column.key as keyof typeof cluster.averageParticipation];
+      }, 0);
+      averages[column.key] = sum / clusterParticipation.length;
+    });
+
+    return averages;
+  }, [clusterParticipation, currentColumns]);
+
 
 
   const nextColumnSet = () => {
@@ -296,6 +332,8 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
     // Get current column set info
     const currentSet = columnSets[currentColumnSet];
     const columnHeaders = [
+      "Region",
+      "District",
       "Cluster",
       ...currentSet.columns.map((col) => col.label),
     ];
@@ -303,6 +341,8 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
     // Prepare CSV data
     const csvData = clusterParticipation.map((cluster) => {
       const row = [
+        cluster.region,
+        cluster.district,
         cluster.cluster,
         ...currentSet.columns.map((col) => {
           const value =
@@ -321,8 +361,24 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
       return row.join(",");
     });
 
-    // Create CSV content
-    const csvContent = [columnHeaders.join(","), ...csvData].join("\n");
+    // Create CSV content with summary row
+    const summaryRow = [
+      "Average",
+      "-",
+      "-",
+      ...currentSet.columns.map((col) => {
+        const value = columnAverages[col.key] || 0;
+        if (col.format === "percentage") {
+          return `${(value * 100).toFixed(1)}%`;
+        } else if (col.format === "currency") {
+          return formatCurrency(value);
+        } else {
+          return value.toFixed(2);
+        }
+      }),
+    ];
+    
+    const csvContent = [columnHeaders.join(","), ...csvData, summaryRow.join(",")].join("\n");
 
     // Create and download file
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -446,6 +502,8 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="region">Region</SelectItem>
+                    <SelectItem value="district">District</SelectItem>
                     <SelectItem value="cluster">Cluster Name</SelectItem>
                     {currentColumns.map((column) => (
                       <SelectItem key={column.key} value={column.key}>
@@ -529,12 +587,32 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
           </div>
 
           {/* Table */}
-          <div className="w-full overflow-x-auto">
+          <div className="w-full overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
             <div className="min-w-max">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="font-semibold sticky left-0 bg-white dark:bg-gray-900 z-10">
+                    <TableHead className="font-semibold sticky left-0 bg-white dark:bg-gray-900 z-10 min-w-[120px]">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSort("region")}
+                        className="h-auto p-0 font-semibold hover:bg-transparent"
+                      >
+                        Region {getSortIcon("region")}
+                      </Button>
+                    </TableHead>
+                    <TableHead className="font-semibold sticky left-12 bg-white dark:bg-gray-900 z-10 min-w-[120px]">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSort("district")}
+                        className="h-auto p-0 font-semibold hover:bg-transparent"
+                      >
+                        District {getSortIcon("district")}
+                      </Button>
+                    </TableHead>
+                    <TableHead className="font-semibold sticky left-24 bg-white dark:bg-gray-900 z-10 min-w-[120px]">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -548,7 +626,7 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
                     {currentColumns.map((column) => (
                       <TableHead
                         key={column.key}
-                        className="text-center font-semibold"
+                        className="text-center font-semibold min-w-[100px]"
                       >
                         <Button
                           variant="ghost"
@@ -564,8 +642,14 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
                 </TableHeader>
                 <TableBody>
                   {currentRows.map((cluster) => (
-                    <TableRow key={cluster.cluster}>
-                      <TableCell className="font-medium sticky left-0 bg-white dark:bg-gray-900 z-10">
+                    <TableRow key={`${cluster.cluster}-${cluster.region}-${cluster.district}`}>
+                      <TableCell className="font-medium sticky left-0 bg-white dark:bg-gray-900 z-10 min-w-[120px]">
+                        <span className="text-sm">{cluster.region}</span>
+                      </TableCell>
+                      <TableCell className="font-medium sticky left-12 bg-white dark:bg-gray-900 z-10 min-w-[120px]">
+                        <span className="text-sm">{cluster.district}</span>
+                      </TableCell>
+                      <TableCell className="font-medium sticky left-24 bg-white dark:bg-gray-900 z-10 min-w-[120px]">
                         <div className="flex items-center gap-2">
                           <Badge variant="outline" className="text-xs">
                             {cluster.cluster}
@@ -574,7 +658,7 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
                       </TableCell>
 
                       {currentColumns.map((column) => (
-                        <TableCell key={column.key} className="text-center">
+                        <TableCell key={column.key} className="text-center min-w-[100px]">
                           <span className="text-sm font-medium">
                             {column.format === "percentage"
                               ? formatPercentage(
@@ -598,6 +682,33 @@ const ClusterParticipationTable: React.FC<ClusterParticipationTableProps> = ({
                       ))}
                     </TableRow>
                   ))}
+                  
+                  {/* Summary Row */}
+                  {clusterParticipation.length > 0 && (
+                    <TableRow className="bg-gray-50 dark:bg-gray-800 border-t-2 border-gray-300 dark:border-gray-600">
+                      <TableCell className="font-semibold sticky left-0 bg-gray-50 dark:bg-gray-800 z-10 min-w-[120px]">
+                        <span className="text-sm font-bold text-gray-700 dark:text-gray-300">Average</span>
+                      </TableCell>
+                      <TableCell className="font-semibold sticky left-12 bg-gray-50 dark:bg-gray-800 z-10 min-w-[120px]">
+                        <span className="text-sm text-gray-500 dark:text-gray-400">-</span>
+                      </TableCell>
+                      <TableCell className="font-semibold sticky left-24 bg-gray-50 dark:bg-gray-800 z-10 min-w-[120px]">
+                        <span className="text-sm text-gray-500 dark:text-gray-400">-</span>
+                      </TableCell>
+
+                      {currentColumns.map((column) => (
+                        <TableCell key={`avg-${column.key}`} className="text-center min-w-[100px]">
+                          <span className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                            {column.format === "percentage"
+                              ? formatPercentage(columnAverages[column.key] || 0)
+                              : column.format === "currency"
+                              ? formatCurrency(columnAverages[column.key] || 0)
+                              : formatAverage(columnAverages[column.key] || 0)}
+                          </span>
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </div>
