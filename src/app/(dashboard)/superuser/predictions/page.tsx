@@ -56,7 +56,7 @@ export default function SuperuserPredictionsPage() {
   const [selectedClusters, setSelectedClusters] = useState<string[]>([]);
   const [selectedCycles, setSelectedCycles] = useState<string[]>([]);
   const [selectedMonths, setSelectedMonths] = useState<string[]>([]);
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
 
   // Filter options
   const [cohortOptions, setCohortOptions] = useState<FilterOption[]>([]);

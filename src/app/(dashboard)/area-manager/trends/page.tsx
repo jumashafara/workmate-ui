@@ -61,7 +61,7 @@ export default function AreaManagerTrendsPage() {
   const { currency, formatCurrency, exchangeRate } = useCurrency();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ClusterIncomeData[]>([]);
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
 
   // Filter states
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);

@@ -68,6 +68,7 @@ interface FilterOption {
 export default function SuperuserTrendsPage() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ClusterIncomeData[]>([]);
+  const [showFilters, setShowFilters] = useState(true);
   const { currency, formatCurrency, exchangeRate } = useCurrency();
 
   // Filter states
@@ -574,21 +575,32 @@ export default function SuperuserTrendsPage() {
                 )}
               </div>
             </CardTitle>
-            {activeFiltersCount > 0 && (
+            <div className="flex gap-3">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={clearFilters}
-                className="text-red-600 border-red-200 hover:bg-red-50 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/20 transition-colors"
+                onClick={() => setShowFilters(!showFilters)}
+                className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
-                Clear All
+                {showFilters ? "Hide" : "Show"} Filters
               </Button>
-            )}
+              {activeFiltersCount > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="text-red-600 border-red-200 hover:bg-red-50 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/20 transition-colors"
+                >
+                  Clear All
+                </Button>
+              )}
+            </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-6 pt-2">
-          {/* Filter Controls */}
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {showFilters && (
+          <CardContent className="space-y-6 pt-2">
+            {/* Filter Controls */}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Region
@@ -642,6 +654,7 @@ export default function SuperuserTrendsPage() {
             </div>
           </div>
         </CardContent>
+        )}
       </Card>
 
       {/* Charts */}

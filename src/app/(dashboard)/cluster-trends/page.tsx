@@ -61,6 +61,7 @@ export default function ClusterTrendsPage() {
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
   const [selectedClusters, setSelectedClusters] = useState<string[]>([]);
   const [selectedMonths, setSelectedMonths] = useState<string[]>([]);
+  const [showFilters, setShowFilters] = useState(true);
 
   // Filter options
   const [regionOptions, setRegionOptions] = useState<FilterOption[]>([]);
@@ -472,16 +473,27 @@ export default function ClusterTrendsPage() {
                 <Badge variant="secondary">{activeFiltersCount}</Badge>
               )}
             </CardTitle>
-            {activeFiltersCount > 0 && (
-              <Button variant="outline" size="sm" onClick={clearFilters}>
-                Clear All
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFilters(!showFilters)}
+                className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              >
+                {showFilters ? "Hide" : "Show"} Filters
               </Button>
-            )}
+              {activeFiltersCount > 0 && (
+                <Button variant="outline" size="sm" onClick={clearFilters}>
+                  Clear All
+                </Button>
+              )}
+            </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Filter Controls */}
-          <div className="grid gap-4 md:grid-cols-4">
+        {showFilters && (
+          <CardContent className="space-y-4">
+            {/* Filter Controls */}
+            <div className="grid gap-4 md:grid-cols-4">
             <div className="space-y-2">
               <Label>Region</Label>
               <MultiSelect
@@ -585,6 +597,7 @@ export default function ClusterTrendsPage() {
             </div>
           )}
         </CardContent>
+        )}
       </Card>
 
       {/* Charts */}
