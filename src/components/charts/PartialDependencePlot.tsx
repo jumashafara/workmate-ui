@@ -162,22 +162,38 @@ const PartialDependencePlot: React.FC = () => {
           },
         }))}
         layout={{
-          title: "",
+          title: {
+            text: `Partial Dependence: ${featureList.find((item) => item[0] === feature)?.[1] || feature}`,
+            font: { size: 16, color: "#374151" },
+            x: 0.5,
+            xanchor: "center"
+          },
           autosize: true,
           margin: {
-            l: 50,
+            l: 60,
             r: 50,
-            t: 10,
-            b: 50,
+            t: 60,
+            b: 80,
           },
           xaxis: {
-            title:
-              featureList.find((item) => item[0] === feature)?.[1] || feature,
+            title: {
+              text: featureList.find((item) => item[0] === feature)?.[1] || feature,
+              font: { size: 14, color: "#374151" },
+              standoff: 20
+            },
             automargin: true,
+            tickfont: { size: 12, color: "#6B7280" },
+            tickangle: 0
           },
           yaxis: {
-            title: "Average Probability",
+            title: {
+              text: "Average Prediction Probability",
+              font: { size: 14, color: "#374151" },
+              standoff: 20
+            },
             automargin: true,
+            tickfont: { size: 12, color: "#6B7280" },
+            tickformat: ".3f"
           },
           font: {
             family: "Arial, sans-serif",
@@ -186,9 +202,11 @@ const PartialDependencePlot: React.FC = () => {
           legend: {
             orientation: "h", // Horizontal orientation
             yanchor: "bottom", // Anchor to the bottom
-            y: -0.3, // Position below the chart
+            y: -0.4, // Position below the chart
             xanchor: "center", // Center the legend
             x: 0.5, // Center the legend horizontally
+            font: { size: 12, color: "#374151" },
+            title: { text: "Feature Values", font: { size: 12, color: "#374151" } }
           },
         }}
         config={{
@@ -219,25 +237,35 @@ const PartialDependencePlot: React.FC = () => {
           },
         ]}
         layout={{
-          title: "",
           autosize: true,
           margin: {
-            l: 50,
+            l: 60,
             r: 30,
-            t: 10,
+            t: 60,
             b: 50,
           },
           xaxis: {
-            title:
-              featureList.find((item) => item[0] === feature)?.[1] || feature,
+            title: {
+              text: featureList.find((item) => item[0] === feature)?.[1] || feature,
+              font: { size: 14, color: "#374151", family: "Gabarito, Arial, sans-serif" },
+              standoff: 20
+            },
             automargin: true,
+            tickfont: { size: 12, color: "#6B7280" },
+            tickangle: 0
           },
           yaxis: {
-            title: "Average Probability",
+            title: {
+              text: "Average Prediction Probability",
+              font: { size: 14, color: "#374151" },
+              standoff: 20
+            },
             automargin: true,
+            tickfont: { size: 12, color: "#6B7280" },
+            tickformat: ".3f"
           },
           font: {
-            family: "Arial, sans-serif",
+            family: "Gabarito, Arial, sans-serif",
           },
         }}
         config={{

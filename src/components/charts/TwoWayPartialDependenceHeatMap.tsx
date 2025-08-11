@@ -165,7 +165,7 @@ const TwoWayPartialDependenceHeatMap: React.FC<
             automargin: true,
           },
           font: {
-            family: "Arial, sans-serif",
+            family: "Gabarito, Arial, sans-serif",
           },
         }}
         config={{
