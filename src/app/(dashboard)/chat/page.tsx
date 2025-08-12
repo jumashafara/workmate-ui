@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sheet,
@@ -100,6 +101,7 @@ const ChatPage = () => {
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Initialize conversation ID on client side only
   useEffect(() => {
@@ -146,7 +148,8 @@ const ChatPage = () => {
       }
     }
 
-    inputRef.current?.focus();
+    // Prefer focusing textarea on mobile-ready layout
+    (textareaRef.current || inputRef.current)?.focus();
   }, [conversationId]);
 
   useEffect(() => {
@@ -692,7 +695,7 @@ const ChatPage = () => {
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary underline hover:opacity-80 break-words"
+                className="text-primary underline hover:opacity-80 break-all"
                 title={href}
               >
                 {linkText}
@@ -704,7 +707,7 @@ const ChatPage = () => {
             if (isInline) {
               return (
                 <code
-                  className="bg-muted px-1 py-0.5 rounded text-sm font-mono"
+                  className="bg-muted px-1 py-0.5 rounded text-sm font-mono break-words"
                   {...props}
                 >
                   {children}
@@ -712,8 +715,8 @@ const ChatPage = () => {
               );
             }
             return (
-              <pre className="bg-muted p-4 rounded-lg overflow-x-auto my-2">
-                <code className="font-mono text-sm break-words" {...props}>
+              <pre className="bg-muted p-4 rounded-lg my-2 whitespace-pre-wrap break-words">
+                <code className="font-mono text-sm whitespace-pre-wrap break-words" {...props}>
                   {children}
                 </code>
               </pre>
@@ -751,6 +754,14 @@ const ChatPage = () => {
     );
   };
 
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+    // Auto-grow the textarea height up to a cap
+    e.target.style.height = "auto";
+    const maxHeight = 160; // ~10 rows cap
+    e.target.style.height = Math.min(e.target.scrollHeight, maxHeight) + "px";
+  };
+
   return (
     <TooltipProvider>
       <style jsx global>{`
@@ -768,17 +779,17 @@ const ChatPage = () => {
           animation: fadeIn 0.2s ease-out forwards;
         }
       `}</style>
-      <div className="flex h-[calc(100vh-4rem)] w-[95%] max-w-8xl mx-auto px-4">
+      <div className="flex h-[calc(100svh-4rem)] w-full max-w-5xl mx-auto px-2 sm:px-4 overflow-x-hidden">
         {/* Main Chat Area */}
         <Card
           className="w-full flex flex-col bg-white border border-slate-200 overflow-hidden"
           style={{
-            minHeight: "calc(100vh - 6rem)",
-            height: "calc(100vh - 6rem)",
+            minHeight: "calc(100svh - 6rem)",
+            height: "calc(100svh - 6rem)",
             borderRadius: "12px",
           }}
         >
-          <CardHeader className="bg-white border-b border-slate-200 px-6 ">
+          <CardHeader className="bg-white border-b border-slate-200 px-4 sm:px-6 sticky top-0 z-10">
             <div className="flex items-center justify-between w-full">
               {/* Left side - Title and Logo */}
               <div className="flex items-center gap-3">
@@ -829,8 +840,8 @@ const ChatPage = () => {
           </CardHeader>
 
           <Sheet open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
-            <SheetContent side="left" className="w-80 p-0">
-              <SheetHeader className="border-b border-gray-200 px-6 py-4">
+            <SheetContent side="left" className="w-full sm:w-80 p-0">
+              <SheetHeader className="border-b border-gray-200 px-4 sm:px-6 py-4">
                 <SheetTitle
                   className="text-lg font-semibold mb-4 text-left"
                   style={{ color: THEME_COLORS.primary.main }}
@@ -854,7 +865,7 @@ const ChatPage = () => {
 
               {/* Chat History List */}
               <div className="flex-1 overflow-hidden">
-                <ScrollArea className="h-[calc(100vh-180px)] px-3 py-2">
+                <ScrollArea className="h-[calc(100svh-180px)] px-3 py-2">
                   {loadingHistory ? (
                     <div className="flex flex-col items-center justify-center py-12">
                       <Loader2
@@ -1027,8 +1038,8 @@ const ChatPage = () => {
           </Dialog>
 
           <CardContent className="flex-1 flex flex-col p-0 min-h-0">
-            <ScrollArea className="flex-1" style={{ minHeight: "400px" }}>
-              <div className="max-w-5xl mx-auto">
+            <ScrollArea className="flex-1 overflow-x-hidden" style={{ minHeight: "400px" }}>
+              <div className="max-w-5xl w-full mx-auto overflow-x-hidden">
                 {messages.length === 0 && !hasStartedConversation ? (
                   <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] text-center px-6">
                     <div className="max-w-md space-y-6 mb-20">
@@ -1115,7 +1126,7 @@ const ChatPage = () => {
                         {/* Message Bubble */}
                         <div
                           className={cn(
-                            "max-w-[80%] md:max-w-[70%] rounded-lg px-4 py-3 break-words",
+                            "max-w-[85%] sm:max-w-[80%] md:max-w-[70%] rounded-lg px-4 py-3 break-words",
                             message.sender === "user"
                               ? "bg-orange-500 text-white"
                               : "bg-slate-100 text-slate-900"
@@ -1262,27 +1273,42 @@ const ChatPage = () => {
               </div>
             </ScrollArea>
 
-            <div className="border-t border-slate-200 bg-white p-4">
-              <div className="flex space-x-3 max-w-5xl mx-auto">
-                <Input
-                  ref={inputRef}
+            <div
+              className="border-t border-slate-200 bg-white p-2 sm:p-4 sticky bottom-0 z-10"
+              style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 0.5rem)" }}
+            >
+              <div className="flex items-end gap-2 sm:gap-3 max-w-5xl mx-auto">
+                <Textarea
+                  ref={textareaRef}
                   value={input}
-                  onChange={(e) => setInput(e.target.value)}
+                  onChange={handleTextareaChange}
                   placeholder="Type your message..."
+                  rows={1}
+                  onFocus={() =>
+                    setTimeout(
+                      () =>
+                        messagesEndRef.current?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "nearest",
+                        }),
+                      100
+                    )
+                  }
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
+                    // Allow newline by default; send on Ctrl/Cmd + Enter
+                    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
                       e.preventDefault();
                       sendMessage();
                     }
                   }}
                   disabled={isLoading}
-                  className="flex-1 border-slate-300 focus:border-orange-500 focus:ring-orange-500 bg-white placeholder-slate-400"
+                  className="flex-1 max-h-40 border-slate-300 focus:border-orange-500 focus:ring-orange-500 bg-white placeholder-slate-400 resize-none"
                 />
-                <Button
-                  onClick={sendMessage}
-                  disabled={!input.trim() || isLoading}
-                  className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg disabled:opacity-50"
-                >
+                 <Button
+                   onClick={sendMessage}
+                   disabled={!input.trim() || isLoading}
+                   className="bg-orange-500 hover:bg-orange-600 text-white h-11 sm:h-12 px-4 rounded-lg disabled:opacity-50"
+                 >
                   {isLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
