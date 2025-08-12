@@ -35,7 +35,7 @@ const getNavigationData = (userRole: string, isSuperuser: boolean) => {
   // Knowledge Management items are visible to all roles
   const knowledgeManagementItems = [
     {
-      title: "Chat",
+      title: "Chatbot",
       url: "/chat",
       icon: MessageCircle,
     },
