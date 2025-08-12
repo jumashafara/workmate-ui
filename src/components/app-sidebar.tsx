@@ -30,10 +30,10 @@ import {
 
 // Navigation data generator based on user role
 const getNavigationData = (userRole: string, isSuperuser: boolean) => {
-  let navItems: any[] = [];
+  let groups: any[] = [];
 
-  // Staff items are visible to all roles.
-  const staffItems = [
+  // Knowledge Management items are visible to all roles
+  const knowledgeManagementItems = [
     {
       title: "Chat",
       url: "/chat",
@@ -42,67 +42,88 @@ const getNavigationData = (userRole: string, isSuperuser: boolean) => {
   ];
 
   if (isSuperuser) {
-    navItems = [
+    groups = [
       {
-        title: "Standard Evaluations",
-        url: "#",
-        icon: Home,
-        isActive: true,
+        label: "Risk Assessment",
         items: [
           {
-            title: "Aggregated Predictions",
-            url: "/superuser/predictions",
+            title: "Standard Evaluations",
+            url: "#",
+            icon: Home,
+            isActive: true,
+            items: [
+              {
+                title: "Aggregated Predictions",
+                url: "/superuser/predictions",
+              },
+              {
+                title: "Cluster Trends",
+                url: "/superuser/trends",
+              },
+            ],
           },
           {
-            title: "Cluster Trends",
-            url: "/superuser/trends",
-          },
-        ],
-      },
-      {
-        title: "Model Interpretability",
-        url: "/model-metrics",
-        icon: Brain,
-        items: [
-          {
-            title: "Model Metrics",
+            title: "Model Interpretability",
             url: "/model-metrics",
-          },
-          {
-            title: "Feature Importance",
-            url: "/feature-importance",
-          },
-          {
-            title: "Individual Predictions",
-            url: "/individual-predictions",
+            icon: Brain,
+            items: [
+              {
+                title: "Model Metrics",
+                url: "/model-metrics",
+              },
+              {
+                title: "Feature Importance",
+                url: "/feature-importance",
+              },
+              {
+                title: "Individual Predictions",
+                url: "/individual-predictions",
+              },
+            ],
           },
         ],
       },
-      ...staffItems,
+      {
+        label: "Knowledge Management",
+        items: knowledgeManagementItems,
+      },
     ];
   } else if (userRole === "area_manager") {
-    navItems = [
+    groups = [
       {
-        title: "Standard Evaluations",
-        url: "#",
-        icon: BarChart3,
-        isActive: true,
+        label: "Risk Assessment",
         items: [
           {
-            title: "Aggregated Predictions",
-            url: "/area-manager/predictions",
-          },
-          {
-            title: "Cluster Trends",
-            url: "/area-manager/trends",
+            title: "Standard Evaluations",
+            url: "#",
+            icon: BarChart3,
+            isActive: true,
+            items: [
+              {
+                title: "Aggregated Predictions",
+                url: "/area-manager/predictions",
+              },
+              {
+                title: "Cluster Trends",
+                url: "/area-manager/trends",
+              },
+            ],
           },
         ],
       },
-      ...staffItems,
+      {
+        label: "Knowledge Management",
+        items: knowledgeManagementItems,
+      },
     ];
   } else {
     // For staff or any other role
-    navItems = staffItems;
+    groups = [
+      {
+        label: "Knowledge Management",
+        items: knowledgeManagementItems,
+      },
+    ];
   }
 
   return {
@@ -122,7 +143,7 @@ const getNavigationData = (userRole: string, isSuperuser: boolean) => {
         plan: "VENN",
       },
     ],
-    navMain: navItems,
+    navMain: groups,
     projects: [],
   };
 };
@@ -133,17 +154,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     navMain: any[];
     projects: any[];
   }>({ teams: [], navMain: [], projects: [] });
+  const [userRole, setUserRole] = useState<string>("");
+  const [isSuperuser, setIsSuperuser] = useState<boolean>(false);
 
   const { currency, toggleCurrency, exchangeRate } = useCurrency();
   const { state } = useSidebar();
 
   useEffect(() => {
     const userData = getUserData();
-    const userRole = userData.role || "";
-    const isSuperuser = userData.superuser === true;
+    const role = userData.role || "";
+    const superuser = userData.superuser === true;
+
+    setUserRole(role);
+    setIsSuperuser(superuser);
 
     // Generate navigation based on user role
-    const navData = getNavigationData(userRole, isSuperuser);
+    const navData = getNavigationData(role, superuser);
     setNavigationData(navData);
   }, []);
 
@@ -175,11 +201,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenuButton>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={navigationData.navMain} />
+        <NavMain groups={navigationData.navMain} />
       </SidebarContent>
 
       <SidebarFooter>
-        {state === "expanded" && (
+        {state === "expanded" && (isSuperuser || userRole === "area_manager") && (
           <div className="flex flex-col gap-2 p-2">
             <Button
               variant="outline"
