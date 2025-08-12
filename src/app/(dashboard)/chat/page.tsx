@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sheet,
@@ -101,7 +100,6 @@ const ChatPage = () => {
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Initialize conversation ID on client side only
   useEffect(() => {
@@ -148,8 +146,7 @@ const ChatPage = () => {
       }
     }
 
-    // Prefer focusing textarea on mobile-ready layout
-    (textareaRef.current || inputRef.current)?.focus();
+    inputRef.current?.focus();
   }, [conversationId]);
 
   useEffect(() => {
@@ -683,11 +680,11 @@ const ChatPage = () => {
     return (
       <ReactMarkdown
         components={{
-          p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+          p: ({ children }) => <p className="mb-2 last:mb-0 break-words">{children}</p>,
           a: ({ href, children }) => {
             const linkText =
-              typeof children === "string" && children.length > 60
-                ? `${children.substring(0, 60)}...`
+              typeof children === "string" && children.length > 40
+                ? `${children.substring(0, 40)}...`
                 : children;
 
             return (
@@ -695,8 +692,9 @@ const ChatPage = () => {
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary underline hover:opacity-80 break-all"
+                className="text-primary underline hover:opacity-80 break-all overflow-hidden"
                 title={href}
+                style={{ wordBreak: 'break-all' }}
               >
                 {linkText}
               </a>
@@ -707,7 +705,7 @@ const ChatPage = () => {
             if (isInline) {
               return (
                 <code
-                  className="bg-muted px-1 py-0.5 rounded text-sm font-mono break-words"
+                  className="bg-muted px-1 py-0.5 rounded text-sm font-mono"
                   {...props}
                 >
                   {children}
@@ -715,8 +713,8 @@ const ChatPage = () => {
               );
             }
             return (
-              <pre className="bg-muted p-4 rounded-lg my-2 whitespace-pre-wrap break-words">
-                <code className="font-mono text-sm whitespace-pre-wrap break-words" {...props}>
+              <pre className="bg-muted p-4 rounded-lg overflow-x-auto my-2">
+                <code className="font-mono text-sm break-words" {...props}>
                   {children}
                 </code>
               </pre>
@@ -754,14 +752,6 @@ const ChatPage = () => {
     );
   };
 
-  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInput(e.target.value);
-    // Auto-grow the textarea height up to a cap
-    e.target.style.height = "auto";
-    const maxHeight = 160; // ~10 rows cap
-    e.target.style.height = Math.min(e.target.scrollHeight, maxHeight) + "px";
-  };
-
   return (
     <TooltipProvider>
       <style jsx global>{`
@@ -779,41 +769,41 @@ const ChatPage = () => {
           animation: fadeIn 0.2s ease-out forwards;
         }
       `}</style>
-      <div className="flex h-[calc(100svh-4rem)] w-full max-w-5xl mx-auto px-2 sm:px-4 overflow-x-hidden">
+      <div className="flex h-[calc(100vh-4rem)] w-full max-w-8xl mx-auto px-1 sm:px-4">
         {/* Main Chat Area */}
         <Card
-          className="w-full flex flex-col bg-white border border-slate-200 overflow-hidden"
+          className="w-full flex flex-col bg-white border border-slate-200 overflow-hidden mx-auto"
           style={{
-            minHeight: "calc(100svh - 6rem)",
-            height: "calc(100svh - 6rem)",
-            borderRadius: "12px",
+            minHeight: "calc(100vh - 6rem)",
+            height: "calc(100vh - 6rem)",
+            borderRadius: "8px",
           }}
         >
-          <CardHeader className="bg-white border-b border-slate-200 px-4 sm:px-6 sticky top-0 z-10">
+          <CardHeader className="bg-white border-b border-slate-200 px-3 sm:px-6 py-3 sm:py-4">
             <div className="flex items-center justify-between w-full">
               {/* Left side - Title and Logo */}
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Bot className="h-4 w-4 text-white" />
                 </div>
-                <div>
-                  <h1 className="text-base font-semibold text-slate-900">
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-sm sm:text-base font-semibold text-slate-900 truncate">
                     Workmate Chatbot
                   </h1>
-                  <p className="text-xs text-slate-500">AI Assistant</p>
+                  <p className="text-xs text-slate-500 hidden sm:block">AI Assistant</p>
                 </div>
               </div>
 
               {/* Right side - Action Buttons */}
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                <div className="flex items-center gap-1 sm:gap-2">
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => setIsHistoryOpen(true)}
-                        className="h-9 w-9 p-0 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                        className="h-8 w-8 sm:h-9 sm:w-9 p-0 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                       >
                         <History className="h-4 w-4" />
                       </Button>
@@ -827,7 +817,7 @@ const ChatPage = () => {
                         variant="ghost"
                         size="sm"
                         onClick={createNewChat}
-                        className="h-9 w-9 p-0 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                        className="h-8 w-8 sm:h-9 sm:w-9 p-0 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                       >
                         <Plus className="h-4 w-4" />
                       </Button>
@@ -865,7 +855,7 @@ const ChatPage = () => {
 
               {/* Chat History List */}
               <div className="flex-1 overflow-hidden">
-                <ScrollArea className="h-[calc(100svh-180px)] px-3 py-2">
+                <ScrollArea className="h-[calc(100vh-180px)] px-2 sm:px-3 py-2">
                   {loadingHistory ? (
                     <div className="flex flex-col items-center justify-center py-12">
                       <Loader2
@@ -892,10 +882,10 @@ const ChatPage = () => {
                         <div
                           key={conversation.conversation_id}
                           className={cn(
-                            "group relative rounded-lg p-3 cursor-pointer transition-all duration-200 border w-full",
+                            "group relative rounded-lg p-3 sm:p-4 cursor-pointer transition-all duration-200 border w-full min-h-[60px] sm:min-h-[auto]",
                             conversation.conversation_id === conversationId
                               ? "bg-orange-50 border-orange-200 shadow-sm"
-                              : "border-transparent hover:bg-gray-50 hover:border-gray-200",
+                              : "border-transparent hover:bg-gray-50 hover:border-gray-200 active:bg-gray-100",
                             loadingConversationId ===
                               conversation.conversation_id &&
                               "opacity-60 cursor-wait"
@@ -906,9 +896,9 @@ const ChatPage = () => {
                           }}
                         >
                           {/* Conversation Content */}
-                          <div className="pr-8 overflow-hidden">
+                          <div className="pr-6 sm:pr-8 overflow-hidden">
                             <div className="flex items-center gap-2 mb-1">
-                              <h3 className="text-sm font-medium text-gray-900 truncate max-w-[200px] min-w-0">
+                              <h3 className="text-sm font-medium text-gray-900 truncate max-w-[160px] sm:max-w-[200px] min-w-0">
                                 {conversation.first_user_message || "New Chat"}
                               </h3>
                               {loadingConversationId ===
@@ -934,13 +924,12 @@ const ChatPage = () => {
                           </div>
 
                           {/* Delete Button */}
-                          {/* Delete Button */}
                           {loadingConversationId !==
                             conversation.conversation_id && (
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 hover:bg-red-50 hover:text-red-600 transition-all"
+                              className="absolute top-2 right-1 sm:right-2 h-7 w-7 sm:h-6 sm:w-6 p-0 opacity-0 group-hover:opacity-100 hover:bg-red-50 hover:text-red-600 transition-all touch-manipulation"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 openDeleteDialog(
@@ -957,7 +946,7 @@ const ChatPage = () => {
                                 );
                               }}
                             >
-                              <Trash2 className="h-3 w-3" />
+                              <Trash2 className="h-3 w-3 sm:h-3 sm:w-3" />
                             </Button>
                           )}
                         </div>
@@ -1037,33 +1026,33 @@ const ChatPage = () => {
             </DialogContent>
           </Dialog>
 
-          <CardContent className="flex-1 flex flex-col p-0 min-h-0">
-            <ScrollArea className="flex-1 overflow-x-hidden" style={{ minHeight: "400px" }}>
-              <div className="max-w-5xl w-full mx-auto overflow-x-hidden">
+          <CardContent className="flex-1 flex flex-col p-0 min-h-0 overflow-hidden">
+            <ScrollArea className="flex-1 overflow-hidden" style={{ minHeight: "400px" }}>
+              <div className="max-w-5xl mx-auto w-full overflow-hidden">
                 {messages.length === 0 && !hasStartedConversation ? (
-                  <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] text-center px-6">
-                    <div className="max-w-md space-y-6 mb-20">
-                      <div className="w-16 h-16 bg-orange-500 rounded-2xl flex items-center justify-center mx-auto">
-                        <Bot className="h-8 w-8 text-white" />
+                  <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] text-center px-3 sm:px-6">
+                    <div className="max-w-md space-y-4 sm:space-y-6 mb-8 sm:mb-20 w-full">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-orange-500 rounded-2xl flex items-center justify-center mx-auto">
+                        <Bot className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                       </div>
                       <div className="space-y-2">
-                        <h2 className="text-2xl font-bold text-slate-900">
+                        <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                           How can I help you today?
                         </h2>
-                        <p className="text-slate-600 text-base">
+                        <p className="text-slate-600 text-sm sm:text-base px-2 sm:px-0">
                           Ask me anything about Raising the Village, WASH
                           programs, or data collection.
                         </p>
                       </div>
 
-                      <div className="grid gap-3 w-full">
+                      <div className="grid gap-2 sm:gap-3 w-full">
                         {suggestedQuestions.map((question, index) => (
                           <button
                             key={index}
                             onClick={() => setInput(question)}
-                            className="p-4 text-left bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg transition-colors group"
+                            className="p-3 sm:p-4 text-left bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg transition-colors group"
                           >
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 sm:gap-3">
                               <MessageSquare className="h-4 w-4 text-orange-500 flex-shrink-0" />
                               <span className="text-sm text-slate-700 group-hover:text-slate-900">
                                 {question}
@@ -1075,24 +1064,30 @@ const ChatPage = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-4 py-6">
+                  <div className="space-y-3 sm:space-y-4 py-3 sm:py-6 px-2 sm:px-6">
+                    {/* Debug info - remove in production */}
+                    {process.env.NODE_ENV === 'development' && (
+                      <div className="text-xs text-gray-400 text-center mb-2">
+                        Messages: {displayedMessages.length} / {messages.length}
+                      </div>
+                    )}
                     {messages.length > messageLimit && (
-                      <div className="flex justify-center mb-4">
+                      <div className="flex justify-center mb-3 sm:mb-4">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={handleLoadMore}
-                          className="gap-2"
+                          className="gap-2 h-8 sm:h-9 px-3 sm:px-4"
                           style={{
                             borderColor: THEME_COLORS.primary.main,
                             color: THEME_COLORS.primary.main,
                           }}
                         >
                           <RefreshCw
-                            className="h-4 w-4"
+                            className="h-3 w-3 sm:h-4 sm:w-4"
                             style={{ color: THEME_COLORS.primary.main }}
                           />
-                          Load More
+                          <span className="text-xs sm:text-sm">Load More</span>
                         </Button>
                       </div>
                     )}
@@ -1101,44 +1096,44 @@ const ChatPage = () => {
                       <div
                         key={message.id}
                         className={cn(
-                          "flex mb-4 animate-fadeIn w-full items-start gap-3",
+                          "flex mb-3 sm:mb-4 animate-fadeIn w-full items-start gap-2 sm:gap-3",
                           message.sender === "user"
-                            ? "flex-row-reverse"
-                            : "flex-row"
+                            ? "flex-row-reverse justify-start"
+                            : "flex-row justify-start"
                         )}
                       >
                         {/* Avatar */}
                         <div
                           className={cn(
-                            "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-1",
+                            "w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-1 ring-2 ring-white",
                             message.sender === "user"
                               ? "bg-orange-500"
                               : "bg-slate-600"
                           )}
                         >
                           {message.sender === "user" ? (
-                            <User className="h-4 w-4 text-white" />
+                            <User className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                           ) : (
-                            <Bot className="h-4 w-4 text-white" />
+                            <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                           )}
                         </div>
 
                         {/* Message Bubble */}
                         <div
                           className={cn(
-                            "max-w-[85%] sm:max-w-[80%] md:max-w-[70%] rounded-lg px-4 py-3 break-words",
+                            "max-w-[78%] sm:max-w-[80%] md:max-w-[70%] rounded-lg px-3 py-2 sm:px-4 sm:py-3 break-words text-sm sm:text-base overflow-hidden word-wrap break-all",
                             message.sender === "user"
-                              ? "bg-orange-500 text-white"
-                              : "bg-slate-100 text-slate-900"
+                              ? "bg-orange-500 text-white shadow-md border border-orange-400"
+                              : "bg-slate-100 text-slate-900 shadow-sm border border-slate-200"
                           )}
                         >
-                          <div className="break-words">
+                          <div className="break-words overflow-hidden">
                             {message.sender === "user" ? (
-                              <div className="whitespace-pre-wrap break-words text-white">
+                              <div className="whitespace-pre-wrap break-words text-white overflow-wrap-anywhere">
                                 {renderUserMessageText(message.text)}
                               </div>
                             ) : (
-                              <div className="break-words">
+                              <div className="break-words overflow-wrap-anywhere">
                                 {message.text === "Thinking..." ? (
                                   <div className="flex items-center space-x-2">
                                     <Loader2 className="h-4 w-4 animate-spin text-slate-500" />
@@ -1147,24 +1142,26 @@ const ChatPage = () => {
                                     </span>
                                   </div>
                                 ) : (
-                                  renderBotMessageText(message.text)
+                                  <div className="overflow-hidden">
+                                    {renderBotMessageText(message.text)}
+                                  </div>
                                 )}
                               </div>
                             )}
                           </div>
                           <div
                             className={cn(
-                              "text-xs mt-2 text-right flex items-center justify-end gap-2",
+                              "text-xs mt-1 sm:mt-2 text-right flex items-center justify-end gap-1 sm:gap-2 flex-wrap",
                               message.sender === "user"
                                 ? "text-white/70"
                                 : "text-slate-500"
                             )}
                           >
-                            <span>{message.timestamp}</span>
+                            <span className="text-[10px] sm:text-xs">{message.timestamp}</span>
                             {message.sender === "bot" &&
                               message.text &&
                               message.text !== "Thinking..." && (
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-0.5 sm:gap-1">
                                   {/* Feedback buttons */}
                                   <Tooltip>
                                     <TooltipTrigger asChild>
@@ -1180,16 +1177,16 @@ const ChatPage = () => {
                                         }}
                                         disabled={feedbackLoading?.messageId === message.id}
                                         className={cn(
-                                          "h-5 w-5 p-0 opacity-60 hover:opacity-100 rounded",
+                                          "h-4 w-4 sm:h-5 sm:w-5 p-0 opacity-60 hover:opacity-100 rounded",
                                           message.feedback?.feedback_type === 'positive'
                                             ? "text-green-500 opacity-100"
                                             : "text-slate-500 hover:text-green-500 hover:bg-green-50"
                                         )}
                                       >
                                         {feedbackLoading?.messageId === message.id && feedbackLoading?.type === 'positive' ? (
-                                          <Loader2 className="h-3 w-3 animate-spin" />
+                                          <Loader2 className="h-2 w-2 sm:h-3 sm:w-3 animate-spin" />
                                         ) : (
-                                          <ThumbsUp className="h-3 w-3" />
+                                          <ThumbsUp className="h-2 w-2 sm:h-3 sm:w-3" />
                                         )}
                                       </Button>
                                     </TooltipTrigger>
@@ -1214,16 +1211,16 @@ const ChatPage = () => {
                                         }}
                                         disabled={feedbackLoading?.messageId === message.id}
                                         className={cn(
-                                          "h-5 w-5 p-0 opacity-60 hover:opacity-100 rounded",
+                                          "h-4 w-4 sm:h-5 sm:w-5 p-0 opacity-60 hover:opacity-100 rounded",
                                           message.feedback?.feedback_type === 'negative'
                                             ? "text-red-500 opacity-100"
                                             : "text-slate-500 hover:text-red-500 hover:bg-red-50"
                                         )}
                                       >
                                         {feedbackLoading?.messageId === message.id && feedbackLoading?.type === 'negative' ? (
-                                          <Loader2 className="h-3 w-3 animate-spin" />
+                                          <Loader2 className="h-2 w-2 sm:h-3 sm:w-3 animate-spin" />
                                         ) : (
-                                          <ThumbsDown className="h-3 w-3" />
+                                          <ThumbsDown className="h-2 w-2 sm:h-3 sm:w-3" />
                                         )}
                                       </Button>
                                     </TooltipTrigger>
@@ -1246,12 +1243,12 @@ const ChatPage = () => {
                                             message.id
                                           )
                                         }
-                                        className="h-5 w-5 p-0 opacity-60 hover:opacity-100 text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded"
+                                        className="h-4 w-4 sm:h-5 sm:w-5 p-0 opacity-60 hover:opacity-100 text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded"
                                       >
                                         {copiedMessageId === message.id ? (
-                                          <Check className="h-3 w-3 text-green-500" />
+                                          <Check className="h-2 w-2 sm:h-3 sm:w-3 text-green-500" />
                                         ) : (
-                                          <Copy className="h-3 w-3" />
+                                          <Copy className="h-2 w-2 sm:h-3 sm:w-3" />
                                         )}
                                       </Button>
                                     </TooltipTrigger>
@@ -1273,42 +1270,27 @@ const ChatPage = () => {
               </div>
             </ScrollArea>
 
-            <div
-              className="border-t border-slate-200 bg-white p-2 sm:p-4 sticky bottom-0 z-10"
-              style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 0.5rem)" }}
-            >
-              <div className="flex items-end gap-2 sm:gap-3 max-w-5xl mx-auto">
-                <Textarea
-                  ref={textareaRef}
+            <div className="border-t border-slate-200 bg-white p-2 sm:p-4">
+              <div className="flex space-x-2 sm:space-x-3 max-w-5xl mx-auto">
+                <Input
+                  ref={inputRef}
                   value={input}
-                  onChange={handleTextareaChange}
+                  onChange={(e) => setInput(e.target.value)}
                   placeholder="Type your message..."
-                  rows={1}
-                  onFocus={() =>
-                    setTimeout(
-                      () =>
-                        messagesEndRef.current?.scrollIntoView({
-                          behavior: "smooth",
-                          block: "nearest",
-                        }),
-                      100
-                    )
-                  }
                   onKeyDown={(e) => {
-                    // Allow newline by default; send on Ctrl/Cmd + Enter
-                    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+                    if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
                       sendMessage();
                     }
                   }}
                   disabled={isLoading}
-                  className="flex-1 max-h-40 border-slate-300 focus:border-orange-500 focus:ring-orange-500 bg-white placeholder-slate-400 resize-none"
+                  className="flex-1 border-slate-300 focus:border-orange-500 focus:ring-orange-500 bg-white placeholder-slate-400 h-10 sm:h-11 text-sm sm:text-base px-3 sm:px-4"
                 />
-                 <Button
-                   onClick={sendMessage}
-                   disabled={!input.trim() || isLoading}
-                   className="bg-orange-500 hover:bg-orange-600 text-white h-11 sm:h-12 px-4 rounded-lg disabled:opacity-50"
-                 >
+                <Button
+                  onClick={sendMessage}
+                  disabled={!input.trim() || isLoading}
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-3 sm:px-4 py-2 rounded-lg disabled:opacity-50 h-10 sm:h-11 min-w-[40px] sm:min-w-[44px] flex-shrink-0"
+                >
                   {isLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
@@ -1325,3 +1307,4 @@ const ChatPage = () => {
 };
 
 export default ChatPage;
+
