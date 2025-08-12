@@ -1,4 +1,4 @@
-import { ChatConversation, ChatMessage } from './ChatHistory';
+import { ChatConversation, ChatMessage } from './chat-history';
 
 class LocalChatHistoryAPI {
   private storageKey = 'workmate_chat_history';

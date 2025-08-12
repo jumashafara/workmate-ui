@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Activity, Loader2 } from "lucide-react";
-import { fetch2DPartialDependence } from "@/utils/ModelMetrics";
+import { fetch2DPartialDependence } from "@/utils/model-metrics";
 
 interface TwoWayPartialDependenceHeatMapProps {
   defaultModel?: string;

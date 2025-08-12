@@ -5,7 +5,9 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Allow access to auth pages without authentication
-  if (pathname.startsWith('/sign-in') ||
+  if (
+    pathname.startsWith('/') ||
+    pathname.startsWith('/sign-in') ||
     pathname.startsWith('/sign-up') ||
     pathname.startsWith('/forgot-password') ||
     pathname.startsWith('/_next') ||
@@ -20,10 +22,10 @@ export function middleware(request: NextRequest) {
   // Get token from cookies
   const token = request.cookies.get('access_token')?.value;
 
-  // If no token, redirect to sign-in
+  // If no token, redirect to landing page
   if (!token) {
-    const signInUrl = new URL('/sign-in', request.url);
-    return NextResponse.redirect(signInUrl);
+    const landingUrl = new URL('/', request.url);
+    return NextResponse.redirect(landingUrl);
   }
 
   // Allow access if authenticated

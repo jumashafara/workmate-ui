@@ -53,10 +53,10 @@ const THEME_COLORS = {
   },
 };
 import { getUserData } from "@/utils/cookie";
-import logToTrubrics from "@/utils/Trubrics";
+import logToTrubrics from "@/utils/trubrics";
 // import logToDATAIDEA from "@/utils/Dataidea"; // Temporarily disabled due to fetch errors
-import ChatHistoryAPI, { ChatConversation } from "@/utils/ChatHistory";
-import ChatFeedbackAPI from "@/utils/ChatFeedback";
+import ChatHistoryAPI, { ChatConversation } from "@/utils/chat-history";
+import ChatFeedbackAPI from "@/utils/chat-feedback";
 import { toast } from "sonner";
 
 interface Message {
