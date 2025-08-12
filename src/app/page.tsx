@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { API_ENDPOINT } from "@/utils/endpoints";
 
 interface InsightStats {
   totalHouseholds: number;
@@ -32,54 +33,51 @@ export default function LandingPage() {
   const fetchInsights = async () => {
     try {
       setLoading(true);
-      // Try to fetch data, but don't break if API is unavailable (for public landing page)
-      const response = await fetch('/api/standard-evaluations/?limit=500', {
+      // Fetch real data from the API
+      const response = await fetch(`${API_ENDPOINT}/standard-evaluations/?limit=1000`, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
       });
       
-      if (response.ok) {
-        const result = await response.json();
-        const predictions = result.predictions || result.results || [];
+      if (!response.ok) {
+        throw new Error(`API responded with status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      const predictions = result.predictions || result.results || [];
+      
+      if (predictions.length > 0) {
+        const regions = new Set(predictions.map((p: any) => p.region)).size;
+        const districts = new Set(predictions.map((p: any) => p.district)).size;
+        const households = predictions.length;
+        const avgIncome = predictions.reduce((sum: number, p: any) => sum + (p.predicted_income || 0), 0) / predictions.length;
+        const riskAlerts = predictions.filter((p: any) => p.prediction === 0).length;
+        const successRate = ((households - riskAlerts) / households * 100);
         
-        if (predictions.length > 0) {
-          const regions = new Set(predictions.map((p: any) => p.region)).size;
-          const districts = new Set(predictions.map((p: any) => p.district)).size;
-          const households = predictions.length;
-          const avgIncome = predictions.reduce((sum: number, p: any) => sum + (p.predicted_income || 0), 0) / predictions.length;
-          const riskAlerts = predictions.filter((p: any) => p.prediction === 0).length;
-          const successRate = ((households - riskAlerts) / households * 100);
-          
-          setStats({
-            totalHouseholds: households,
-            totalRegions: regions,
-            totalDistricts: districts,
-            avgIncome: avgIncome,
-            riskAlerts: riskAlerts,
-            successRate: successRate,
-          });
-        }
-      } else {
-        // Fallback to demo data if API unavailable
         setStats({
-          totalHouseholds: 12847,
-          totalRegions: 8,
-          totalDistricts: 25,
-          avgIncome: 2850,
-          riskAlerts: 1240,
-          successRate: 90.4,
+          totalHouseholds: households,
+          totalRegions: regions,
+          totalDistricts: districts,
+          avgIncome: avgIncome,
+          riskAlerts: riskAlerts,
+          successRate: successRate,
         });
+      } else {
+        throw new Error('No data received from API');
       }
     } catch (error) {
-      console.log("API unavailable, using demo data");
-      // Fallback demo data for public landing page
+      console.error("Failed to fetch insights:", error);
+      // Keep stats at zero/empty state when API fails
       setStats({
-        totalHouseholds: 12847,
-        totalRegions: 8,
-        totalDistricts: 25,
-        avgIncome: 2850,
-        riskAlerts: 1240,
-        successRate: 90.4,
+        totalHouseholds: 0,
+        totalRegions: 0,
+        totalDistricts: 0,
+        avgIncome: 0,
+        riskAlerts: 0,
+        successRate: 0,
       });
     } finally {
       setLoading(false);
@@ -322,13 +320,32 @@ export default function LandingPage() {
                     <div className="flex items-center gap-4">
                       <Skeleton className="h-12 w-12 rounded-lg" />
                       <div className="space-y-2 flex-1">
-                        <Skeleton className="h-4 w-24" />
-                        <Skeleton className="h-8 w-16" />
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-8 w-20" />
+                        <Skeleton className="h-3 w-16" />
                       </div>
                     </div>
                   </CardContent>
                 </Card>
               ))}
+            </div>
+          ) : stats.totalHouseholds === 0 ? (
+            <div className="text-center py-12">
+              <div className="flex items-center justify-center mb-4">
+                <AlertCircle className="h-12 w-12 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Data Currently Unavailable</h3>
+              <p className="text-gray-600 mb-6">
+                Unable to fetch live analytics data. Please try refreshing the page or check back later.
+              </p>
+              <Button 
+                onClick={fetchInsights} 
+                variant="outline" 
+                className="hover:bg-teal-50 hover:border-teal-300"
+              >
+                <Activity className="h-4 w-4 mr-2" />
+                Retry Loading Data
+              </Button>
             </div>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-12">
@@ -373,7 +390,7 @@ export default function LandingPage() {
                     <div>
                       <p className="text-sm font-medium text-gray-600">Avg Income + Production</p>
                       <p className="text-2xl font-bold text-gray-900">
-                        ${Math.round(stats.avgIncome).toLocaleString()}
+                        ${stats.avgIncome >= 100 ? Math.round(stats.avgIncome).toLocaleString() : stats.avgIncome.toFixed(2)}
                       </p>
                       <p className="text-xs text-purple-600">Per household</p>
                     </div>
@@ -399,28 +416,30 @@ export default function LandingPage() {
           )}
 
           {/* Live Data Status */}
-          <Card className="bg-teal-50 border-teal-200 mb-12">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-2 bg-teal-100 rounded-lg">
-                  <Activity className="h-5 w-5 text-teal-600" />
+          {!loading && stats.totalHouseholds > 0 && (
+            <Card className="bg-teal-50 border-teal-200 mb-12">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-2 bg-teal-100 rounded-lg">
+                    <Activity className="h-5 w-5 text-teal-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-teal-900 mb-1">
+                      Live Data Pipeline
+                    </h4>
+                    <p className="text-sm text-teal-700">
+                      These insights are pulled directly from WorkMate's AI analytics system, 
+                      processing real data from {stats.totalHouseholds.toLocaleString()} households across {stats.totalRegions} regions.
+                    </p>
+                  </div>
+                  <Badge className="bg-green-100 text-green-800">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                    Live
+                  </Badge>
                 </div>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-teal-900 mb-1">
-                    Live Data Pipeline
-                  </h4>
-                  <p className="text-sm text-teal-700">
-                    These insights are pulled directly from WorkMate's AI analytics system, 
-                    processing real data from poverty alleviation programs across multiple regions.
-                  </p>
-                </div>
-                <Badge className="bg-green-100 text-green-800">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
-                  Live
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
 
 
         </div>
@@ -557,24 +576,114 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-3 mb-4">
-              <Image 
-                src="/RTV_Logo.png"
-                alt="Raising the Village Logo"
-                width={32}
-                height={32}
-                className="rounded-lg"
-              />
-              <h3 className="text-xl font-bold">WorkMate</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            {/* Company Info */}
+            <div className="lg:col-span-2">
+              <div className="flex items-center space-x-3 mb-6">
+                <Image 
+                  src="/RTV_Logo.png"
+                  alt="Raising the Village Logo"
+                  width={40}
+                  height={40}
+                  className="rounded-lg"
+                />
+                <h3 className="text-2xl font-bold">WorkMate</h3>
+              </div>
+              <p className="text-gray-400 mb-6 leading-relaxed max-w-md">
+                WorkMate is RTV's comprehensive AI platform that transforms insights into impact for last-mile communities worldwide. 
+                Our integrated system unifies analytics, predictions, and decision support to maximize poverty alleviation efforts.
+              </p>
+              <div className="flex items-center space-x-2 text-sm text-gray-400">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span>Live Analytics System</span>
+              </div>
             </div>
-            <p className="text-gray-400 mb-6">
-              Empowering last-mile communities through AI-driven insights and analytics
-            </p>
-            <div className="text-sm text-gray-500">
-              © {new Date().getFullYear()} Raising the Village (RTV). All rights reserved.
+
+            {/* Quick Links */}
+            <div>
+              <h4 className="text-lg font-semibold mb-6">Quick Access</h4>
+              <ul className="space-y-3">
+                <li>
+                  <Link href="/chat" className="text-gray-400 hover:text-white transition-colors flex items-center group">
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    AI Chat Assistant
+                    <ArrowRight className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/model-metrics" className="text-gray-400 hover:text-white transition-colors flex items-center group">
+                    <Brain className="w-4 h-4 mr-2" />
+                    ML Dashboard
+                    <ArrowRight className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/cluster-trends" className="text-gray-400 hover:text-white transition-colors flex items-center group">
+                    <Shield className="w-4 h-4 mr-2" />
+                    Risk Assessment
+                    <ArrowRight className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/sign-up" className="text-gray-400 hover:text-white transition-colors flex items-center group">
+                    <Users className="w-4 h-4 mr-2" />
+                    Get Started
+                    <ArrowRight className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Organization Info */}
+            <div>
+              <h4 className="text-lg font-semibold mb-6">Organization</h4>
+              <ul className="space-y-3">
+                <li>
+                  <a href="https://raisingthevillage.org" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors flex items-center group">
+                    About RTV
+                    <ArrowRight className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </a>
+                </li>
+                <li>
+                  <a href="https://raisingthevillage.org/our-work" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors flex items-center group">
+                    Our Work
+                    <ArrowRight className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </a>
+                </li>
+                <li>
+                  <a href="https://raisingthevillage.org/our-impact" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors flex items-center group">
+                    Our Impact
+                    <ArrowRight className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </a>
+                </li>
+                <li>
+                  <a href="https://raisingthevillage.org/about-us" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors flex items-center group">
+                    Contact Us
+                    <ArrowRight className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom Section */}
+          <div className="border-t border-gray-800 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <div className="text-sm text-gray-500 mb-4 md:mb-0">
+                © {new Date().getFullYear()} Raising the Village (RTV). All rights reserved.
+              </div>
+              <div className="flex items-center space-x-6 text-sm text-gray-500">
+                <span className="flex items-center">
+                  <Activity className="w-4 h-4 mr-2" />
+                  PEAL Department
+                </span>
+                <span className="flex items-center">
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  Analytics Unit
+                </span>
+              </div>
             </div>
           </div>
         </div>
