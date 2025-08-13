@@ -335,29 +335,30 @@ export default function LandingPage() {
       {/* Header */}
       <header className="relative z-50 bg-white/80 backdrop-blur-sm border-b border-gray-200/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center space-x-3">
+          <div className="flex justify-between items-center py-4 sm:py-6">
+            <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-shrink">
               <Image 
                 src="/RTV_Logo.png"
                 alt="Raising the Village Logo"
-                width={40}
-                height={40}
-                className="rounded-lg"
+                width={32}
+                height={32}
+                className="rounded-lg sm:w-10 sm:h-10 flex-shrink-0"
               />
-              <h1 className="text-2xl font-bold text-teal-700">
+              <h1 className="text-lg sm:text-2xl font-bold text-teal-700 truncate">
                 WorkMate
               </h1>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
               <Link href="/sign-in">
-                <Button variant="ghost" className="text-gray-600 hover:text-gray-900">
+                <Button variant="ghost" className="text-gray-600 hover:text-gray-900 text-sm sm:text-base px-2 sm:px-4">
                   Sign In
                 </Button>
               </Link>
               <Link href="/sign-up">
-                <Button className="bg-orange-600 hover:bg-orange-700 text-white shadow-lg">
-                  Get Started
-                  <ArrowRight className="w-4 h-4 ml-2" />
+                <Button className="text-white shadow-lg text-sm sm:text-base px-2 sm:px-4" style={{backgroundColor: '#d65a31'}} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c14d26'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#d65a31'}>
+                  <span className="hidden sm:inline">Get Started</span>
+                  <span className="sm:hidden">Start</span>
+                  <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
                 </Button>
               </Link>
             </div>
