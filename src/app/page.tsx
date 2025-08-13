@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Bot, Brain, TrendingUp, Users, Shield, Zap, CheckCircle, Clock, MessageSquare, Activity, BarChart3, MapPin, AlertCircle, Target } from "lucide-react";
+import { ArrowRight, Bot, Brain, TrendingUp, Users, Shield, Zap, CheckCircle, Clock, MessageSquare, Activity, BarChart3, MapPin, AlertCircle, Target, Group } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -39,6 +39,7 @@ const useTypingEffect = (text: string, speed: number = 50) => {
 };
 
 interface InsightStats {
+  totalClusters: number;
   totalHouseholds: number;
   totalRegions: number;
   totalDistricts: number;
@@ -193,7 +194,7 @@ export default function LandingPage() {
         const avgIncome = predictions.reduce((sum: number, p: any) => sum + (p.predicted_income || 0), 0) / predictions.length;
         const riskAlerts = predictions.filter((p: any) => p.prediction === 0).length;
         const successRate = ((households - riskAlerts) / households * 100);
-        
+        const clusters = new Set(predictions.map((p: any) => p.cluster)).size;
         setStats({
           totalHouseholds: households,
           totalRegions: regions,
@@ -201,6 +202,7 @@ export default function LandingPage() {
           avgIncome: avgIncome,
           riskAlerts: riskAlerts,
           successRate: successRate,
+          totalClusters: clusters,
         });
       } else {
         throw new Error('No data received from API');
@@ -215,6 +217,7 @@ export default function LandingPage() {
         avgIncome: 0,
         riskAlerts: 0,
         successRate: 0,
+        totalClusters: 0,
       });
     } finally {
       setLoading(false);
@@ -350,11 +353,6 @@ export default function LandingPage() {
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
               <Link href="/sign-in">
-                <Button variant="ghost" className="text-gray-600 hover:text-gray-900 text-sm sm:text-base px-2 sm:px-4">
-                  Sign In
-                </Button>
-              </Link>
-              <Link href="/sign-up">
                 <Button className="text-white shadow-lg text-sm sm:text-base px-2 sm:px-4" style={{backgroundColor: '#d65a31'}} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c14d26'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#d65a31'}>
                   <span className="hidden sm:inline">Get Started</span>
                   <span className="sm:hidden">Start</span>
@@ -504,7 +502,7 @@ export default function LandingPage() {
                       <p className="text-2xl font-bold text-gray-900">
                         {displayStats.totalHouseholds.toLocaleString()}
                       </p>
-                      <p className="text-xs text-blue-600">Being monitored</p>
+                      {/* <p className="text-xs text-blue-600">Being monitored</p> */}
                     </div>
                   </div>
                 </CardContent>
@@ -519,7 +517,7 @@ export default function LandingPage() {
                     <div>
                       <p className="text-sm font-medium text-gray-600">Active Regions</p>
                       <p className="text-2xl font-bold text-gray-900">{displayStats.totalRegions}</p>
-                      <p className="text-xs text-green-600">{displayStats.totalDistricts} districts</p>
+                      {/* <p className="text-xs text-green-600">{displayStats.totalDistricts} districts</p> */}
                     </div>
                   </div>
                 </CardContent>
@@ -532,11 +530,11 @@ export default function LandingPage() {
                       <TrendingUp className="h-6 w-6 text-purple-600" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Avg Income + Production</p>
+                      <p className="text-sm font-medium text-gray-600">Districts</p>
                       <p className="text-2xl font-bold text-gray-900">
-                        ${displayStats.avgIncome >= 100 ? Math.round(displayStats.avgIncome).toLocaleString() : displayStats.avgIncome.toFixed(2)}
+                        {displayStats.totalDistricts}
                       </p>
-                      <p className="text-xs text-purple-600">Per household</p>
+                      {/* <p className="text-xs text-purple-600">{displayStats.totalRegions} regions</p> */}  
                     </div>
                   </div>
                 </CardContent>
@@ -546,12 +544,12 @@ export default function LandingPage() {
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-orange-50 rounded-lg">
-                      <AlertCircle className="h-6 w-6 text-orange-600" />
+                      <Group className="h-6 w-6 text-orange-600" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Achievement Rate</p>
-                      <p className="text-2xl font-bold text-gray-900">{displayStats.successRate.toFixed(1)}%</p>
-                      <p className="text-xs text-orange-600">{displayStats.riskAlerts} at risk</p>
+                      <p className="text-sm font-medium text-gray-600">Clusters</p>
+                      <p className="text-2xl font-bold text-gray-900">{displayStats.totalClusters.toLocaleString()}</p>
+                      {/* <p className="text-xs text-orange-600">clusters</p> */}
                     </div>
                   </div>
                 </CardContent>
@@ -883,7 +881,7 @@ export default function LandingPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/sign-up" className="text-gray-400 hover:text-white transition-colors flex items-center group">
+                  <Link href="/sign-in" className="text-gray-400 hover:text-white transition-colors flex items-center group">
                     <Users className="w-4 h-4 mr-2" />
                     Get Started
                     <ArrowRight className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
