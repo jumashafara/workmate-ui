@@ -660,7 +660,7 @@ export default function LandingPage() {
                           {
                             type: 'pie',
                             values: [achievedCount, notAchievedCount],
-                            labels: ['Achieved Goals', 'At Risk'],
+                            labels: ['Achieved Target', 'At Risk'],
                             hole: 0.4,
                             marker: {
                               colors: ['#2c5f82', '#d65a31']
@@ -698,7 +698,7 @@ export default function LandingPage() {
                         <div className="text-2xl font-bold" style={{color: '#2c5f82'}}>
                           {achievedCount.toLocaleString()}
                         </div>
-                        <div className="text-sm" style={{color: '#2c5f82'}}>Achieved Goals</div>
+                        <div className="text-sm" style={{color: '#2c5f82'}}>Achieved Target</div>
                       </div>
                       <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
                         <div className="text-2xl font-bold" style={{color: '#d65a31'}}>
@@ -729,9 +729,9 @@ export default function LandingPage() {
                             x: Object.keys(regionStats),
                             y: Object.values(regionStats).map((stat: any) => stat.achieved),
                             type: 'bar',
-                            name: 'Achieved Goals',
+                            name: 'Achieved Target',
                             marker: { color: '#2c5f82' },
-                            hovertemplate: '<b>%{x}</b><br>Achieved Goals: %{y}<extra></extra>'
+                            hovertemplate: '<b>%{x}</b><br>Achieved Target: %{y}<extra></extra>'
                           },
                           {
                             x: Object.keys(regionStats),
