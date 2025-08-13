@@ -146,7 +146,7 @@ export default function LandingPage() {
   const heroInsights = [
     "Transforming Insights into Impact for Last-Mile Communities",
     `Monitoring ${displayStats.totalHouseholds.toLocaleString()} Households Across ${displayStats.totalRegions} Regions`,
-    `${displayStats.successRate.toFixed(1)}% Achievement Rate in Poverty Alleviation Programs`,
+    `${displayStats.successRate.toFixed(1)}% Average Achievement Rate`,
     `AI-Powered Analytics for Sustainable Development Goals`,
     `Real-time Risk Assessment for ${displayStats.riskAlerts.toLocaleString()} At-Risk Households`
   ];
