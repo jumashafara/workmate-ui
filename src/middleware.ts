@@ -4,28 +4,36 @@ import { getAuthToken } from './utils/cookie';
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Allow access to auth pages without authentication
-  if (
-    pathname.startsWith('/') ||
-    pathname.startsWith('/sign-in') ||
-    pathname.startsWith('/sign-up') ||
-    pathname.startsWith('/forgot-password') ||
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/api') ||
-    pathname.startsWith('/auth/google/callback') ||
-    pathname.startsWith('/google') ||
-    pathname.startsWith('/RTV_Logo.png') ||
-    pathname === '/favicon.ico') {
+  // Define public routes that don't require authentication
+  const publicRoutes = [
+    '/',
+    '/sign-in',
+    '/sign-up', 
+    '/forgot-password',
+    '/_next',
+    '/api',
+    '/auth/google/callback',
+    '/google',
+    '/RTV_Logo.png',
+    '/favicon.ico'
+  ];
+
+  // Check if current path is public
+  const isPublicRoute = publicRoutes.some(route => 
+    route === pathname || pathname.startsWith(route)
+  );
+
+  if (isPublicRoute) {
     return NextResponse.next();
   }
 
   // Get token from cookies
   const token = request.cookies.get('access_token')?.value;
 
-  // If no token, redirect to landing page
+  // If no token, redirect to sign-in page
   if (!token) {
-    const landingUrl = new URL('/', request.url);
-    return NextResponse.redirect(landingUrl);
+    const signInUrl = new URL('/sign-in', request.url);
+    return NextResponse.redirect(signInUrl);
   }
 
   // Allow access if authenticated
