@@ -405,7 +405,7 @@ export default function LandingPage() {
                       <AlertCircle className="h-6 w-6 text-orange-600" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Success Rate</p>
+                      <p className="text-sm font-medium text-gray-600">Achievement Rate</p>
                       <p className="text-2xl font-bold text-gray-900">{stats.successRate.toFixed(1)}%</p>
                       <p className="text-xs text-orange-600">{stats.riskAlerts} at risk</p>
                     </div>
@@ -549,32 +549,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-teal-700">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">
-            Ready to Transform Your Impact?
-          </h2>
-          <p className="text-xl text-teal-100 mb-8 leading-relaxed">
-            Join organizations worldwide using WorkMate to drive data-driven decisions 
-            and maximize impact in poverty alleviation efforts.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/sign-up">
-              <Button size="lg" className="bg-white text-teal-700 hover:bg-gray-100 shadow-lg px-8">
-                Get Started Today
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
-            <Link href="/sign-in">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-teal-700 px-8 bg-transparent">
-                Sign In
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -592,7 +566,7 @@ export default function LandingPage() {
                 <h3 className="text-2xl font-bold">WorkMate</h3>
               </div>
               <p className="text-gray-400 mb-6 leading-relaxed max-w-md">
-                WorkMate is RTV's comprehensive AI platform that transforms insights into impact for last-mile communities worldwide. 
+                WorkMate is RTV's comprehensive AI platform that transforms insights into impact for last-mile communities. 
                 Our integrated system unifies analytics, predictions, and decision support to maximize poverty alleviation efforts.
               </p>
               <div className="flex items-center space-x-2 text-sm text-gray-400">

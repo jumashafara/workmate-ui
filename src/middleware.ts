@@ -20,15 +20,43 @@ export function middleware(request: NextRequest) {
 
   // Check if current path is public
   const isPublicRoute = publicRoutes.some(route => 
-    route === pathname || pathname.startsWith(route)
+    route === pathname 
   );
 
+  console.log("isPublicRoute: ", isPublicRoute);
+
   if (isPublicRoute) {
+    // Check if user is already logged in and trying to access auth pages
+    const token = request.cookies.get('access_token')?.value;
+    const role = request.cookies.get('user_role')?.value;
+    const isSuperuser = request.cookies.get('user_superuser')?.value === 'true';
+
+    const authPages = ['/sign-in', '/sign-up', '/forgot-password'];
+    const isAuthPage = authPages.some(page => pathname.startsWith(page));
+
+    if (token && isAuthPage) {
+      // User is logged in but trying to access auth pages, redirect to appropriate dashboard
+      let redirectUrl;
+      
+      if (isSuperuser) {
+        redirectUrl = new URL('/superuser/predictions', request.url);
+      } else if (role === 'area_manager') {
+        redirectUrl = new URL('/area-manager/predictions', request.url);
+      } else {
+        redirectUrl = new URL('/chat', request.url);
+      }
+      
+      console.log(`Redirecting logged-in user from ${pathname} to ${redirectUrl.pathname}`);
+      return NextResponse.redirect(redirectUrl);
+    }
+
     return NextResponse.next();
   }
 
-  // Get token from cookies
+  // Get token and user info from cookies
   const token = request.cookies.get('access_token')?.value;
+  const role = request.cookies.get('user_role')?.value;
+  const isSuperuser = request.cookies.get('user_superuser')?.value === 'true';
 
   // If no token, redirect to sign-in page
   if (!token) {
@@ -36,7 +64,64 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(signInUrl);
   }
 
-  // Allow access if authenticated
+  // Define role-based route access
+  const superuserOnlyRoutes = [
+    '/superuser',
+    '/dashboard',
+    '/model-metrics',
+    '/feature-importance',
+    '/individual-predictions',
+    '/multiple-predictions',
+    '/cluster-trends',
+    '/project-manager',
+    '/reports'
+  ];
+
+  const areaManagerRoutes = [
+    '/area-manager'
+  ];
+
+  // Routes accessible to all authenticated users
+  const commonRoutes = [
+    '/chat'
+  ];
+
+  // Check if user is trying to access a restricted route
+  const isAccessingSuperuserRoute = superuserOnlyRoutes.some(route => 
+    pathname.startsWith(route)
+  );
+  
+  const isAccessingAreaManagerRoute = areaManagerRoutes.some(route => 
+    pathname.startsWith(route)
+  );
+
+  console.log("role: ", role);
+  console.log("isSuperuser: ", isSuperuser);
+
+  // Role-based access control - check user role first
+  if (!isSuperuser) {
+    // Non-superusers have restricted access
+    if (role === 'area_manager') {
+      // Area managers can only access chat and area-manager routes
+      const isAllowedRoute = pathname.startsWith('/chat') || pathname.startsWith('/area-manager') || pathname.startsWith('/unauthorized');
+      if (!isAllowedRoute) {
+        console.log(`Area manager blocked from accessing: ${pathname}`);
+        const unauthorizedUrl = new URL('/unauthorized', request.url);
+        return NextResponse.redirect(unauthorizedUrl);
+      }
+    } else {
+      // Regular users can only access chat
+      const isAllowedRoute = pathname.startsWith('/chat') || pathname.startsWith('/unauthorized');
+      if (!isAllowedRoute) {
+        console.log(`Regular user blocked from accessing: ${pathname}`);
+        const unauthorizedUrl = new URL('/unauthorized', request.url);
+        return NextResponse.redirect(unauthorizedUrl);
+      }
+    }
+  }
+  // Superusers can access everything, so no restrictions
+
+  // Allow access if user has proper permissions
   return NextResponse.next();
 }
 
