@@ -344,7 +344,7 @@ export default function LandingPage() {
                 height={32}
                 className="rounded-lg sm:w-10 sm:h-10 flex-shrink-0"
               />
-              <h1 className="text-lg sm:text-2xl font-bold text-teal-700 truncate">
+              <h1 className="text-lg sm:text-2xl font-bold truncate">
                 WorkMate
               </h1>
             </div>
@@ -414,15 +414,10 @@ export default function LandingPage() {
               poverty alleviation efforts.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/sign-up">
+              <Link href="/sign-in">
                 <Button size="lg" className="text-white shadow-lg px-8" style={{backgroundColor: '#d65a31'}} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c14d26'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#d65a31'}>
-                  Start Your Journey
+                  Sign In to WorkMate
                   <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
-              </Link>
-              <Link href="/chat">
-                <Button size="lg" variant="outline" className="text-white px-8" style={{borderColor: '#2c5f82', backgroundColor: '#2c5f82'}} onMouseEnter={(e) => {e.currentTarget.style.backgroundColor = '#254f73'; e.currentTarget.style.borderColor = '#254f73'}} onMouseLeave={(e) => {e.currentTarget.style.backgroundColor = '#2c5f82'; e.currentTarget.style.borderColor = '#2c5f82'}}>
-                  Try WorkMate
                 </Button>
               </Link>
             </div>
@@ -1023,16 +1018,6 @@ export default function LandingPage() {
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div className="text-sm text-gray-500 mb-4 md:mb-0">
                 © {new Date().getFullYear()} Raising the Village (RTV). All rights reserved.
-              </div>
-              <div className="flex items-center space-x-6 text-sm text-gray-500">
-                <span className="flex items-center">
-                  <Activity className="w-4 h-4 mr-2" />
-                  PEAL Department
-                </span>
-                <span className="flex items-center">
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  Analytics Unit
-                </span>
               </div>
             </div>
           </div>
