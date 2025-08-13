@@ -42,7 +42,7 @@ export function middleware(request: NextRequest) {
       } else if (role === 'area_manager') {
         redirectUrl = new URL('/area-manager/predictions', request.url);
       } else {
-        redirectUrl = new URL('/chat', request.url);
+        redirectUrl = new URL('/dashboard', request.url);
       }
       
       return NextResponse.redirect(redirectUrl);
@@ -65,7 +65,6 @@ export function middleware(request: NextRequest) {
   // Define role-based route access
   const superuserOnlyRoutes = [
     '/superuser',
-    '/dashboard',
     '/model-metrics',
     '/feature-importance',
     '/individual-predictions',
@@ -81,7 +80,8 @@ export function middleware(request: NextRequest) {
 
   // Routes accessible to all authenticated users
   const commonRoutes = [
-    '/chat'
+    '/chat',
+    '/dashboard'
   ];
 
   // Check if user is trying to access a restricted route
@@ -98,15 +98,15 @@ export function middleware(request: NextRequest) {
   if (!isSuperuser) {
     // Non-superusers have restricted access
     if (role === 'area_manager') {
-      // Area managers can only access chat and area-manager routes
-      const isAllowedRoute = pathname.startsWith('/chat') || pathname.startsWith('/area-manager') || pathname.startsWith('/unauthorized');
+      // Area managers can only access chat, dashboard, and area-manager routes
+      const isAllowedRoute = pathname.startsWith('/chat') || pathname.startsWith('/dashboard') || pathname.startsWith('/area-manager') || pathname.startsWith('/unauthorized');
       if (!isAllowedRoute) {
         const unauthorizedUrl = new URL('/unauthorized', request.url);
         return NextResponse.redirect(unauthorizedUrl);
       }
     } else {
-      // Regular users can only access chat
-      const isAllowedRoute = pathname.startsWith('/chat') || pathname.startsWith('/unauthorized');
+      // Regular users can only access chat and dashboard
+      const isAllowedRoute = pathname.startsWith('/chat') || pathname.startsWith('/dashboard') || pathname.startsWith('/unauthorized');
       if (!isAllowedRoute) {
         const unauthorizedUrl = new URL('/unauthorized', request.url);
         return NextResponse.redirect(unauthorizedUrl);
