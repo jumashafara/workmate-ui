@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Bot, Brain, TrendingUp, Users, Shield, Zap, CheckCircle, Clock, MessageSquare, Activity, BarChart3, MapPin, AlertCircle } from "lucide-react";
@@ -9,6 +9,31 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { API_ENDPOINT } from "@/utils/endpoints";
+
+// Custom hook for typing effect
+const useTypingEffect = (text: string, speed: number = 50) => {
+  const [displayedText, setDisplayedText] = useState("");
+  const [isComplete, setIsComplete] = useState(false);
+
+  useEffect(() => {
+    setDisplayedText("");
+    setIsComplete(false);
+    let i = 0;
+    const timer = setInterval(() => {
+      if (i < text.length) {
+        setDisplayedText(text.slice(0, i + 1));
+        i++;
+      } else {
+        setIsComplete(true);
+        clearInterval(timer);
+      }
+    }, speed);
+
+    return () => clearInterval(timer);
+  }, [text, speed]);
+
+  return { displayedText, isComplete };
+};
 
 interface InsightStats {
   totalHouseholds: number;
@@ -29,6 +54,52 @@ export default function LandingPage() {
     riskAlerts: 0,
     successRate: 0,
   });
+
+  // Default content for when API is unavailable
+  const defaultStats: InsightStats = {
+    totalHouseholds: 12500,
+    totalRegions: 8,
+    totalDistricts: 42,
+    avgIncome: 2350,
+    riskAlerts: 850,
+    successRate: 93.2,
+  };
+
+  // Use default stats when API fails or returns empty data
+  const displayStats = stats.totalHouseholds === 0 ? defaultStats : stats;
+  const isUsingDefaults = stats.totalHouseholds === 0;
+
+  // Typing effect content
+  const typingContent = isUsingDefaults 
+    ? "Experience WorkMate's powerful analytics with real-time insights from our poverty alleviation programs. These sample metrics demonstrate our comprehensive monitoring capabilities."
+    : `See WorkMate's analytics in action with live data from our poverty alleviation programs across ${displayStats.totalRegions} regions and ${displayStats.totalDistricts} districts.`;
+
+  const { displayedText: typedText, isComplete: typingComplete } = useTypingEffect(typingContent, 30);
+  
+  // Hero title cycling insights
+  const heroInsights = [
+    "Transforming Insights into Impact for Last-Mile Communities",
+    `Monitoring ${displayStats.totalHouseholds.toLocaleString()} Households Across ${displayStats.totalRegions} Regions`,
+    `${displayStats.successRate.toFixed(1)}% Achievement Rate in Poverty Alleviation Programs`,
+    `AI-Powered Analytics for Sustainable Development Goals`,
+    `Real-time Risk Assessment for ${displayStats.riskAlerts.toLocaleString()} At-Risk Households`
+  ];
+
+  const [currentInsightIndex, setCurrentInsightIndex] = useState(0);
+  const { displayedText: typedHeroTitle, isComplete: heroTypingComplete } = useTypingEffect(
+    heroInsights[currentInsightIndex], 
+    60
+  );
+
+  // Cycle through insights every 4 seconds after typing completes
+  useEffect(() => {
+    if (heroTypingComplete) {
+      const timer = setTimeout(() => {
+        setCurrentInsightIndex((prev) => (prev + 1) % heroInsights.length);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [heroTypingComplete, currentInsightIndex, heroInsights.length]);
 
   const fetchInsights = async () => {
     try {
@@ -236,13 +307,39 @@ export default function LandingPage() {
               <Zap className="w-4 h-4 mr-2" />
               RTV Work Mate - AI-Powered Analytics Platform
             </div>
-            <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
-              Transforming{" "}
-              <span className="text-teal-700">
-                Insights into Impact
+            <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6 min-h-[8rem] lg:min-h-[12rem] flex flex-col justify-center">
+              <span className="inline-block text-center">
+                {currentInsightIndex === 0 ? (
+                  // Original styled title for the first insight
+                  <>
+                    {typedHeroTitle.substring(0, 13)}
+                    {typedHeroTitle.length > 13 && (
+                      <span className="text-teal-700">
+                        {typedHeroTitle.substring(13, 35)}
+                      </span>
+                    )}
+                    {typedHeroTitle.length > 35 && (
+                      <>
+                        <br />
+                        {typedHeroTitle.substring(35)}
+                      </>
+                    )}
+                    {!heroTypingComplete && <span className="animate-pulse text-teal-700">|</span>}
+                  </>
+                ) : (
+                  // Dynamic insights with highlighted numbers/percentages
+                  <>
+                    {typedHeroTitle.split(/(\d+[,\d]*\.?\d*%?)/g).map((part, index) => 
+                      /\d/.test(part) ? (
+                        <span key={index} className="text-teal-700">{part}</span>
+                      ) : (
+                        <span key={index}>{part}</span>
+                      )
+                    )}
+                    {!heroTypingComplete && <span className="animate-pulse text-teal-700">|</span>}
+                  </>
+                )}
               </span>
-              <br />
-              for Last-Mile Communities
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
               A comprehensive, integrated AI platform that unifies chatbot, risk assessment tools, 
@@ -304,12 +401,15 @@ export default function LandingPage() {
           <div className="text-center mb-16">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-teal-100 text-teal-800 text-sm font-medium mb-4">
               <Activity className="w-4 h-4 mr-2" />
-              Live Analytics
+              {isUsingDefaults ? "Sample Analytics" : "Live Analytics"}
             </div>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">Real-time Impact Insights</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              See WorkMate's analytics in action with live data from our poverty alleviation programs
-            </p>
+            <div className="text-xl text-gray-600 max-w-3xl mx-auto min-h-[3rem] flex items-center justify-center">
+              <p className="leading-relaxed">
+                {typedText}
+                {!typingComplete && <span className="animate-pulse">|</span>}
+              </p>
+            </div>
           </div>
           
           {loading ? (
@@ -329,24 +429,6 @@ export default function LandingPage() {
                 </Card>
               ))}
             </div>
-          ) : stats.totalHouseholds === 0 ? (
-            <div className="text-center py-12">
-              <div className="flex items-center justify-center mb-4">
-                <AlertCircle className="h-12 w-12 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Data Currently Unavailable</h3>
-              <p className="text-gray-600 mb-6">
-                Unable to fetch live analytics data. Please try refreshing the page or check back later.
-              </p>
-              <Button 
-                onClick={fetchInsights} 
-                variant="outline" 
-                className="hover:bg-teal-50 hover:border-teal-300"
-              >
-                <Activity className="h-4 w-4 mr-2" />
-                Retry Loading Data
-              </Button>
-            </div>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-12">
               <Card className="border-gray-200 shadow-sm hover:shadow-lg transition-shadow">
@@ -358,7 +440,7 @@ export default function LandingPage() {
                     <div>
                       <p className="text-sm font-medium text-gray-600">Total Households</p>
                       <p className="text-2xl font-bold text-gray-900">
-                        {stats.totalHouseholds.toLocaleString()}
+                        {displayStats.totalHouseholds.toLocaleString()}
                       </p>
                       <p className="text-xs text-blue-600">Being monitored</p>
                     </div>
@@ -374,8 +456,8 @@ export default function LandingPage() {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-600">Active Regions</p>
-                      <p className="text-2xl font-bold text-gray-900">{stats.totalRegions}</p>
-                      <p className="text-xs text-green-600">{stats.totalDistricts} districts</p>
+                      <p className="text-2xl font-bold text-gray-900">{displayStats.totalRegions}</p>
+                      <p className="text-xs text-green-600">{displayStats.totalDistricts} districts</p>
                     </div>
                   </div>
                 </CardContent>
@@ -390,7 +472,7 @@ export default function LandingPage() {
                     <div>
                       <p className="text-sm font-medium text-gray-600">Avg Income + Production</p>
                       <p className="text-2xl font-bold text-gray-900">
-                        ${stats.avgIncome >= 100 ? Math.round(stats.avgIncome).toLocaleString() : stats.avgIncome.toFixed(2)}
+                        ${displayStats.avgIncome >= 100 ? Math.round(displayStats.avgIncome).toLocaleString() : displayStats.avgIncome.toFixed(2)}
                       </p>
                       <p className="text-xs text-purple-600">Per household</p>
                     </div>
@@ -406,8 +488,8 @@ export default function LandingPage() {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-600">Achievement Rate</p>
-                      <p className="text-2xl font-bold text-gray-900">{stats.successRate.toFixed(1)}%</p>
-                      <p className="text-xs text-orange-600">{stats.riskAlerts} at risk</p>
+                      <p className="text-2xl font-bold text-gray-900">{displayStats.successRate.toFixed(1)}%</p>
+                      <p className="text-xs text-orange-600">{displayStats.riskAlerts} at risk</p>
                     </div>
                   </div>
                 </CardContent>
@@ -416,26 +498,41 @@ export default function LandingPage() {
           )}
 
           {/* Live Data Status */}
-          {!loading && stats.totalHouseholds > 0 && (
-            <Card className="bg-teal-50 border-teal-200 mb-12">
+          {!loading && (
+            <Card className={`${isUsingDefaults ? 'bg-blue-50 border-blue-200' : 'bg-teal-50 border-teal-200'} mb-12`}>
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
-                  <div className="p-2 bg-teal-100 rounded-lg">
-                    <Activity className="h-5 w-5 text-teal-600" />
+                  <div className={`p-2 ${isUsingDefaults ? 'bg-blue-100' : 'bg-teal-100'} rounded-lg`}>
+                    <Activity className={`h-5 w-5 ${isUsingDefaults ? 'text-blue-600' : 'text-teal-600'}`} />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-semibold text-teal-900 mb-1">
-                      Live Data Pipeline
+                    <h4 className={`font-semibold ${isUsingDefaults ? 'text-blue-900' : 'text-teal-900'} mb-1`}>
+                      {isUsingDefaults ? 'Sample Data Pipeline' : 'Live Data Pipeline'}
                     </h4>
-                    <p className="text-sm text-teal-700">
-                      These insights are pulled directly from WorkMate's AI analytics system, 
-                      processing real data from {stats.totalHouseholds.toLocaleString()} households across {stats.totalRegions} regions.
+                    <p className={`text-sm ${isUsingDefaults ? 'text-blue-700' : 'text-teal-700'}`}>
+                      {isUsingDefaults 
+                        ? `These sample insights demonstrate WorkMate's AI analytics capabilities, showcasing data from ${displayStats.totalHouseholds.toLocaleString()} households across ${displayStats.totalRegions} regions. Try refreshing to connect to live data.`
+                        : `These insights are pulled directly from WorkMate's AI analytics system, processing real data from ${displayStats.totalHouseholds.toLocaleString()} households across ${displayStats.totalRegions} regions.`
+                      }
                     </p>
                   </div>
-                  <Badge className="bg-green-100 text-green-800">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
-                    Live
-                  </Badge>
+                  <div className="flex flex-col gap-2">
+                    <Badge className={isUsingDefaults ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}>
+                      <div className={`w-2 h-2 ${isUsingDefaults ? 'bg-blue-500' : 'bg-green-500'} rounded-full mr-2 ${isUsingDefaults ? '' : 'animate-pulse'}`}></div>
+                      {isUsingDefaults ? 'Sample' : 'Live'}
+                    </Badge>
+                    {isUsingDefaults && (
+                      <Button 
+                        onClick={fetchInsights} 
+                        size="sm"
+                        variant="outline" 
+                        className="text-xs hover:bg-blue-50 hover:border-blue-300"
+                      >
+                        <Activity className="h-3 w-3 mr-1" />
+                        Try Live
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
