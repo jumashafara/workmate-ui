@@ -446,7 +446,7 @@ export default function LandingPage() {
       </section>
 
       {/* Available Features */}
-      <section className="py-16 bg-gray-50/50">
+      <section className="py-16 bg-teal-50/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-teal-100 text-teal-800 text-sm font-medium mb-4">
@@ -503,7 +503,7 @@ export default function LandingPage() {
       </section>
 
       {/* Coming Soon Features */}
-      <section className="py-16 bg-gray-50/50">
+      <section className="py-16 bg-orange-50/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-orange-100 text-orange-800 text-sm font-medium mb-4">
