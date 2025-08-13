@@ -594,7 +594,7 @@ export default function LandingPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/cluster-trends" className="text-gray-400 hover:text-white transition-colors flex items-center group">
+                  <Link href="/superuser/cluster-trends" className="text-gray-400 hover:text-white transition-colors flex items-center group">
                     <Shield className="w-4 h-4 mr-2" />
                     Risk Assessment
                     <ArrowRight className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
