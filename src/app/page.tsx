@@ -171,7 +171,7 @@ export default function LandingPage() {
       title: "Trend Analysis",
       description: "Analyze cluster performance and income trends",
       icon: <TrendingUp className="h-6 w-6" />,
-      href: "/cluster-trends",
+      href: "/superuser/cluster-trends",
       color: "bg-purple-50 text-purple-600 border-purple-200",
       hoverColor: "hover:bg-purple-100",
     },
