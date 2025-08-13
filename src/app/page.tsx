@@ -369,7 +369,7 @@ export default function LandingPage() {
       <section className="relative py-20 lg:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-teal-100 text-teal-800 text-sm font-medium mb-8">
+            <div className="inline-flex items-center px-4 py-2 rounded-full text-white text-sm font-medium mb-8" style={{backgroundColor: '#2c5f82'}}>
               <Zap className="w-4 h-4 mr-2" />
               RTV Work Mate - AI-Powered Analytics Platform
             </div>
@@ -380,7 +380,7 @@ export default function LandingPage() {
                   <>
                     {typedHeroTitle.substring(0, 13)}
                     {typedHeroTitle.length > 13 && (
-                      <span className="text-teal-700">
+                      <span style={{color: '#d65a31'}}>
                         {typedHeroTitle.substring(13, 35)}
                       </span>
                     )}
@@ -390,19 +390,19 @@ export default function LandingPage() {
                         {typedHeroTitle.substring(35)}
                       </>
                     )}
-                    {!heroTypingComplete && <span className="animate-pulse text-teal-700">|</span>}
+                    {!heroTypingComplete && <span className="animate-pulse" style={{color: '#d65a31'}}>|</span>}
                   </>
                 ) : (
                   // Dynamic insights with highlighted numbers/percentages
                   <>
                     {typedHeroTitle.split(/(\d+[,\d]*\.?\d*%?)/g).map((part, index) => 
                       /\d/.test(part) ? (
-                        <span key={index} className="text-teal-700">{part}</span>
+                        <span key={index} style={{color: '#d65a31'}}>{part}</span>
                       ) : (
                         <span key={index}>{part}</span>
                       )
                     )}
-                    {!heroTypingComplete && <span className="animate-pulse text-teal-700">|</span>}
+                    {!heroTypingComplete && <span className="animate-pulse" style={{color: '#d65a31'}}>|</span>}
                   </>
                 )}
               </span>
@@ -414,13 +414,13 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/sign-up">
-                <Button size="lg" className="bg-orange-600 hover:bg-orange-700 text-white shadow-lg px-8">
+                <Button size="lg" className="text-white shadow-lg px-8" style={{backgroundColor: '#d65a31'}} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c14d26'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#d65a31'}>
                   Start Your Journey
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </Link>
               <Link href="/chat">
-                <Button size="lg" variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8">
+                <Button size="lg" variant="outline" className="text-white px-8" style={{borderColor: '#2c5f82', backgroundColor: '#2c5f82'}} onMouseEnter={(e) => {e.currentTarget.style.backgroundColor = '#254f73'; e.currentTarget.style.borderColor = '#254f73'}} onMouseLeave={(e) => {e.currentTarget.style.backgroundColor = '#2c5f82'; e.currentTarget.style.borderColor = '#2c5f82'}}>
                   Try WorkMate
                 </Button>
               </Link>
@@ -663,7 +663,7 @@ export default function LandingPage() {
                             labels: ['Achieved Goals', 'At Risk'],
                             hole: 0.4,
                             marker: {
-                              colors: ['#14B8A6', '#F97316']
+                              colors: ['#2c5f82', '#d65a31']
                             },
                             //@ts-ignore
                             textinfo: 'percent+label',
@@ -694,17 +694,17 @@ export default function LandingPage() {
                       />
                     </div>
                     <div className="mt-4 grid grid-cols-2 gap-4 text-center">
-                      <div className="p-3 bg-teal-50 rounded-lg">
-                        <div className="text-2xl font-bold text-teal-600">
+                      <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                        <div className="text-2xl font-bold" style={{color: '#2c5f82'}}>
                           {achievedCount.toLocaleString()}
                         </div>
-                        <div className="text-sm text-teal-700">Achieved Goals</div>
+                        <div className="text-sm" style={{color: '#2c5f82'}}>Achieved Goals</div>
                       </div>
-                      <div className="p-3 bg-orange-50 rounded-lg">
-                        <div className="text-2xl font-bold text-orange-600">
+                      <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                        <div className="text-2xl font-bold" style={{color: '#d65a31'}}>
                           {notAchievedCount.toLocaleString()}
                         </div>
-                        <div className="text-sm text-orange-700">At Risk</div>
+                        <div className="text-sm" style={{color: '#d65a31'}}>At Risk</div>
                       </div>
                     </div>
                   </CardContent>
@@ -730,7 +730,7 @@ export default function LandingPage() {
                             y: Object.values(regionStats).map((stat: any) => stat.achieved),
                             type: 'bar',
                             name: 'Achieved Goals',
-                            marker: { color: '#14B8A6' },
+                            marker: { color: '#2c5f82' },
                             hovertemplate: '<b>%{x}</b><br>Achieved Goals: %{y}<extra></extra>'
                           },
                           {
@@ -738,7 +738,7 @@ export default function LandingPage() {
                             y: Object.values(regionStats).map((stat: any) => stat.households - stat.achieved),
                             type: 'bar',
                             name: 'At Risk',
-                            marker: { color: '#F97316' },
+                            marker: { color: '#d65a31' },
                             hovertemplate: '<b>%{x}</b><br>At Risk: %{y}<extra></extra>'
                           }
                         ]}
