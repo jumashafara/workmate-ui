@@ -566,7 +566,7 @@ export default function LandingPage() {
 
           {chartLoading ? (
             <div className="grid lg:grid-cols-2 gap-8 mb-12">
-              {Array.from({ length: 4 }).map((_, i) => (
+              {Array.from({ length: 2}).map((_, i) => (
                 <Card key={i} className="border-gray-200 shadow-sm">
                   <CardContent className="p-6">
                     <div className="h-80 flex items-center justify-center">
