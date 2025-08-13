@@ -23,7 +23,6 @@ export function middleware(request: NextRequest) {
     route === pathname 
   );
 
-  console.log("isPublicRoute: ", isPublicRoute);
 
   if (isPublicRoute) {
     // Check if user is already logged in and trying to access auth pages
@@ -46,7 +45,6 @@ export function middleware(request: NextRequest) {
         redirectUrl = new URL('/chat', request.url);
       }
       
-      console.log(`Redirecting logged-in user from ${pathname} to ${redirectUrl.pathname}`);
       return NextResponse.redirect(redirectUrl);
     }
 
@@ -95,8 +93,6 @@ export function middleware(request: NextRequest) {
     pathname.startsWith(route)
   );
 
-  console.log("role: ", role);
-  console.log("isSuperuser: ", isSuperuser);
 
   // Role-based access control - check user role first
   if (!isSuperuser) {
@@ -105,7 +101,6 @@ export function middleware(request: NextRequest) {
       // Area managers can only access chat and area-manager routes
       const isAllowedRoute = pathname.startsWith('/chat') || pathname.startsWith('/area-manager') || pathname.startsWith('/unauthorized');
       if (!isAllowedRoute) {
-        console.log(`Area manager blocked from accessing: ${pathname}`);
         const unauthorizedUrl = new URL('/unauthorized', request.url);
         return NextResponse.redirect(unauthorizedUrl);
       }
@@ -113,7 +108,6 @@ export function middleware(request: NextRequest) {
       // Regular users can only access chat
       const isAllowedRoute = pathname.startsWith('/chat') || pathname.startsWith('/unauthorized');
       if (!isAllowedRoute) {
-        console.log(`Regular user blocked from accessing: ${pathname}`);
         const unauthorizedUrl = new URL('/unauthorized', request.url);
         return NextResponse.redirect(unauthorizedUrl);
       }
