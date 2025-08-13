@@ -475,7 +475,7 @@ export default function LandingPage() {
           </div>
           
           {loading ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-12">
               {Array.from({ length: 4 }).map((_, i) => (
                 <Card key={i} className="border-gray-200 shadow-sm">
                   <CardContent className="p-6">
@@ -559,66 +559,10 @@ export default function LandingPage() {
             </div>
           )}
 
-          {/* Live Data Status */}
-          {!loading && (
-            <Card className={`${isUsingDefaults ? 'bg-blue-50 border-blue-200' : 'bg-teal-50 border-teal-200'} mb-12`}>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className={`p-2 ${isUsingDefaults ? 'bg-blue-100' : 'bg-teal-100'} rounded-lg`}>
-                    <Activity className={`h-5 w-5 ${isUsingDefaults ? 'text-blue-600' : 'text-teal-600'}`} />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className={`font-semibold ${isUsingDefaults ? 'text-blue-900' : 'text-teal-900'} mb-1`}>
-                      {isUsingDefaults ? 'Sample Data Pipeline' : 'Live Data Pipeline'}
-                    </h4>
-                    <p className={`text-sm ${isUsingDefaults ? 'text-blue-700' : 'text-teal-700'}`}>
-                      {isUsingDefaults 
-                        ? `These sample insights demonstrate WorkMate's AI analytics capabilities, showcasing data from ${displayStats.totalHouseholds.toLocaleString()} households across ${displayStats.totalRegions} regions. Try refreshing to connect to live data.`
-                        : `These insights are pulled directly from WorkMate's AI analytics system, processing real data from ${displayStats.totalHouseholds.toLocaleString()} households across ${displayStats.totalRegions} regions.`
-                      }
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Badge className={isUsingDefaults ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}>
-                      <div className={`w-2 h-2 ${isUsingDefaults ? 'bg-blue-500' : 'bg-green-500'} rounded-full mr-2 ${isUsingDefaults ? '' : 'animate-pulse'}`}></div>
-                      {isUsingDefaults ? 'Sample' : 'Live'}
-                    </Badge>
-                    {isUsingDefaults && (
-                      <Button 
-                        onClick={fetchInsights} 
-                        size="sm"
-                        variant="outline" 
-                        className="text-xs hover:bg-blue-50 hover:border-blue-300"
-                      >
-                        <Activity className="h-3 w-3 mr-1" />
-                        Try Live
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-
+          
         </div>
-      </section>
 
-      {/* Analytics Visualization Section */}
-      <section className="py-16 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-purple-100 text-purple-800 text-sm font-medium mb-4">
-              <BarChart3 className="w-4 h-4 mr-2" />
-              Analytics Dashboard Preview
-            </div>
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
-              Visual Analytics in Action
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              See how WorkMate transforms complex data into actionable insights with powerful visualizations
-            </p>
-          </div>
 
           {chartLoading ? (
             <div className="grid lg:grid-cols-2 gap-8 mb-12">
@@ -780,39 +724,6 @@ export default function LandingPage() {
 
             </>
           )}
-
-          {/* Analytics Features Grid */}
-          <div className="grid md:grid-cols-3 gap-6">
-            <Card className="text-center p-6 border-gray-200 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Brain className="w-6 h-6 text-blue-600" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Predictive Models</h3>
-              <p className="text-sm text-gray-600">
-                Advanced ML algorithms predict household graduation likelihood and income projections
-              </p>
-            </Card>
-
-            <Card className="text-center p-6 border-gray-200 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <TrendingUp className="w-6 h-6 text-green-600" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Trend Analysis</h3>
-              <p className="text-sm text-gray-600">
-                Track progress over time and identify patterns in program effectiveness
-              </p>
-            </Card>
-
-            <Card className="text-center p-6 border-gray-200 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-6 h-6 text-orange-600" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Risk Assessment</h3>
-              <p className="text-sm text-gray-600">
-                Early warning system identifies households at risk of program dropout
-              </p>
-            </Card>
-          </div>
         </div>
       </section>
 
