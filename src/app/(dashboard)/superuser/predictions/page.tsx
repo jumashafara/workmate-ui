@@ -49,6 +49,7 @@ export default function SuperuserPredictionsPage() {
   const [error, setError] = useState<string | null>(null);
   const [predictions, setPredictions] = useState<PredictionData[]>([]);
   const [allRegionNames, setAllRegionNames] = useState<string[]>([]);
+  const [allPredictionsUnfiltered, setAllPredictionsUnfiltered] = useState<PredictionData[]>([]);
 
   // Filter states
   const [selectedCohorts, setSelectedCohorts] = useState<string[]>([]);
@@ -195,14 +196,22 @@ export default function SuperuserPredictionsPage() {
 
       // Always fetch the complete list of regions (unfiltered) for chart completeness
       try {
+        // Unfiltered regions
         const allRegionsResp = await fetch(`${API_ENDPOINT}/filter-options/`);
         if (allRegionsResp.ok) {
           const allRegionsJson = await allRegionsResp.json();
           const regions: string[] = allRegionsJson?.regions || [];
           setAllRegionNames(regions);
         }
+        // Unfiltered predictions for chart baseline
+        const allPredsResp = await fetch(`${API_ENDPOINT}/standard-evaluations/`);
+        if (allPredsResp.ok) {
+          const json = await allPredsResp.json();
+          const allPreds = json.predictions || json.results || [];
+          setAllPredictionsUnfiltered(allPreds);
+        }
       } catch (e) {
-        // Non-fatal; keep previous allRegionNames
+        // Non-fatal; keep previous state
       }
     } catch (err: any) {
       console.error("Data fetch error:", err);
@@ -592,7 +601,7 @@ export default function SuperuserPredictionsPage() {
 
       {/* Map and Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RegionPerformanceChart data={predictions} allRegions={allRegionNames} />
+        <RegionPerformanceChart data={predictions} allRegions={allRegionNames} sourceData={allPredictionsUnfiltered} />
         <Card className="flex flex-col">
           <CardHeader>
             <CardTitle>Household Predictions Map</CardTitle>

@@ -33,6 +33,7 @@ interface RegionPerformanceChartProps {
   data: PredictionData[];
   height?: number;
   allRegions?: string[];
+  sourceData?: PredictionData[];
 }
 
 interface RegionStats {
@@ -48,14 +49,16 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
   data,
   height = 400,
   allRegions = [],
+  sourceData = [],
 }) => {
   const { currency, formatCurrency, exchangeRate } = useCurrency();
 
   // Process data to aggregate by region
   const regionStats = useMemo(() => {
-    if (!data || data.length === 0) return [];
+    const dataset = (sourceData && sourceData.length > 0) ? sourceData : data;
+    if (!dataset || dataset.length === 0) return [];
 
-    const grouped = data.reduce((acc, item) => {
+    const grouped = dataset.reduce((acc, item) => {
       const region = item.region || "Unknown";
 
       if (!acc[region]) {
@@ -85,7 +88,7 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
         achieved_count: stats.achieved,
       }))
       .sort((a, b) => b.achievement_rate - a.achievement_rate);
-  }, [data]);
+  }, [data, sourceData]);
 
   // Ensure all regions are represented (even when filtered data omits some)
   const fullRegionStats = useMemo(() => {
