@@ -151,7 +151,7 @@ export default function LandingPage() {
     `Monitoring ${displayStats.totalHouseholds.toLocaleString()} Households Across ${displayStats.totalRegions} Regions`,
     `${displayStats.successRate.toFixed(1)}% Average Achievement Rate`,
     `AI-Powered Analytics for Sustainable Development Goals`,
-    `Real-time Risk Assessment for ${displayStats.riskAlerts.toLocaleString()} At-Risk Households`
+    `Real-time Risk Assessment for ${displayStats.totalHouseholds.toLocaleString()} Households`
   ];
 
   const [currentInsightIndex, setCurrentInsightIndex] = useState(0);
