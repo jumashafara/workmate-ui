@@ -48,6 +48,7 @@ export default function SuperuserPredictionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [predictions, setPredictions] = useState<PredictionData[]>([]);
+  const [allRegionNames, setAllRegionNames] = useState<string[]>([]);
 
   // Filter states
   const [selectedCohorts, setSelectedCohorts] = useState<string[]>([]);
@@ -190,6 +191,18 @@ export default function SuperuserPredictionsPage() {
             })) || []
           );
         }
+      }
+
+      // Always fetch the complete list of regions (unfiltered) for chart completeness
+      try {
+        const allRegionsResp = await fetch(`${API_ENDPOINT}/filter-options/`);
+        if (allRegionsResp.ok) {
+          const allRegionsJson = await allRegionsResp.json();
+          const regions: string[] = allRegionsJson?.regions || [];
+          setAllRegionNames(regions);
+        }
+      } catch (e) {
+        // Non-fatal; keep previous allRegionNames
       }
     } catch (err: any) {
       console.error("Data fetch error:", err);
@@ -579,7 +592,7 @@ export default function SuperuserPredictionsPage() {
 
       {/* Map and Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RegionPerformanceChart data={predictions} />
+        <RegionPerformanceChart data={predictions} allRegions={allRegionNames} />
         <Card className="flex flex-col">
           <CardHeader>
             <CardTitle>Household Predictions Map</CardTitle>

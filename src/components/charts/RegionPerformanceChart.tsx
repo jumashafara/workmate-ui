@@ -32,6 +32,7 @@ interface PredictionData {
 interface RegionPerformanceChartProps {
   data: PredictionData[];
   height?: number;
+  allRegions?: string[];
 }
 
 interface RegionStats {
@@ -46,6 +47,7 @@ interface RegionStats {
 const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
   data,
   height = 400,
+  allRegions = [],
 }) => {
   const { currency, formatCurrency, exchangeRate } = useCurrency();
 
@@ -85,6 +87,26 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
       .sort((a, b) => b.achievement_rate - a.achievement_rate);
   }, [data]);
 
+  // Ensure all regions are represented (even when filtered data omits some)
+  const fullRegionStats = useMemo(() => {
+    if (!allRegions || allRegions.length === 0) return regionStats;
+    const currentByName = new Map(regionStats.map((s) => [s.region, s]));
+    const completed = allRegions.map((region) => {
+      const existing = currentByName.get(region);
+      return (
+        existing || {
+          region,
+          achievement_rate: 0,
+          avg_income: 0,
+          total_households: 0,
+          avg_probability: 0,
+          achieved_count: 0,
+        }
+      );
+    });
+    return completed.sort((a, b) => b.achievement_rate - a.achievement_rate);
+  }, [allRegions, regionStats]);
+
   const colorPalette = [
     "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
     "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"
@@ -93,13 +115,13 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
   // Prepare data for Plotly
   const plotData = [
     {
-      y: regionStats.map((stat) => stat.region),
-      x: regionStats.map((stat) => stat.achievement_rate),
+      y: fullRegionStats.map((stat) => stat.region),
+      x: fullRegionStats.map((stat) => stat.achievement_rate),
       type: "bar" as const,
       orientation: "h" as const,
       name: "Achievement Rate (%)",
       marker: {
-        color: regionStats.map((_, i) => colorPalette[i % colorPalette.length]),
+        color: fullRegionStats.map((_, i) => colorPalette[i % colorPalette.length]),
         opacity: 0.8,
         line: {
           color: "#2E7D32",
@@ -107,7 +129,7 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
         },
         cornerradius: 10,
       },
-      text: regionStats.map(
+      text: fullRegionStats.map(
         (stat) =>
           `${stat.achievement_rate.toFixed(1)}%`
       ),
@@ -121,7 +143,7 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
         `Average Income + Production: %{customdata[2]}<br>` +
         "Average Probability: %{customdata[3]:.3f}" +
         "<extra></extra>",
-      customdata: regionStats.map((stat) => [
+      customdata: fullRegionStats.map((stat) => [
         stat.achieved_count,
         stat.total_households,
         formatCurrency(stat.avg_income),
@@ -144,7 +166,7 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
         0,
         Math.max(
           100,
-          Math.max(...regionStats.map((s) => s.achievement_rate)) + 10
+          Math.max(...(fullRegionStats.length ? fullRegionStats : [{achievement_rate:0}] as any).map((s: any) => s.achievement_rate)) + 10
         ),
       ],
       tickfont: { color: "#1c2434", family: "Gabarito"   },
@@ -176,7 +198,7 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
     },
   };
 
-  if (!data || data.length === 0) {
+  if ((!data || data.length === 0) && (!allRegions || allRegions.length === 0)) {
     return (
       <Card className="mb-3" style={{ height: height }}>
         <CardContent className="flex justify-center items-center h-full">
