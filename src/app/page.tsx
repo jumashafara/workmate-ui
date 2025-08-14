@@ -86,25 +86,34 @@ export default function LandingPage() {
   const [chartData, setChartData] = useState<any[]>([]);
   const [chartLoading, setChartLoading] = useState(true);
 
-  const fetchChartData = async () => {
-    try {
-      setChartLoading(true);
-      const response = await fetch(`${API_ENDPOINT}/standard-evaluations/?limit=1000`, {
+  const isAchieved = (value: any): boolean =>
+    value === 1 || value === "1" || value === true;
+
+  const fetchAllStandardEvaluations = async (startUrl?: string): Promise<any[]> => {
+    let url = startUrl || `${API_ENDPOINT}/standard-evaluations/?limit=1000`;
+    const aggregated: any[] = [];
+    while (url) {
+      const response = await fetch(url, {
         method: 'GET',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
       });
-      
-      if (response.ok) {
-        const result = await response.json();
-        const predictions = result.predictions || result.results || [];
-        setChartData(predictions);
-      } else {
-        // Use fallback data if API fails
-        setChartData([]);
-      }
+      if (!response.ok) break;
+      const result = await response.json();
+      const page = result.predictions || result.results || [];
+      aggregated.push(...page);
+      url = result.next || null;
+    }
+    return aggregated;
+  };
+
+  const fetchChartData = async () => {
+    try {
+      setChartLoading(true);
+      const predictions = await fetchAllStandardEvaluations();
+      setChartData(predictions);
     } catch (error) {
       console.error("Failed to fetch chart data:", error);
       setChartData([]);
@@ -133,13 +142,13 @@ export default function LandingPage() {
 
   // Regional performance aggregation
   const regionStats = processedChartData.reduce((acc: any, item: any) => {
-    const region = item.region;
+    const region = item.region || 'Unknown';
     if (!acc[region]) {
       acc[region] = { households: 0, totalIncome: 0, achieved: 0 };
     }
     acc[region].households++;
     acc[region].totalIncome += item.predicted_income || 0;
-    if (item.prediction === 1) acc[region].achieved++;
+    if (isAchieved(item.prediction)) acc[region].achieved++;
     return acc;
   }, {});
 
@@ -173,28 +182,13 @@ export default function LandingPage() {
   const fetchInsights = async () => {
     try {
       setLoading(true);
-      // Fetch real data from the API
-      const response = await fetch(`${API_ENDPOINT}/standard-evaluations/?limit=1000`, {
-        method: 'GET',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error(`API responded with status: ${response.status}`);
-      }
-      
-      const result = await response.json();
-      const predictions = result.predictions || result.results || [];
-      
+      const predictions = await fetchAllStandardEvaluations();
       if (predictions.length > 0) {
         const regions = new Set(predictions.map((p: any) => p.region)).size;
         const districts = new Set(predictions.map((p: any) => p.district)).size;
         const households = predictions.length;
         const avgIncome = predictions.reduce((sum: number, p: any) => sum + (p.predicted_income || 0), 0) / predictions.length;
-        const riskAlerts = predictions.filter((p: any) => p.prediction === 0).length;
+        const riskAlerts = predictions.filter((p: any) => !isAchieved(p.prediction)).length;
         const successRate = ((households - riskAlerts) / households * 100);
         const clusters = new Set(predictions.map((p: any) => p.cluster)).size;
         setStats({
@@ -211,7 +205,6 @@ export default function LandingPage() {
       }
     } catch (error) {
       console.error("Failed to fetch insights:", error);
-      // Keep stats at zero/empty state when API fails
       setStats({
         totalHouseholds: 0,
         totalRegions: 0,
