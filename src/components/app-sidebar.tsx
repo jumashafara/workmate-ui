@@ -11,6 +11,7 @@ import {
   Repeat,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { getUserData } from "@/utils/cookie";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Button } from "@/components/ui/button";
@@ -176,29 +177,31 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <SidebarMenuButton
-          size="lg"
-          className="group data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-        >
-          <div className=" text-sidebar-primary-foreground flex aspect-square size-12 items-center justify-center rounded-lg transition-all group-data-[state=collapsed]:size-8">
-            <Image
-              src="/RTV_Logo.png"
-              alt="RTV Logo"
-              className="object-contain"
-              width={64}
-              height={64}
-            />
-          </div>
-          <div className="grid flex-1 text-left text-sm leading-tight">
-            <div className="flex items-center gap-2">
-              <span className="truncate font-medium">Workmate</span>
-              <span className="px-1.5 py-0.5 text-[10px] font-medium bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400 rounded-sm">
-                BETA
-              </span>
+        <Link href="/">
+          <SidebarMenuButton
+            size="lg"
+            className="group data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer"
+          >
+            <div className=" text-sidebar-primary-foreground flex aspect-square size-12 items-center justify-center rounded-lg transition-all group-data-[state=collapsed]:size-8">
+              <Image
+                src="/RTV_Logo.png"
+                alt="RTV Logo"
+                className="object-contain"
+                width={64}
+                height={64}
+              />
             </div>
-            <span className="truncate text-xs">VENN</span>
-          </div>
-        </SidebarMenuButton>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <div className="flex items-center gap-2">
+                <span className="truncate font-medium">Workmate</span>
+                <span className="px-1.5 py-0.5 text-[10px] font-medium bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400 rounded-sm">
+                  BETA
+                </span>
+              </div>
+              <span className="truncate text-xs">VENN</span>
+            </div>
+          </SidebarMenuButton>
+        </Link>
       </SidebarHeader>
       <SidebarContent>
         <NavMain groups={navigationData.navMain} />
