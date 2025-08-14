@@ -259,7 +259,7 @@ export default function SignInPage() {
         )}
       </Button>
 
-      <p className="text-center text-sm text-gray-600">
+      {/* <p className="text-center text-sm text-gray-600">
         Don&apos;t have an account?{" "}
         <Link
           href="/sign-up"
@@ -267,7 +267,7 @@ export default function SignInPage() {
         >
           Sign up
         </Link>
-      </p>
+      </p> */}
     </div>
   );
 }

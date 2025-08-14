@@ -53,10 +53,10 @@ const THEME_COLORS = {
   },
 };
 import { getUserData } from "@/utils/cookie";
-import logToTrubrics from "@/utils/Trubrics";
+import logToTrubrics from "@/utils/trubrics";
 // import logToDATAIDEA from "@/utils/Dataidea"; // Temporarily disabled due to fetch errors
-import ChatHistoryAPI, { ChatConversation } from "@/utils/ChatHistory";
-import ChatFeedbackAPI from "@/utils/ChatFeedback";
+import ChatHistoryAPI, { ChatConversation } from "@/utils/chat-history";
+import ChatFeedbackAPI from "@/utils/chat-feedback";
 import { toast } from "sonner";
 
 interface Message {
@@ -1028,7 +1028,7 @@ const ChatPage = () => {
 
           <CardContent className="flex-1 flex flex-col p-0 min-h-0 overflow-hidden">
             <ScrollArea className="flex-1 overflow-hidden" style={{ minHeight: "400px" }}>
-              <div className="max-w-5xl mx-auto w-full overflow-hidden">
+              <div className="max-w-6xl lg:max-w-7xl mx-auto w-full overflow-hidden">
                 {messages.length === 0 && !hasStartedConversation ? (
                   <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] text-center px-3 sm:px-6">
                     <div className="max-w-md space-y-4 sm:space-y-6 mb-8 sm:mb-20 w-full">
@@ -1271,7 +1271,7 @@ const ChatPage = () => {
             </ScrollArea>
 
             <div className="border-t border-slate-200 bg-white p-2 sm:p-4">
-              <div className="flex space-x-2 sm:space-x-3 max-w-5xl mx-auto">
+              <div className="flex space-x-2 sm:space-x-3 max-w-6xl lg:max-w-7xl mx-auto">
                 <Input
                   ref={inputRef}
                   value={input}
