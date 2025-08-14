@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Bot, Brain, TrendingUp, Users, Shield, Zap, CheckCircle, Clock, MessageSquare, Activity, BarChart3, MapPin, AlertCircle, Target, Group } from "lucide-react";
+import { ArrowRight, Bot, Brain, TrendingUp, Users, Shield, Zap, CheckCircle, Clock, MessageSquare, Activity, BarChart3, MapPin, Target, Group } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { API_ENDPOINT } from "@/utils/endpoints";
 import dynamic from 'next/dynamic';
@@ -147,7 +147,7 @@ export default function LandingPage() {
   
   // Hero title cycling insights
   const heroInsights = [
-    "Transforming Insights into Impact for Last-Mile Communities",
+    "Transforming Insights into Impact  for Last-Mile Communities",
     `Monitoring ${displayStats.totalHouseholds.toLocaleString()} Households Across ${displayStats.totalRegions} Regions`,
     `${displayStats.successRate.toFixed(1)}% Average Achievement Rate`,
     `AI-Powered Analytics for Sustainable Development Goals`,
