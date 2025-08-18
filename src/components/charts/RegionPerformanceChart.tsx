@@ -231,7 +231,7 @@ const RegionPerformanceChart: React.FC<RegionPerformanceChartProps> = ({
   return (
     <Card className="mb-3">
       <CardHeader>
-        <CardTitle>Regional Performance Analysis</CardTitle>
+        <CardTitle>Predicted Regional Performance Analysis</CardTitle>
         <CardDescription>
           Compare achievement rates across different regions
         </CardDescription>

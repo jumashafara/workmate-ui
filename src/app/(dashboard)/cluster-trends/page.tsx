@@ -605,7 +605,7 @@ export default function ClusterTrendsPage() {
         {/* Line Chart - Income Trends */}
         <Card>
           <CardHeader>
-            <CardTitle>Average Income + Production Trends by Cluster</CardTitle>
+            <CardTitle>Average Income + Production Trends by Cluster (Predicted)</CardTitle>
             <CardDescription>
               Solid lines show actual data, dotted lines show predictions.
               Orange dashed line shows overall trend across all selected
@@ -649,7 +649,7 @@ export default function ClusterTrendsPage() {
         {/* Scatter Plot */}
         <Card>
           <CardHeader>
-            <CardTitle>Income + Production vs Achievement Rate</CardTitle>
+            <CardTitle>Income + Production vs Achievement Rate (Predicted)</CardTitle>
             <CardDescription>
               Bubble size represents number of households. Color represents
               evaluation month.

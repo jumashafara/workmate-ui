@@ -130,7 +130,7 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({ data }) => {
               {overallAchievedPercentage.toFixed(1)}%
             </div>
             <div className="text-sm text-blue-700 dark:text-blue-300">
-              Achieved Goal
+              Likely to Achieve Goal
             </div>
           </div>
           <div className="text-center">
@@ -138,7 +138,7 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({ data }) => {
               {formatCurrency(overallAverageIncome)}
             </div>
             <div className="text-sm text-blue-700 dark:text-blue-300">
-              Avg. Income
+              Avg. Predicted Income
             </div>
           </div>
           <div className="text-center text-xs text-gray-500 pt-2">

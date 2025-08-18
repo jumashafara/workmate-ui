@@ -577,7 +577,7 @@ export default function AreaManagerTrendsPage() {
               </div>
               <div>
                 <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Average Income + Production Trends by Cluster
+                  Predicted Average Income + Production Trends by Cluster
                 </CardTitle>
                 <CardDescription className="text-gray-600 dark:text-gray-400 mt-1">
                   Solid lines show actual data, dotted lines show predictions.
@@ -629,7 +629,7 @@ export default function AreaManagerTrendsPage() {
               </div>
               <div>
                 <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Income + Production vs Achievement Rate
+                  Income + Production vs Achievement Rate (Predicted)
                 </CardTitle>
                 <CardDescription className="text-gray-600 dark:text-gray-400 mt-1">
                   Bubble size represents number of households. Color represents

@@ -102,7 +102,7 @@ const FeatureImportanceChart: React.FC<FeatureImportanceChartProps> = ({
       name,
       importance: importances[index] || 0,
     }))
-    .sort((a, b) => b.importance - a.importance);
+    .sort((a, b) => a.importance - b.importance);
 
   const sortedFeatureNames = sortedData.map((item) => item.name);
   const sortedImportances = sortedData.map((item) => item.importance);

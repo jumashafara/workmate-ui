@@ -648,7 +648,7 @@ export default function LandingPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg">
                       <MapPin className="h-5 w-5 text-teal-600" />
-                      Regional Performance Analysis
+                      Predicted Regional Performance Analysis
                     </CardTitle>
                     <CardDescription>
                       Live data showing household distribution and success rates across regions
