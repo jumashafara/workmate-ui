@@ -348,6 +348,28 @@ export default function IndividualPredictionPage() {
             <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Location & Context</h4>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cohort *</Label>
+              <MultiSelect
+                options={filterOptions.cohorts}
+                selected={formData.cohort ? [formData.cohort] : []}
+                onChange={(value) => updateLocationField("cohort", value.length > 0 ? [value[0]] : [])}
+                placeholder="Select cohort"
+                emptyText="No cohorts found"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cycle *</Label>
+              <MultiSelect
+                options={filterOptions.cycles}
+                selected={formData.cycle ? [formData.cycle] : []}
+                onChange={(value) => updateLocationField("cycle", value.length > 0 ? [value[0]] : [])}
+                placeholder="Select cycle"
+                emptyText="No cycles found"
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Region *</Label>
               <div className="text-xs text-gray-500 mb-1">Options: {filterOptions.regions.length}</div>
               <MultiSelect
@@ -374,17 +396,6 @@ export default function IndividualPredictionPage() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Village *</Label>
-              <MultiSelect
-                options={filterOptions.villages}
-                selected={formData.village ? [formData.village] : []}
-                onChange={(value) => updateLocationField("village", value.length > 0 ? [value[0]] : [])}
-                placeholder="Select village"
-                emptyText="No villages found"
-              />
-            </div>
-
-            <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cluster *</Label>
               <MultiSelect
                 options={filterOptions.clusters}
@@ -396,24 +407,13 @@ export default function IndividualPredictionPage() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cohort *</Label>
+              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Village *</Label>
               <MultiSelect
-                options={filterOptions.cohorts}
-                selected={formData.cohort ? [formData.cohort] : []}
-                onChange={(value) => updateLocationField("cohort", value.length > 0 ? [value[0]] : [])}
-                placeholder="Select cohort"
-                emptyText="No cohorts found"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cycle *</Label>
-              <MultiSelect
-                options={filterOptions.cycles}
-                selected={formData.cycle ? [formData.cycle] : []}
-                onChange={(value) => updateLocationField("cycle", value.length > 0 ? [value[0]] : [])}
-                placeholder="Select cycle"
-                emptyText="No cycles found"
+                options={filterOptions.villages}
+                selected={formData.village ? [formData.village] : []}
+                onChange={(value) => updateLocationField("village", value.length > 0 ? [value[0]] : [])}
+                placeholder="Select village"
+                emptyText="No villages found"
               />
             </div>
 
