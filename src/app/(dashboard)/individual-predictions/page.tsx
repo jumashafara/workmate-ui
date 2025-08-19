@@ -139,7 +139,7 @@ export default function IndividualPredictionPage() {
     farm_implements_owned: [1],
     tot_hhmembers: [5],
     Distance_travelled_one_way_OPD_treatment: [1],
-    Average_Water_Consumed_Per_Day: [20],
+    Average_Water_Consumed_Per_Day: [10],
     hh_water_collection_Minutes: [30],
     composts_num: [0],
     education_level_encoded: [0],
@@ -166,7 +166,16 @@ export default function IndividualPredictionPage() {
     // Fetch filter options from backend
   const fetchFilterOptions = async () => {
     try {
-      const response = await fetch(`${API_ENDPOINT}/filter-options/`);
+      // Build query parameters for cascading filters
+      const filterParams = new URLSearchParams();
+      if (formData.cohort) filterParams.append("cohort", formData.cohort);
+      if (formData.cycle) filterParams.append("cycle", formData.cycle);
+      if (formData.region) filterParams.append("region", formData.region);
+      if (formData.district) filterParams.append("district", formData.district);
+      if (formData.cluster) filterParams.append("cluster", formData.cluster);
+      if (formData.evaluation_month) filterParams.append("evaluation_month", formData.evaluation_month.toString());
+
+      const response = await fetch(`${API_ENDPOINT}/filter-options/?${filterParams.toString()}`);
       if (response.ok) {
         const result = await response.json();
         console.log("Filter options result:", result);
@@ -177,7 +186,7 @@ export default function IndividualPredictionPage() {
           clusters: result.clusters?.map((c: string) => ({ value: c, label: c })) || [],
           cohorts: result.cohorts?.map((c: string) => ({ value: c, label: c })) || [],
           cycles: result.cycles?.map((c: string) => ({ value: c, label: c })) || [],
-          months: [
+          months: result.evaluation_months?.map((em: number) => ({ value: em.toString(), label: `Month ${em}` })) || [
             { value: "6", label: "Month 6" },
             { value: "9", label: "Month 9" },
             { value: "12", label: "Month 12" },
@@ -190,9 +199,21 @@ export default function IndividualPredictionPage() {
     }
   };
 
+  // Get filtered options based on selected values
+  const getFilteredOptions = () => {
+    return filterOptions;
+  };
+
+  const filteredOptions = getFilteredOptions();
+
   useEffect(() => {
     fetchFilterOptions();
   }, []);
+
+  // Refetch filter options when form data changes
+  useEffect(() => {
+    fetchFilterOptions();
+  }, [formData.cohort, formData.cycle, formData.region, formData.district, formData.cluster, formData.evaluation_month]);
 
   const validateForm = () => {
     if (!formData.district || formData.district === "") {
@@ -253,10 +274,39 @@ export default function IndividualPredictionPage() {
 
   const updateLocationField = (field: keyof Features, value: string[]) => {
     console.log(`Updating ${field}:`, value);
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value.length > 0 ? value[0] : "",
-    }));
+    const newValue = value.length > 0 ? value[0] : "";
+    
+    setFormData((prev) => {
+      const updated = {
+        ...prev,
+        [field]: newValue,
+      };
+
+      // Clear dependent fields when parent field changes
+      if (field === "cohort") {
+        updated.cycle = "";
+        updated.region = "";
+        updated.district = "";
+        updated.cluster = "";
+        updated.village = "";
+      } else if (field === "cycle") {
+        updated.region = "";
+        updated.district = "";
+        updated.cluster = "";
+        updated.village = "";
+      } else if (field === "region") {
+        updated.district = "";
+        updated.cluster = "";
+        updated.village = "";
+      } else if (field === "district") {
+        updated.cluster = "";
+        updated.village = "";
+      } else if (field === "cluster") {
+        updated.village = "";
+      }
+
+      return updated;
+    });
   };
 
   const updateNumericArray = (
@@ -350,7 +400,7 @@ export default function IndividualPredictionPage() {
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cohort *</Label>
               <MultiSelect
-                options={filterOptions.cohorts}
+                options={filteredOptions.cohorts}
                 selected={formData.cohort ? [formData.cohort] : []}
                 onChange={(value) => updateLocationField("cohort", value.length > 0 ? [value[0]] : [])}
                 placeholder="Select cohort"
@@ -361,19 +411,20 @@ export default function IndividualPredictionPage() {
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cycle *</Label>
               <MultiSelect
-                options={filterOptions.cycles}
+                options={filteredOptions.cycles}
                 selected={formData.cycle ? [formData.cycle] : []}
                 onChange={(value) => updateLocationField("cycle", value.length > 0 ? [value[0]] : [])}
                 placeholder="Select cycle"
                 emptyText="No cycles found"
+                disabled={!formData.cohort}
               />
             </div>
 
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Region *</Label>
-              <div className="text-xs text-gray-500 mb-1">Options: {filterOptions.regions.length}</div>
+              <div className="text-xs text-gray-500 mb-1">Options: {filteredOptions.regions.length}</div>
               <MultiSelect
-                options={filterOptions.regions.length > 0 ? filterOptions.regions : [
+                options={filteredOptions.regions.length > 0 ? filteredOptions.regions : [
                   { value: "test1", label: "Test Region 1" },
                   { value: "test2", label: "Test Region 2" }
                 ]}
@@ -381,39 +432,43 @@ export default function IndividualPredictionPage() {
                 onChange={(value) => updateLocationField("region", value.length > 0 ? [value[0]] : [])}
                 placeholder="Select region"
                 emptyText="No regions found"
+                disabled={!formData.cohort || !formData.cycle}
               />
             </div>
 
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">District *</Label>
               <MultiSelect
-                options={filterOptions.districts}
+                options={filteredOptions.districts}
                 selected={formData.district ? [formData.district] : []}
                 onChange={(value) => updateLocationField("district", value.length > 0 ? [value[0]] : [])}
                 placeholder="Select district"
                 emptyText="No districts found"
+                disabled={!formData.region}
               />
             </div>
 
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cluster *</Label>
               <MultiSelect
-                options={filterOptions.clusters}
+                options={filteredOptions.clusters}
                 selected={formData.cluster ? [formData.cluster] : []}
                 onChange={(value) => updateLocationField("cluster", value.length > 0 ? [value[0]] : [])}
                 placeholder="Select cluster"
                 emptyText="No clusters found"
+                disabled={!formData.district}
               />
             </div>
 
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Village *</Label>
               <MultiSelect
-                options={filterOptions.villages}
+                options={filteredOptions.villages}
                 selected={formData.village ? [formData.village] : []}
                 onChange={(value) => updateLocationField("village", value.length > 0 ? [value[0]] : [])}
                 placeholder="Select village"
                 emptyText="No villages found"
+                disabled={!formData.cluster}
               />
             </div>
 
@@ -547,7 +602,7 @@ export default function IndividualPredictionPage() {
 
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Average Water Consumed Per Day (L): <span className="text-orange-600 dark:text-orange-400 font-semibold">{formData.Average_Water_Consumed_Per_Day[0]}</span>
+                  Average Water Consumed Per Day (Jerry Cans): <span className="text-orange-600 dark:text-orange-400 font-semibold">{formData.Average_Water_Consumed_Per_Day[0]}</span>
                 </Label>
                 <Slider
                   value={[formData.Average_Water_Consumed_Per_Day[0]]}
@@ -557,9 +612,9 @@ export default function IndividualPredictionPage() {
                       value[0]
                     )
                   }
-                  max={100}
-                  min={5}
-                  step={5}
+                  max={20}
+                  min={1}
+                  step={1}
                   className="w-full"
                 />
               </div>

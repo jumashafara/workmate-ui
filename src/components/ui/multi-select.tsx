@@ -31,6 +31,7 @@ export interface MultiSelectProps {
   placeholder?: string;
   className?: string;
   emptyText?: string;
+  disabled?: boolean;
 }
 
 export function MultiSelect({
@@ -40,6 +41,7 @@ export function MultiSelect({
   placeholder = "Select options",
   className,
   emptyText = "No options found",
+  disabled = false,
 }: MultiSelectProps) {
   const [open, setOpen] = React.useState(false);
 
@@ -62,6 +64,7 @@ export function MultiSelect({
           variant="outline"
           role="combobox"
           aria-expanded={open}
+          disabled={disabled}
           className={cn("w-full min-h-10 h-auto justify-between", className)}
         >
           <div className="flex flex-wrap gap-1 py-1">
