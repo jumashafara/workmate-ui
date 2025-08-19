@@ -499,9 +499,10 @@ const ChatPage = () => {
           logToTrubrics(
             newMessage.text,
             receivedText,
-            fullname,
-            conversationId
+            fullname
           );
+
+          console.log("Trubrics logging successful");
         } catch (error) {
           console.warn("Trubrics logging failed (non-critical):", error);
         }

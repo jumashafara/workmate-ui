@@ -1,19 +1,25 @@
-// Fallback Trubrics implementation without external dependency
-const logToTrubrics = async (prompt: string, response: any, email: string, thread_id: string) => {
-    try {
-        console.log('Trubrics tracking (fallback):', {
-            event: "Generation",
-            user_id: email,
-            thread_id: thread_id,
-            prompt: prompt.substring(0, 100),
-            response: typeof response === 'string' ? response.substring(0, 100) : response,
+import { Trubrics } from "@trubrics/trubrics";
+
+type TrubricsConfig = {
+    apiKey: string;
+}
+
+const config: TrubricsConfig = {
+    apiKey: process.env.NEXT_PUBLIC_TRUBRICS_API_KEY || "",
+}
+
+const trubrics = new Trubrics(config);
+
+const logToTrubrics = async (prompt: string, response: any, email: string) => {
+    trubrics.track({
+        event: "Generation",
+        user_id: email,
+        properties: {
+            prompt: prompt,
+            response: response,
             source: "Workmate"
-        });
-    } catch (error) {
-        console.error("Error logging to Trubrics:", error);
-    }
+        }
+    });
 }
 
 export default logToTrubrics;
-
-
