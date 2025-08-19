@@ -48,7 +48,6 @@ export function MultiSelect({
   };
 
   const handleSelect = (value: string) => {
-    console.log("Selecting value:", value, "Current selected:", selected);
     if (selected.includes(value)) {
       onChange(selected.filter((item) => item !== value));
     } else {
@@ -114,7 +113,6 @@ export function MultiSelect({
           <CommandList>
             <CommandEmpty>{emptyText}</CommandEmpty>
             <CommandGroup>
-              {console.log("Rendering options:", options)}
               {options.map((option) => (
                 <CommandItem
                   key={option.value}
