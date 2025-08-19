@@ -48,6 +48,7 @@ export function MultiSelect({
   };
 
   const handleSelect = (value: string) => {
+    console.log("Selecting value:", value, "Current selected:", selected);
     if (selected.includes(value)) {
       onChange(selected.filter((item) => item !== value));
     } else {
@@ -107,12 +108,13 @@ export function MultiSelect({
           </span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0 popover-content-width-same-as-its-trigger z-[10000]">
+      <PopoverContent className="w-full p-0 z-[99999]">
         <Command>
           <CommandInput placeholder="Search options..." />
           <CommandList>
             <CommandEmpty>{emptyText}</CommandEmpty>
             <CommandGroup>
+              {console.log("Rendering options:", options)}
               {options.map((option) => (
                 <CommandItem
                   key={option.value}

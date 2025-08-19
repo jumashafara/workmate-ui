@@ -20,7 +20,7 @@ const getPrediction = async (features: Features): Promise<PredictionResult> => {
     
     // Ensure evaluation_month is a number, not an array
     if (typeof formattedFeatures.evaluation_month !== 'number') {
-        formattedFeatures.evaluation_month = Number(formattedFeatures.evaluation_month) || 1;
+        formattedFeatures.evaluation_month = Number(formattedFeatures.evaluation_month) || 6;
     }
     
     // Ensure standard_evaluation and checkin_evaluation are arrays of booleans

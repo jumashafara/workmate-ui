@@ -1,17 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
+import { MultiSelect } from "@/components/ui/multi-select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2, AlertCircle, User, BarChart3, Settings, TrendingUp } from "lucide-react";
 import dynamic from "next/dynamic";
 import { API_ENDPOINT } from "@/utils/endpoints";
+import getPrediction from "@/utils/predictions";
 
 // Dynamically import components
 const PredictionDisplay = dynamic(
@@ -30,7 +32,18 @@ const FeatureContributionsChart = dynamic(
   }
 );
 
+interface FilterOption {
+  value: string;
+  label: string;
+}
+
+interface FilterOption {
+  value: string;
+  label: string;
+}
+
 interface Features {
+  household_id: string;
   district: string;
   village: string;
   cluster: string;
@@ -70,46 +83,51 @@ interface Features {
   hhh_sex: boolean[];
 }
 
-// Mock prediction API function
-const getPrediction = async (data: Features) => {
-  // Simulate API call
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-
-  // Return mock prediction result
-  return {
-    prediction: Math.random() > 0.5 ? 1 : 0,
-    probability: Math.random(),
-    predicted_income_production: Math.random() * 1000 + 500,
-    contributions: {
-      "Land Size": Math.random() * 0.3,
-      "Household Members": Math.random() * 0.2,
-      "Water Access": Math.random() * 0.15,
-      "Farm Implements": Math.random() * 0.1,
-      "Education Level": Math.random() * 0.08,
-      "Distance to OPD": Math.random() * 0.07,
-      Other: Math.random() * 0.1,
-    },
-  };
-};
+interface PredictionResult {
+  prediction: number;
+  probability: number;
+  predicted_income_production: number;
+  contributions: Record<string, number>;
+}
 
 export default function IndividualPredictionPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [predictionMade, setPredictionMade] = useState<boolean>(false);
   const [validationError, setValidationError] = useState<string>("");
+  const [filterOptions, setFilterOptions] = useState<{
+    regions: FilterOption[];
+    districts: FilterOption[];
+    villages: FilterOption[];
+    clusters: FilterOption[];
+    cohorts: FilterOption[];
+    cycles: FilterOption[];
+    months: FilterOption[];
+  }>({
+    regions: [],
+    districts: [],
+    villages: [],
+    clusters: [],
+    cohorts: [],
+    cycles: [],
+    months: [],
+  });
 
   // Prediction results
-  const [prediction, setPrediction] = useState<number>(0.5);
-  const [probabilities, setProbabilities] = useState<Array<number>>([0.5, 0.5]);
-  const [predictedIncomeProduction, setPredictedIncomeProduction] =
-    useState<number>(0);
-  const [contributions, setContributions] = useState({});
+  const [prediction, setPrediction] = useState<PredictionResult>({
+    prediction: 0,
+    probability: 0,
+    predicted_income_production: 0,
+    contributions: {},
+  });
+  const [contributions, setContributions] = useState<Record<string, number>>({});
 
   // Form data
   const [formData, setFormData] = useState<Features>({
+    household_id: "",
     district: "",
     village: "",
     cluster: "",
-    evaluation_month: 1,
+    evaluation_month: 6,
     cohort: "",
     cycle: "",
     region: "",
@@ -145,28 +163,59 @@ export default function IndividualPredictionPage() {
     hhh_sex: [false],
   });
 
+    // Fetch filter options from backend
+  const fetchFilterOptions = async () => {
+    try {
+      const response = await fetch(`${API_ENDPOINT}/filter-options/`);
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Filter options result:", result);
+        setFilterOptions({
+          regions: result.regions?.map((r: string) => ({ value: r, label: r })) || [],
+          districts: result.districts?.map((d: string) => ({ value: d, label: d })) || [],
+          villages: result.villages?.map((v: string) => ({ value: v, label: v })) || [],
+          clusters: result.clusters?.map((c: string) => ({ value: c, label: c })) || [],
+          cohorts: result.cohorts?.map((c: string) => ({ value: c, label: c })) || [],
+          cycles: result.cycles?.map((c: string) => ({ value: c, label: c })) || [],
+          months: [
+            { value: "6", label: "Month 6" },
+            { value: "9", label: "Month 9" },
+            { value: "12", label: "Month 12" },
+            { value: "23", label: "Month 23" }
+          ],
+        });
+      }
+    } catch (error) {
+      console.error("Failed to fetch filter options:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchFilterOptions();
+  }, []);
+
   const validateForm = () => {
-    if (!formData.district.trim()) {
+    if (!formData.district || formData.district === "") {
       setValidationError("District is required");
       return false;
     }
-    if (!formData.village.trim()) {
+    if (!formData.village || formData.village === "") {
       setValidationError("Village is required");
       return false;
     }
-    if (!formData.cluster.trim()) {
+    if (!formData.cluster || formData.cluster === "") {
       setValidationError("Cluster is required");
       return false;
     }
-    if (!formData.cohort.trim()) {
+    if (!formData.cohort || formData.cohort === "") {
       setValidationError("Cohort is required");
       return false;
     }
-    if (!formData.cycle.trim()) {
+    if (!formData.cycle || formData.cycle === "") {
       setValidationError("Cycle is required");
       return false;
     }
-    if (!formData.region.trim()) {
+    if (!formData.region || formData.region === "") {
       setValidationError("Region is required");
       return false;
     }
@@ -184,13 +233,8 @@ export default function IndividualPredictionPage() {
     try {
       const response = await getPrediction(formData);
 
-      setPrediction(Number(response.prediction));
+      setPrediction(response as PredictionResult);
       setContributions(response.contributions);
-      setPredictedIncomeProduction(response.predicted_income_production);
-      setProbabilities([
-        Number(response.probability),
-        1 - Number(response.probability),
-      ]);
       setPredictionMade(true);
     } catch (error) {
       console.error("Prediction failed:", error);
@@ -200,10 +244,18 @@ export default function IndividualPredictionPage() {
     }
   };
 
-  const updateFormField = (field: keyof Features, value: any) => {
+  const updateFormField = (field: keyof Features, value: unknown) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
+    }));
+  };
+
+  const updateLocationField = (field: keyof Features, value: string[]) => {
+    console.log(`Updating ${field}:`, value);
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value.length > 0 ? value[0] : "",
     }));
   };
 
@@ -296,79 +348,93 @@ export default function IndividualPredictionPage() {
             <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Location & Context</h4>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="region" className="text-sm font-medium text-gray-700 dark:text-gray-300">Region *</Label>
-              <Input
-                id="region"
-                value={formData.region}
-                onChange={(e) => updateFormField("region", e.target.value)}
-                placeholder="Enter region"
+              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Region *</Label>
+              <div className="text-xs text-gray-500 mb-1">Options: {filterOptions.regions.length}</div>
+              <MultiSelect
+                options={filterOptions.regions.length > 0 ? filterOptions.regions : [
+                  { value: "test1", label: "Test Region 1" },
+                  { value: "test2", label: "Test Region 2" }
+                ]}
+                selected={formData.region ? [formData.region] : []}
+                onChange={(value) => updateLocationField("region", value.length > 0 ? [value[0]] : [])}
+                placeholder="Select region"
+                emptyText="No regions found"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="district" className="text-sm font-medium text-gray-700 dark:text-gray-300">District *</Label>
-              <Input
-                id="district"
-                value={formData.district}
-                onChange={(e) => updateFormField("district", e.target.value)}
-                placeholder="Enter district"
+              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">District *</Label>
+              <MultiSelect
+                options={filterOptions.districts}
+                selected={formData.district ? [formData.district] : []}
+                onChange={(value) => updateLocationField("district", value.length > 0 ? [value[0]] : [])}
+                placeholder="Select district"
+                emptyText="No districts found"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="village" className="text-sm font-medium text-gray-700 dark:text-gray-300">Village *</Label>
-              <Input
-                id="village"
-                value={formData.village}
-                onChange={(e) => updateFormField("village", e.target.value)}
-                placeholder="Enter village"
+              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Village *</Label>
+              <MultiSelect
+                options={filterOptions.villages}
+                selected={formData.village ? [formData.village] : []}
+                onChange={(value) => updateLocationField("village", value.length > 0 ? [value[0]] : [])}
+                placeholder="Select village"
+                emptyText="No villages found"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cluster" className="text-sm font-medium text-gray-700 dark:text-gray-300">Cluster *</Label>
-              <Input
-                id="cluster"
-                value={formData.cluster}
-                onChange={(e) => updateFormField("cluster", e.target.value)}
-                placeholder="Enter cluster"
+              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cluster *</Label>
+              <MultiSelect
+                options={filterOptions.clusters}
+                selected={formData.cluster ? [formData.cluster] : []}
+                onChange={(value) => updateLocationField("cluster", value.length > 0 ? [value[0]] : [])}
+                placeholder="Select cluster"
+                emptyText="No clusters found"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cohort" className="text-sm font-medium text-gray-700 dark:text-gray-300">Cohort *</Label>
-              <Input
-                id="cohort"
-                value={formData.cohort}
-                onChange={(e) => updateFormField("cohort", e.target.value)}
-                placeholder="Enter cohort"
+              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cohort *</Label>
+              <MultiSelect
+                options={filterOptions.cohorts}
+                selected={formData.cohort ? [formData.cohort] : []}
+                onChange={(value) => updateLocationField("cohort", value.length > 0 ? [value[0]] : [])}
+                placeholder="Select cohort"
+                emptyText="No cohorts found"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cycle" className="text-sm font-medium text-gray-700 dark:text-gray-300">Cycle *</Label>
-              <Input
-                id="cycle"
-                value={formData.cycle}
-                onChange={(e) => updateFormField("cycle", e.target.value)}
-                placeholder="Enter cycle"
+              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cycle *</Label>
+              <MultiSelect
+                options={filterOptions.cycles}
+                selected={formData.cycle ? [formData.cycle] : []}
+                onChange={(value) => updateLocationField("cycle", value.length > 0 ? [value[0]] : [])}
+                placeholder="Select cycle"
+                emptyText="No cycles found"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="evaluation_month" className="text-sm font-medium text-gray-700 dark:text-gray-300">Evaluation Month</Label>
-              <Input
-                id="evaluation_month"
-                type="number"
-                value={formData.evaluation_month}
-                onChange={(e) =>
-                  updateFormField(
-                    "evaluation_month",
-                    parseInt(e.target.value) || 1
-                  )
-                }
-                min="1"
-                max="24"
+              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Evaluation Month</Label>
+              <MultiSelect
+                options={filterOptions.months}
+                selected={[formData.evaluation_month.toString()]}
+                onChange={(value) => {
+                  console.log("Evaluation month onChange:", value);
+                  // For single selection, always use the most recent selection
+                  if (value.length > 0) {
+                    const selectedValue = value[value.length - 1];
+                    updateFormField(
+                      "evaluation_month",
+                      parseInt(selectedValue) || 6
+                    );
+                  }
+                }}
+                placeholder="Select month"
+                emptyText="No months found"
               />
             </div>
             </div>
@@ -759,9 +825,9 @@ export default function IndividualPredictionPage() {
       {predictionMade && (
         <div className="space-y-6">
           <PredictionDisplay
-            probabilities={probabilities}
-            prediction={prediction}
-            predicted_income_production={predictedIncomeProduction}
+            probabilities={[prediction.probability, 1 - prediction.probability]}
+            prediction={prediction.prediction}
+            predicted_income_production={prediction.predicted_income_production}
           />
 
           <FeatureContributionsChart contributions={contributions} />
@@ -778,7 +844,7 @@ export default function IndividualPredictionPage() {
               Ready to Generate Prediction
             </h3>
             <p className="text-orange-700 dark:text-orange-300">
-              Fill in the form above and click "Generate Prediction" to see AI-powered results and feature contributions
+              Fill in the form above and click &quot;Generate Prediction&quot; to see AI-powered results and feature contributions
             </p>
           </CardContent>
         </Card>
