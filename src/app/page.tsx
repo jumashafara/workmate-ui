@@ -450,7 +450,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Real-time Insights Section */}
+      {/* Real-time Insights Section
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -497,7 +497,7 @@ export default function LandingPage() {
                       <p className="text-2xl font-bold text-gray-900">
                         {displayStats.totalHouseholds.toLocaleString()}
                       </p>
-                      {/* <p className="text-xs text-blue-600">Being monitored</p> */}
+                      
                     </div>
                   </div>
                 </CardContent>
@@ -512,7 +512,7 @@ export default function LandingPage() {
                     <div>
                       <p className="text-sm font-medium text-gray-600">Active Regions</p>
                       <p className="text-2xl font-bold text-gray-900">{displayStats.totalRegions}</p>
-                      {/* <p className="text-xs text-green-600">{displayStats.totalDistricts} districts</p> */}
+                    
                     </div>
                   </div>
                 </CardContent>
@@ -529,7 +529,7 @@ export default function LandingPage() {
                       <p className="text-2xl font-bold text-gray-900">
                         {displayStats.totalDistricts}
                       </p>
-                      {/* <p className="text-xs text-purple-600">{displayStats.totalRegions} regions</p> */}  
+                     
                     </div>
                   </div>
                 </CardContent>
@@ -544,7 +544,7 @@ export default function LandingPage() {
                     <div>
                       <p className="text-sm font-medium text-gray-600">Clusters</p>
                       <p className="text-2xl font-bold text-gray-900">{displayStats.totalClusters.toLocaleString()}</p>
-                      {/* <p className="text-xs text-orange-600">clusters</p> */}
+                      
                     </div>
                   </div>
                 </CardContent>
@@ -575,7 +575,7 @@ export default function LandingPage() {
           ) : (
             <>
               <div className="grid lg:grid-cols-2 gap-8 mb-12">
-                {/* Achievement Rate Donut Chart */}
+                
                 <Card className="border-gray-200 shadow-lg hover:shadow-xl transition-shadow">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg">
@@ -643,7 +643,7 @@ export default function LandingPage() {
                   </CardContent>
                 </Card>
 
-                {/* Regional Performance Bar Chart */}
+                
                 <Card className="border-gray-200 shadow-lg hover:shadow-xl transition-shadow">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg">
@@ -718,7 +718,7 @@ export default function LandingPage() {
             </>
           )}
         </div>
-      </section>
+      </section> */}
 
       {/* Available Features */}
       <section className="py-16 bg-teal-50/30">
