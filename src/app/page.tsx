@@ -159,7 +159,7 @@ export default function LandingPage() {
     "Transforming Insights into Impact  for Last-Mile Communities",
     `Monitoring ${displayStats.totalHouseholds.toLocaleString()} Households Across ${displayStats.totalRegions} Regions`,
     `${displayStats.successRate.toFixed(1)}% Average Achievement Rate`,
-    `AI-Powered Analytics for Sustainable Development Goals`,
+    `AI-Powered Analytics`,
     `Real-time Risk Assessment for ${displayStats.totalHouseholds.toLocaleString()} Households`
   ];
 
